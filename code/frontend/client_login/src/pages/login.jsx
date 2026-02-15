@@ -21,8 +21,7 @@ const Login = () => {
     setEmail('');
     setPassword('');
   };
-
-  // 2. Create the function to send data to Spring Boot
+// 2. Create the function to send data to Spring Boot
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
@@ -36,7 +35,8 @@ const Login = () => {
           password
         });
 
-        if (response.data.success === "true") {
+        // FIX: Check for boolean true, not string "true"
+        if (response.data.success === true) { 
           alert("Registration Successful! Please login.");
           setState('Login'); // Flip card to login side
         } else {
@@ -45,17 +45,18 @@ const Login = () => {
 
       } else {
         // --- LOGIN API CALL ---
-        const response = await axios.post('http://localhost:8080/login', {
+        // FIX: Updated the URL to match our new AuthController
+        const response = await axios.post('http://localhost:8080/api/auth/login', {
           username,
           password
         });
 
-        // Our Spring Boot LoginController returns a raw String, so we check the text
-        if (typeof response.data === 'string' && response.data.includes("Login Successful")) {
-          alert(response.data); // "Login Successful! Welcome [Name]"
+        // FIX: Check the JSON 'success' property instead of a string
+        if (response.data.success === true) {
+          alert(response.data.message); // "Login Successful"
           navigate('/'); // Send user to the dashboard/home page!
         } else {
-          alert(response.data); // "Login Failed..."
+          alert(response.data.message); // "Incorrect Password" or "User not found"
         }
       }
     } catch (error) {
