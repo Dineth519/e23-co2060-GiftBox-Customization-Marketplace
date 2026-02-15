@@ -10,11 +10,9 @@ const Customers = () => {
 
   // --- Fetch Data from Backend ---
   useEffect(() => {
-    // Make sure your backend endpoint is correct
     fetch('http://localhost:8080/api/users') 
       .then(res => res.json())
       .then(data => {
-        // Filter only 'CUSTOMER' role
         const customerData = data.filter(user => user.role === 'CUSTOMER');
         setCustomers(customerData);
         setLoading(false);
@@ -38,6 +36,7 @@ const Customers = () => {
       <div style={styles.headerSection}>
         <div>
           <h1 style={styles.mainTitle}>Customers</h1>
+          <p style={styles.subTitle}>Manage and view all customer accounts</p>
         </div>
         
         {/* Modern Search Bar */}
@@ -53,23 +52,60 @@ const Customers = () => {
         </div>
       </div>
 
+      {/* Stats Summary Cards */}
+      <div style={styles.statsContainer}>
+        <div style={styles.statCard}>
+          <h3 style={styles.statNumber}>{customers.length}</h3>
+          <p style={styles.statLabel}>Total Customers</p>
+        </div>
+        <div style={styles.statCard}>
+          <h3 style={styles.statNumber}>{filteredCustomers.length}</h3>
+          <p style={styles.statLabel}>Filtered Results</p>
+        </div>
+        <div style={styles.statCard}>
+          <h3 style={styles.statNumber}>
+            {customers.filter(c => c.address).length}
+          </h3>
+          <p style={styles.statLabel}>With Address</p>
+        </div>
+      </div>
+
       {/* --- CONTENT SECTION --- */}
       {loading ? (
-        <p style={{textAlign: 'center', color: '#64748b'}}>Loading customers...</p>
+        <div style={styles.loadingContainer}>
+          <p style={styles.loadingText}>Loading customers...</p>
+        </div>
       ) : (
         <div style={styles.gridContainer}>
           {filteredCustomers.length === 0 ? (
-            <p style={{colSpan: 3, textAlign: 'center', color: '#94a3b8'}}>No customers found.</p>
+            <div style={styles.emptyState}>
+              <p style={styles.emptyText}>No customers found.</p>
+            </div>
           ) : (
             filteredCustomers.map((customer) => (
-              <div key={customer.user_id} style={styles.card}>
+              <div 
+                key={customer.user_id} 
+                style={styles.card}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 15px 35px -5px rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.05)';
+                }}
+              >
                 
                 {/* Top: Avatar & Menu */}
                 <div style={styles.cardHeader}>
                   <div style={styles.avatar}>
                     <FaUser size={20} color="#4f46e5" />
                   </div>
-                  <button style={styles.menuBtn}>
+                  <button 
+                    style={styles.menuBtn}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
                     <FaEllipsisV color="#94a3b8" />
                   </button>
                 </div>
@@ -84,7 +120,6 @@ const Customers = () => {
                     <span style={styles.infoText}>{customer.email}</span>
                   </div>
                   
-                  {/* Address (If available in your backend join) */}
                   <div style={styles.infoRow}>
                     <FaMapMarkerAlt size={12} color="#94a3b8" />
                     <span style={styles.infoText}>
@@ -95,7 +130,19 @@ const Customers = () => {
 
                 {/* Bottom: Action Button */}
                 <div style={styles.cardFooter}>
-                  <button style={styles.viewBtn}>View Profile</button>
+                  <button 
+                    style={styles.viewBtn}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
+                  >
+                    View Profile
+                  </button>
                 </div>
 
               </div>
@@ -110,32 +157,34 @@ const Customers = () => {
 // --- STYLES OBJECT (CSS-in-JS) ---
 const styles = {
   pageContainer: { 
-    padding: '40px', 
-    fontFamily: "'Inter', sans-serif", 
-    backgroundColor: '#f0f7ff', 
-    minHeight: '100vh' 
+    padding: '40px',
+    position: 'relative',
+    zIndex: 1,
+    marginLeft: '300px'
   },
   headerSection: { 
     display: 'flex', 
-    justifyContent: 'flex-start', 
-    gap: '20px',
-    alignItems: 'center', 
-    marginBottom: '40px' 
+    justifyContent: 'space-between', 
+    alignItems: 'flex-start', 
+    marginBottom: '30px',
+    flexWrap: 'wrap',
+    gap: '20px'
   },
   mainTitle: { 
-    fontSize: '32px', 
-    fontWeight: '800', 
-    color: '#1e293b', 
-    margin: 0 
+    fontSize: '36px', 
+    fontWeight: '700', 
+    color: '#010911', 
+    margin: '0 0 8px 0'
   },
   subTitle: { 
     fontSize: '14px', 
     color: '#64748b', 
-    marginTop: '5px' 
+    margin: 0
   },
   searchWrapper: { 
     position: 'relative', 
-    width: '30%' 
+    minWidth: '300px',
+    flex: '0 1 auto'
   },
   searchIcon: { 
     position: 'absolute', 
@@ -151,7 +200,34 @@ const styles = {
     border: '1px solid #e2e8f0', 
     outline: 'none', 
     fontSize: '14px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.02)' 
+    boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
+    backgroundColor: 'white'
+  },
+  
+  // Stats Summary
+  statsContainer: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '20px',
+    marginBottom: '30px'
+  },
+  statCard: {
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    padding: '20px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+    textAlign: 'center'
+  },
+  statNumber: {
+    fontSize: '32px',
+    fontWeight: '700',
+    color: '#4f46e5',
+    margin: '0 0 8px 0'
+  },
+  statLabel: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: 0
   },
   
   // Grid Layout for Cards
@@ -159,6 +235,27 @@ const styles = {
     display: 'grid', 
     gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
     gap: '25px' 
+  },
+  
+  // Loading & Empty States
+  loadingContainer: {
+    textAlign: 'center',
+    padding: '60px 20px'
+  },
+  loadingText: {
+    color: '#64748b',
+    fontSize: '16px'
+  },
+  emptyState: {
+    gridColumn: '1 / -1',
+    textAlign: 'center',
+    padding: '60px 20px',
+    backgroundColor: 'white',
+    borderRadius: '12px'
+  },
+  emptyText: {
+    color: '#94a3b8',
+    fontSize: '16px'
   },
   
   // Card Styles
@@ -170,8 +267,10 @@ const styles = {
     border: '1px solid #f1f5f9',
     display: 'flex',
     flexDirection: 'column',
-    transition: 'transform 0.2s',
-    cursor: 'default'
+    transition: 'all 0.3s ease',
+    cursor: 'pointer',
+    position: 'relative',
+    zIndex: 1
   },
   cardHeader: { 
     display: 'flex', 
@@ -191,7 +290,10 @@ const styles = {
   menuBtn: { 
     background: 'transparent', 
     border: 'none', 
-    cursor: 'pointer' 
+    cursor: 'pointer',
+    padding: '8px',
+    borderRadius: '8px',
+    transition: 'background 0.2s'
   },
   cardBody: { 
     marginBottom: '20px' 
@@ -200,11 +302,11 @@ const styles = {
     fontSize: '18px', 
     fontWeight: '700', 
     color: '#334155', 
-    margin: '0 0 5px 0' 
+    margin: '0 0 8px 0' 
   },
   roleBadge: { 
     display: 'inline-block', 
-    padding: '4px 10px', 
+    padding: '4px 12px', 
     borderRadius: '20px', 
     backgroundColor: '#f0fdf4', 
     color: '#16a34a', 
@@ -216,11 +318,12 @@ const styles = {
     display: 'flex', 
     alignItems: 'center', 
     gap: '10px', 
-    marginBottom: '8px' 
+    marginBottom: '10px' 
   },
   infoText: { 
     fontSize: '13px', 
-    color: '#64748b' 
+    color: '#64748b',
+    wordBreak: 'break-word'
   },
   cardFooter: { 
     marginTop: 'auto', 
@@ -237,7 +340,7 @@ const styles = {
     fontWeight: '600', 
     fontSize: '13px', 
     cursor: 'pointer',
-    transition: 'background 0.2s'
+    transition: 'all 0.2s ease'
   }
 };
 
