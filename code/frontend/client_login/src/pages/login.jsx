@@ -12,6 +12,7 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const toggleState = () => {
     setState(state === 'Sign Up' ? 'Login' : 'Sign Up');
@@ -20,6 +21,7 @@ const Login = () => {
     setUsername('');
     setEmail('');
     setPassword('');
+    setShowPassword(false);
   };
 // 2. Create the function to send data to Spring Boot
   const onSubmitHandler = async (e) => {
@@ -100,10 +102,17 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)} 
                   value={password} 
                   className='bg-transparent outline-none w-full text-white' 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   placeholder='Password' 
                   required
                 />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className='text-neutral-400 hover:text-amber-500 text-[10px] font-bold transition-colors'
+                >
+                  {showPassword ? "HIDE" : "SHOW"}
+                </button>
               </div>
               
               <p onClick={() => navigate('/email-verify')} className='text-sm text-amber-500 cursor-pointer hover:text-amber-300 mb-4 ml-2 w-fit transition-colors'>
