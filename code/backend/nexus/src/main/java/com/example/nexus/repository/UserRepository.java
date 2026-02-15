@@ -14,4 +14,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     
     // Used for Password Recovery and Registration checks
     Optional<User> findByEmail(String email);
+    Optional<User> findByEmailIgnoreCase(String email);
 }
