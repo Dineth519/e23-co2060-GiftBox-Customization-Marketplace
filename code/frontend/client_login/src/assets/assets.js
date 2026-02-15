@@ -7,7 +7,7 @@ import hand_wave from './hand_wave.png'
 import header_img from './header_img.png'
 import Open_Eye from './Open_Eye.png'
 import Close_Eye from './Close_Eye.png'
-
+import conner from './conner.png'
 export const assets = {
     arrow_icon,
     lock_icon,
@@ -18,4 +18,5 @@ export const assets = {
     header_img,
     Open_Eye,
     Close_Eye,
+    conner
 }
