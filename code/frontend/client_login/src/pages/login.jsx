@@ -96,24 +96,31 @@ const Login = () => {
                 />
               </div>
 
-              <div className='flex items-center gap-3 w-full px-5 py-3 rounded-full bg-neutral-800 mb-4 focus-within:ring-1 focus-within:ring-amber-500 transition-all'>
-                <img src={assets.lock_icon} className="w-5" alt="" />
-                <input 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  value={password} 
-                  className='bg-transparent outline-none w-full text-white' 
-                  type={showPassword ? "text" : "password"} 
-                  placeholder='Password' 
-                  required
+            <div className='flex items-center gap-3 w-full px-5 py-3 rounded-full bg-neutral-800 mb-4 focus-within:ring-1 focus-within:ring-amber-500 transition-all'>
+              <img src={assets.lock_icon} className="w-5" alt="" />
+  
+              <input 
+                onChange={(e) => setPassword(e.target.value)} 
+                value={password} 
+                className='bg-transparent outline-none w-full text-white' 
+                type={showPassword ? "text" : "password"} 
+                placeholder='Password' 
+                required
+              />
+
+              {/* ICON TOGGLE BUTTON */}
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className='outline-none'
+              >
+                <img 
+                  src={showPassword ? assets.Open_Eye : assets.Close_Eye} 
+                  className="w-5 opacity-60 hover:opacity-100 transition-opacity cursor-pointer invert" 
+                  alt="Toggle Visibility" 
                 />
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
-                  className='text-neutral-400 hover:text-amber-500 text-[10px] font-bold transition-colors'
-                >
-                  {showPassword ? "HIDE" : "SHOW"}
-                </button>
-              </div>
+              </button>
+            </div> 
               
               <p onClick={() => navigate('/email-verify')} className='text-sm text-amber-500 cursor-pointer hover:text-amber-300 mb-4 ml-2 w-fit transition-colors'>
                 Forgot Password?
