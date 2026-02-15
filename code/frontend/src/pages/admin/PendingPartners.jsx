@@ -7,11 +7,9 @@ const PendingPartners = () => {
   const [pendingSellers, setPendingSellers] = useState([]);
 
   useEffect(() => {
-    // 1. Fetch all partners
     fetch('http://localhost:8080/api/partners')
       .then(res => res.json())
       .then(data => {
-        // 2. Filter for PENDING status
         const pending = data
           .filter(p => p.status === 'PENDING')
           .map(p => ({
@@ -27,15 +25,12 @@ const PendingPartners = () => {
       .catch(err => console.error("Error fetching data:", err));
   }, []);
 
-  // 3. Handle Status Update (Approve/Reject)
   const handleStatusUpdate = (id, newStatus) => {
-    // Send PUT request to Backend
     fetch(`http://localhost:8080/api/partners/${id}/status?status=${newStatus}`, {
       method: 'PUT',
     })
     .then(response => {
       if (response.ok) {
-        // Remove from UI if successful
         setPendingSellers(pendingSellers.filter(seller => seller.id !== id));
         console.log("Database updated successfully!");
       } else {
@@ -55,22 +50,33 @@ const PendingPartners = () => {
           <FaArrowLeft /> Back to Partners
         </button>
         <h1 style={styles.mainTitle}>Pending Requests</h1>
+        <p style={styles.subTitle}>Review and approve new partner applications</p>
+      </div>
+
+      {/* Stats Summary */}
+      <div style={styles.statsContainer}>
+        <div style={styles.statCard}>
+          <h3 style={styles.statNumber}>{pendingSellers.length}</h3>
+          <p style={styles.statLabel}>Pending Requests</p>
+        </div>
       </div>
 
       <div style={styles.cardListWrapper}>
         {pendingSellers.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#666' }}>No pending requests found.</p>
+          <div style={styles.emptyState}>
+            <p style={styles.emptyText}>No pending requests found.</p>
+          </div>
         ) : (
           pendingSellers.map((seller) => (
             <div key={seller.id} style={styles.cardWrapper}>
               <div style={styles.cardContent}>
-                <div>
+                <div style={{ flex: 1 }}>
                   <h2 style={styles.shopName}>{seller.shop}</h2>
                   <div style={styles.metaGrid}>
-                    <span><FaUser /> {seller.name}</span>
-                    <span><FaPhone /> {seller.phone}</span>
-                    <span><FaMapMarkerAlt /> {seller.address}</span>
-                    <span style={{ fontWeight: 'bold' }}>BR No: {seller.br_no}</span>
+                    <span style={styles.metaItem}><FaUser /> {seller.name}</span>
+                    <span style={styles.metaItem}><FaPhone /> {seller.phone}</span>
+                    <span style={styles.metaItem}><FaMapMarkerAlt /> {seller.address}</span>
+                    <span style={{ ...styles.metaItem, fontWeight: 'bold' }}>BR No: {seller.br_no}</span>
                   </div>
                 </div>
                 
@@ -78,6 +84,8 @@ const PendingPartners = () => {
                   <button 
                     style={styles.approveBtn} 
                     onClick={() => handleStatusUpdate(seller.id, 'ACTIVE')}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
                   >
                     <FaCheck /> Approve
                   </button>
@@ -85,6 +93,8 @@ const PendingPartners = () => {
                   <button 
                     style={styles.rejectBtn} 
                     onClick={() => handleStatusUpdate(seller.id, 'REJECTED')}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
                   >
                     <FaTimes /> Reject
                   </button>
@@ -100,18 +110,151 @@ const PendingPartners = () => {
 
 // Styles
 const styles = {
-  pageContainer: { padding: '60px 40px', backgroundColor: '#f0f7ff', minHeight: '100vh', fontFamily: "'Inter', sans-serif" },
-  headerSection: { marginBottom: '30px' },
-  backBtn: { display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: '#4f46e5', fontWeight: 'bold', cursor: 'pointer', marginBottom: '10px' },
-  mainTitle: { fontSize: '32px', fontWeight: '800', color: '#1e293b' },
-  cardListWrapper: { display: 'flex', flexDirection: 'column', gap: '20px' },
-  cardWrapper: { background: '#fff', borderRadius: '16px', padding: '25px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' },
-  cardContent: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  shopName: { margin: '0 0 10px 0', fontSize: '20px', fontWeight: 'bold' },
-  metaGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', color: '#64748b', fontSize: '14px' },
-  actionButtons: { display: 'flex', gap: '10px' },
-  approveBtn: { display: 'flex', gap: '5px', alignItems: 'center', padding: '10px 20px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' },
-  rejectBtn: { display: 'flex', gap: '5px', alignItems: 'center', padding: '10px 20px', backgroundColor: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }
+  pageContainer: { 
+    padding: '40px',
+    position: 'relative',
+    zIndex: 1,
+    marginLeft: '300px'
+  },
+  headerSection: { 
+    marginBottom: '30px' 
+  },
+  backBtn: { 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '8px', 
+    background: 'none', 
+    border: 'none', 
+    color: '#4f46e5', 
+    fontWeight: 'bold', 
+    cursor: 'pointer', 
+    marginBottom: '10px',
+    fontSize: '14px',
+    transition: 'color 0.2s'
+  },
+  mainTitle: { 
+    fontSize: '36px', 
+    fontWeight: '700', 
+    color: '#010911',
+    margin: '0 0 8px 0'
+  },
+  subTitle: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: 0,
+    marginBottom: '20px'
+  },
+  
+  // Stats Summary
+  statsContainer: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '20px',
+    marginBottom: '30px'
+  },
+  statCard: {
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    padding: '20px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+    textAlign: 'center'
+  },
+  statNumber: {
+    fontSize: '32px',
+    fontWeight: '700',
+    color: '#ef4444',
+    margin: '0 0 8px 0'
+  },
+  statLabel: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: 0
+  },
+  
+  cardListWrapper: { 
+    display: 'flex', 
+    flexDirection: 'column', 
+    gap: '20px' 
+  },
+  emptyState: {
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    padding: '60px 20px',
+    textAlign: 'center'
+  },
+  emptyText: {
+    color: '#94a3b8',
+    fontSize: '16px',
+    margin: 0
+  },
+  cardWrapper: { 
+    background: '#fff', 
+    borderRadius: '16px', 
+    padding: '25px', 
+    boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+    border: '1px solid #f1f5f9',
+    position: 'relative',
+    zIndex: 1,
+    transition: 'all 0.2s'
+  },
+  cardContent: { 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    gap: '20px',
+    flexWrap: 'wrap'
+  },
+  shopName: { 
+    margin: '0 0 10px 0', 
+    fontSize: '24px', 
+    fontWeight: '700',
+    color: '#111827'
+  },
+  metaGrid: { 
+    display: 'grid', 
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+    gap: '15px', 
+    color: '#64748b', 
+    fontSize: '14px' 
+  },
+  metaItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
+  },
+  actionButtons: { 
+    display: 'flex', 
+    gap: '10px',
+    flexWrap: 'wrap'
+  },
+  approveBtn: { 
+    display: 'flex', 
+    gap: '8px', 
+    alignItems: 'center', 
+    padding: '12px 20px', 
+    backgroundColor: '#10b981', 
+    color: '#fff', 
+    border: 'none', 
+    borderRadius: '8px', 
+    cursor: 'pointer', 
+    fontWeight: '600',
+    transition: 'background 0.2s',
+    fontSize: '14px'
+  },
+  rejectBtn: { 
+    display: 'flex', 
+    gap: '8px', 
+    alignItems: 'center', 
+    padding: '12px 20px', 
+    backgroundColor: '#ef4444', 
+    color: '#fff', 
+    border: 'none', 
+    borderRadius: '8px', 
+    cursor: 'pointer', 
+    fontWeight: '600',
+    transition: 'background 0.2s',
+    fontSize: '14px'
+  }
 };
 
 export default PendingPartners;

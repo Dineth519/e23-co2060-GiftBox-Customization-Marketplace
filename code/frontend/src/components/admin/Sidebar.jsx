@@ -37,10 +37,13 @@ const Sidebar = () => {
       flexShrink: 0, 
       background: '#111827', // Dark slate background
       color: 'white', 
-      height: '100vh',     // Full viewport height
+      height: 'calc(100vh - 64px)',     // Full viewport height minus top bar height
       overflowY: 'auto',   // Scroll if content exceeds viewport height
       position: 'fixed',   // Fixes the sidebar to the left side of the screen
-      top: 0,
+      top: 64,
+      left: 0,        // Add this
+      margin: 0,      // Add this
+      padding: 0,     // Add this (for the container itself)
     }}>
       
       {/* Sidebar Branding/Header Section */}

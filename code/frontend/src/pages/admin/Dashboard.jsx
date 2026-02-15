@@ -3,12 +3,9 @@ import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
   return (
-    // Dashboard container with padding, font, background color, and minimum height to ensure it fills the viewport
+    // Dashboard container - NO background, just padding
     <div style={{ 
-      padding: '40px', 
-      fontFamily: "'Inter', sans-serif", 
-      backgroundColor: '#d2e2f5', 
-      minHeight: '100vh' 
+      padding: '40px'
     }}>
       
       {/* Title */}
@@ -16,17 +13,100 @@ const Dashboard = () => {
         fontSize: '36px', 
         fontWeight: '700', 
         color: '#010911', 
-        marginBottom: '32px' 
+        marginBottom: '32px', 
+        marginLeft: '300px'
       }}>
         Dashboard
       </h1>
 
-      {/* Grid container for the square cards with gap and responsive wrapping */}
+      {/* Card on top of AdminLayout background */}
       <div className={styles.squareCard}>
           <div className={styles.cardStats}>
               <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
           </div>
       </div>
+
+      {/* Card on top of AdminLayout background */}
+      <div className={styles.squareCard}>
+          <div className={styles.cardStats}>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+          </div>
+      </div>
+
+      {/* Card on top of AdminLayout background */}
+      <div className={styles.squareCard}>
+          <div className={styles.cardStats}>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+          </div>
+      </div>
+
+      {/* Card on top of AdminLayout background */}
+      <div className={styles.squareCard}>
+          <div className={styles.cardStats}>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+          </div>
+      </div>
+
+      {/* Card on top of AdminLayout background */}
+      <div className={styles.squareCard}>
+          <div className={styles.cardStats}>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+          </div>
+      </div>
+
+      {/* Card on top of AdminLayout background */}
+      <div className={styles.squareCard}>
+          <div className={styles.cardStats}>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+          </div>
+      </div>
+
+      {/* Card on top of AdminLayout background */}
+      <div className={styles.squareCard}>
+          <div className={styles.cardStats}>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+          </div>
+      </div>
+
+      {/* Card on top of AdminLayout background */}
+      <div className={styles.squareCard}>
+          <div className={styles.cardStats}>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+              <h2>Welcome back Mathew Anderson...!</h2>
+          </div>
+      </div>
+
 
     </div>
   );

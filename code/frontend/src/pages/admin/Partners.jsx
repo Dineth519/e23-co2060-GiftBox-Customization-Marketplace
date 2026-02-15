@@ -11,7 +11,7 @@ const Partners = () => {
   const [activeSellers, setActiveSellers] = useState([]); 
   const [pendingCount, setPendingCount] = useState(0);
 
-  // --- NEW: Fetch Data from Backend ---
+  // --- Fetch Data from Backend ---
   useEffect(() => {
     fetch('http://localhost:8080/api/partners')
       .then(res => res.json())
@@ -28,10 +28,10 @@ const Partners = () => {
             shop: p.shopName,
             name: p.fullName,
             address: p.shopAddress,
-            email: p.email || 'No Email', // Handle missing fields if necessary
+            email: p.email || 'No Email',
             phone: p.phoneNumber,
             br_no: p.brNo,
-            joined: new Date().toLocaleDateString() // Placeholder for date if backend doesn't send it
+            joined: new Date().toLocaleDateString()
           }));
         
         setActiveSellers(active);
@@ -48,7 +48,10 @@ const Partners = () => {
       
       {/* --- HEADER SECTION --- */}
       <div style={styles.headerSection}>
-        <h1 style={styles.mainTitle}>Partners</h1>
+        <div>
+          <h1 style={styles.mainTitle}>Partners</h1>
+          <p style={styles.subTitleText}>Manage your business partners and pending requests</p>
+        </div>
 
         <button onClick={() => navigate('/admin/partners/pending')} style={styles.pendingActionBtn}>
           {/* Dynamic Pending Count */}
@@ -63,15 +66,31 @@ const Partners = () => {
         </button>
       </div>
 
+      {/* Stats Summary */}
+      <div style={styles.statsContainer}>
+        <div style={styles.statCard}>
+          <h3 style={styles.statNumber}>{activeSellers.length}</h3>
+          <p style={styles.statLabel}>Active Partners</p>
+        </div>
+        <div style={styles.statCard}>
+          <h3 style={styles.statNumber}>{pendingCount}</h3>
+          <p style={styles.statLabel}>Pending Requests</p>
+        </div>
+        <div style={styles.statCard}>
+          <h3 style={styles.statNumber}>{activeSellers.length + pendingCount}</h3>
+          <p style={styles.statLabel}>Total Partners</p>
+        </div>
+      </div>
+
       <h3 style={styles.subTitle}>Active Partners</h3>
 
       {/* --- PARTNERS LIST SECTION --- */}
       <div style={styles.cardListWrapper}>
         
         {activeSellers.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '20px' }}>
-                No active partners found.
-            </p>
+            <div style={styles.emptyState}>
+              <p style={styles.emptyText}>No active partners found.</p>
+            </div>
         ) : (
             activeSellers.map((seller) => (
             <div key={seller.id} style={styles.getCardWrapperStyle(expandedId === seller.id)}>
@@ -126,36 +145,192 @@ const Partners = () => {
 
 // --- STYLES OBJECT ---
 const styles = {
-  pageContainer: { padding: '60px 40px', fontFamily: "'Inter', sans-serif", backgroundColor: '#f0f7ff', minHeight: '100vh' },
-  headerSection: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '15px', marginBottom: '40px' },
-  mainTitle: { fontSize: '36px', fontWeight: '800', color: '#000000', margin: 0 },
-  pendingActionBtn: { display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 24px', backgroundColor: '#1e293b', color: 'white', border: 'none', borderRadius: '16px', cursor: 'pointer', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' },
-  notificationBadge: { background: '#ef4444', color: 'white', width: '24px', height: '24px', borderRadius: '50%', fontSize: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  btnTextWrapper: { display: 'flex', flexDirection: 'column', textAlign: 'left', lineHeight: '1.1' },
-  btnLabel: { fontSize: '13px', fontWeight: '600' },
-  subTitle: { fontSize: '22px', fontWeight: '700', color: '#1e293b', marginBottom: '25px' },
-  cardListWrapper: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  pageContainer: { 
+    padding: '40px',
+    position: 'relative',
+    zIndex: 1,
+    marginLeft: '300px'
+  },
+  headerSection: { 
+    display: 'flex', 
+    justifyContent: 'space-between',
+    alignItems: 'flex-start', 
+    gap: '20px', 
+    marginBottom: '30px',
+    flexWrap: 'wrap'
+  },
+  mainTitle: { 
+    fontSize: '36px', 
+    fontWeight: '700', 
+    color: '#010911', 
+    margin: '0 0 8px 0' 
+  },
+  subTitleText: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: 0
+  },
+  pendingActionBtn: { 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '12px', 
+    padding: '12px 24px', 
+    backgroundColor: '#1e293b', 
+    color: 'white', 
+    border: 'none', 
+    borderRadius: '16px', 
+    cursor: 'pointer', 
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+    transition: 'transform 0.2s'
+  },
+  notificationBadge: { 
+    background: '#ef4444', 
+    color: 'white', 
+    width: '24px', 
+    height: '24px', 
+    borderRadius: '50%', 
+    fontSize: '12px', 
+    fontWeight: 'bold', 
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center' 
+  },
+  btnTextWrapper: { 
+    display: 'flex', 
+    flexDirection: 'column', 
+    textAlign: 'left', 
+    lineHeight: '1.1' 
+  },
+  btnLabel: { 
+    fontSize: '13px', 
+    fontWeight: '600' 
+  },
+  
+  // Stats Summary
+  statsContainer: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '20px',
+    marginBottom: '30px'
+  },
+  statCard: {
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    padding: '20px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+    textAlign: 'center'
+  },
+  statNumber: {
+    fontSize: '32px',
+    fontWeight: '700',
+    color: '#4f46e5',
+    margin: '0 0 8px 0'
+  },
+  statLabel: {
+    fontSize: '14px',
+    color: '#64748b',
+    margin: 0
+  },
+  
+  subTitle: { 
+    fontSize: '22px', 
+    fontWeight: '700', 
+    color: '#1e293b', 
+    marginBottom: '25px' 
+  },
+  cardListWrapper: { 
+    display: 'flex', 
+    flexDirection: 'column', 
+    gap: '20px' 
+  },
+  
+  emptyState: {
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    padding: '60px 20px',
+    textAlign: 'center'
+  },
+  emptyText: {
+    color: '#94a3b8',
+    fontSize: '16px',
+    margin: 0
+  },
   
   // Dynamic Style Function
   getCardWrapperStyle: (isOpen) => ({ 
     background: '#ffffff', 
     borderRadius: '24px', 
-    border: isOpen ? '2px solid #4f46e5' : '1px solid transparent', 
+    border: isOpen ? '2px solid #4f46e5' : '1px solid #f1f5f9', 
     boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)', 
     overflow: 'hidden', 
-    transition: '0.3s ease' 
+    transition: 'all 0.3s ease',
+    position: 'relative',
+    zIndex: 1
   }),
 
-  cardHeader: { padding: '30px', display: 'flex', alignItems: 'center', cursor: 'pointer' },
-  shopNameText: { fontSize: '26px', fontWeight: '800', color: '#111827' },
-  cardMeta: { display: 'flex', gap: '20px', marginTop: '10px', color: '#6b7280', fontSize: '15px' },
-  metaItem: { display: 'flex', alignItems: 'center', gap: '8px' },
-  detailsSection: { padding: '0 30px 30px 30px', borderTop: '1px solid #f3f4f6', backgroundColor: '#f9fafb' },
-  detailsGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginTop: '24px' },
-  infoBlock: { display: 'flex', flexDirection: 'column', gap: '6px' },
-  infoLabel: { fontSize: '11px', color: '#9ca3af', fontWeight: '800', textTransform: 'uppercase' },
-  infoValue: { fontSize: '15px', color: '#374151', display: 'flex', alignItems: 'center' },
-  manageBtn: { padding: '12px 24px', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '10px', fontWeight: '700', cursor: 'pointer' }
+  cardHeader: { 
+    padding: '30px', 
+    display: 'flex', 
+    alignItems: 'center', 
+    cursor: 'pointer',
+    transition: 'background 0.2s'
+  },
+  shopNameText: { 
+    fontSize: '26px', 
+    fontWeight: '800', 
+    color: '#111827' 
+  },
+  cardMeta: { 
+    display: 'flex', 
+    gap: '20px', 
+    marginTop: '10px', 
+    color: '#6b7280', 
+    fontSize: '15px',
+    flexWrap: 'wrap'
+  },
+  metaItem: { 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '8px' 
+  },
+  detailsSection: { 
+    padding: '0 30px 30px 30px', 
+    borderTop: '1px solid #f3f4f6', 
+    backgroundColor: '#f9fafb' 
+  },
+  detailsGrid: { 
+    display: 'grid', 
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+    gap: '24px', 
+    marginTop: '24px' 
+  },
+  infoBlock: { 
+    display: 'flex', 
+    flexDirection: 'column', 
+    gap: '6px' 
+  },
+  infoLabel: { 
+    fontSize: '11px', 
+    color: '#9ca3af', 
+    fontWeight: '800', 
+    textTransform: 'uppercase' 
+  },
+  infoValue: { 
+    fontSize: '15px', 
+    color: '#374151', 
+    display: 'flex', 
+    alignItems: 'center' 
+  },
+  manageBtn: { 
+    padding: '12px 24px', 
+    background: '#4f46e5', 
+    color: 'white', 
+    border: 'none', 
+    borderRadius: '10px', 
+    fontWeight: '700', 
+    cursor: 'pointer',
+    transition: 'background 0.2s'
+  }
 };
 
 export default Partners;
