@@ -78,7 +78,7 @@ public String sendResetOtp(String email) {
         System.err.println("Email Error: " + e.getMessage());
         return "Error sending email, but OTP was generated";
     }
-    }
+}
 
     // 4. Verify OTP
     public String verifyOtp(String email, String otp) {
@@ -117,12 +117,4 @@ public String sendResetOtp(String email) {
         message.setText(text);
         mailSender.send(message);
     }
-}
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    User findByEmailIgnoreCase(String email);
 }
