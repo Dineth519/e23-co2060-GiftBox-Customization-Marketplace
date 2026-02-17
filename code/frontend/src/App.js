@@ -7,6 +7,7 @@ import Sidebar from './components/admin/Sidebar.jsx';
 import Partners from './pages/admin/Partners.jsx'; 
 import Settings from './pages/admin/Settings.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
+import LandingPage from './pages/LandingPage.jsx';
 
 /**
  * Main App Component
@@ -16,37 +17,40 @@ import Dashboard from './pages/admin/Dashboard.jsx';
 function App() {
   return (
     <Router>
-      {/* Main Layout Wrapper: 
-        Using 'flex' ensures the Sidebar and Main Content sit side-by-side. 
-      */}
-      <div style={{ display: 'flex', minHeight: '100vh' }}>
+      <Routes>
         
-        {/* Sidebar stays visible across all routes */}
-        <Sidebar /> 
+        {/* --- PUBLIC ROUTE --- */}
+        {/* This is the first page users will see (http://localhost:5173/) */}
+        {/* It does NOT have the Sidebar */}
+        <Route path="/" element={<LandingPage />} />
 
-        {/* Main Content Area: 
-          'flex: 1' allows this div to take up the remaining width.
+
+        {/* --- ADMIN ROUTES --- */}
+        {/* Any URL starting with "/admin" will be handled here.
+            We wrap these routes in the Sidebar layout.
         */}
-        <div style={{ flex: 1, background: '#deebf7' }}>
-          <Routes>
-            {/* Route for the main Admin Overview */}
-            <Route path="/admin" element={<Dashboard />} />
+        <Route path="/admin/*" element={
+          <div style={{ display: 'flex', minHeight: '100vh' }}>
             
-            {/* Route for Partner/Seller management */}
-            <Route path="/admin/partners" element={<Partners />} />
-            
-            {/* Route for System Settings */}
-            <Route path="/admin/settings" element={<Settings />} />
+            {/* Sidebar is only visible for admin routes */}
+            <Sidebar /> 
 
-            {/* Default Redirect: 
-              If the user visits the base URL "/", they are automatically 
-              sent to the "/admin" dashboard.
-            */}
-            <Route path="/" element={<Navigate to="/admin" />} />
-          </Routes>
-        </div>
+            {/* Main Content Area for Admin */}
+            <div style={{ flex: 1, background: '#deebf7' }}>
+              <Routes>
+                {/* Default Admin Page (Dashboard) - matches "/admin" */}
+                <Route path="/" element={<Dashboard />} />
+                
+                {/* Other Admin Pages - matches "/admin/partners", etc. */}
+                <Route path="partners" element={<Partners />} />
+                <Route path="settings" element={<Settings />} />
+              </Routes>
+            </div>
 
-      </div>
+          </div>
+        } />
+
+      </Routes>
     </Router>
   );
 }
