@@ -46,20 +46,39 @@ const LandingPage = () => {
         </div>
 
         {/* Icons Section */}
-        <div style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
-          <div style={{ cursor: 'pointer', textAlign: 'center' }}>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          
+          {/* 1. Cart Button */}
+          <button style={{ 
+            background: 'none', 
+            border: 'none', 
+            cursor: 'pointer',
+            padding: '5px', // පොඩි ඉඩක් දුන්නා click කරන්න ලේසි වෙන්න
+            display: 'flex', 
+            alignItems: 'center' 
+          }}>
              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0e2a47" strokeWidth="2">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
              </svg>
-          </div>
-          <div style={{ cursor: 'pointer', textAlign: 'center' }}>
+          </button>
+
+          {/* 2. User Profile Button */}
+          <button style={{ 
+            background: 'none', 
+            border: 'none', 
+            cursor: 'pointer',
+            padding: '5px',
+            display: 'flex', 
+            alignItems: 'center' 
+          }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0e2a47" strokeWidth="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-          </div>
+          </button>
+
         </div>
       </nav>
 
