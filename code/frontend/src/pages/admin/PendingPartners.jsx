@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaCheck, FaTimes, FaMapMarkerAlt, FaUser, FaPhone } from 'react-icons/fa';
+import { 
+  FaArrowLeft, FaCheck, FaTimes, FaMapMarkerAlt, 
+  FaUser, FaPhone, FaStore, FaClock 
+} from 'react-icons/fa';
+import './PendingPartners.css';
 
 const PendingPartners = () => {
   const navigate = useNavigate();
@@ -44,217 +48,88 @@ const PendingPartners = () => {
   };
 
   return (
-    <div style={styles.pageContainer}>
-      <div style={styles.headerSection}>
-        <button onClick={() => navigate(-1)} style={styles.backBtn}>
+    <div className="pending-container">
+      
+      {/* Header */}
+      <div className="pending-header">
+        <button onClick={() => navigate(-1)} className="back-btn">
           <FaArrowLeft /> Back to Partners
         </button>
-        <h1 style={styles.mainTitle}>Pending Requests</h1>
-        <p style={styles.subTitle}>Review and approve new partner applications</p>
+        <h1 className="page-title">Pending Requests</h1>
+        <p className="page-subtitle">Review and approve new partner applications</p>
       </div>
 
-      {/* Stats Summary */}
-      <div style={styles.statsContainer}>
-        <div style={styles.statCard}>
-          <h3 style={styles.statNumber}>{pendingSellers.length}</h3>
-          <p style={styles.statLabel}>Pending Requests</p>
+      {/* Stats */}
+      <div className="stats-grid">
+        <div className="stat-card pending">
+          <div className="stat-icon">
+            <FaClock size={24} />
+          </div>
+          <div className="stat-content">
+            <h3 className="stat-number">{pendingSellers.length}</h3>
+            <p className="stat-label">Pending Requests</p>
+          </div>
         </div>
       </div>
 
-      <div style={styles.cardListWrapper}>
+      {/* Pending List */}
+      <div className="pending-list">
         {pendingSellers.length === 0 ? (
-          <div style={styles.emptyState}>
-            <p style={styles.emptyText}>No pending requests found.</p>
+          <div className="empty-state">
+            <FaClock size={48} className="empty-icon" />
+            <p className="empty-text">No pending requests found.</p>
           </div>
         ) : (
           pendingSellers.map((seller) => (
-            <div key={seller.id} style={styles.cardWrapper}>
-              <div style={styles.cardContent}>
-                <div style={{ flex: 1 }}>
-                  <h2 style={styles.shopName}>{seller.shop}</h2>
-                  <div style={styles.metaGrid}>
-                    <span style={styles.metaItem}><FaUser /> {seller.name}</span>
-                    <span style={styles.metaItem}><FaPhone /> {seller.phone}</span>
-                    <span style={styles.metaItem}><FaMapMarkerAlt /> {seller.address}</span>
-                    <span style={{ ...styles.metaItem, fontWeight: 'bold' }}>BR No: {seller.br_no}</span>
+            <div key={seller.id} className="pending-card">
+              
+              <div className="card-content">
+                <div className="shop-info">
+                  <div className="shop-avatar">
+                    <FaStore size={20} />
+                  </div>
+                  <div className="shop-details">
+                    <h2 className="shop-name">{seller.shop}</h2>
+                    <div className="meta-grid">
+                      <span className="meta-item">
+                        <FaUser size={12} /> {seller.name}
+                      </span>
+                      <span className="meta-item">
+                        <FaPhone size={12} /> {seller.phone}
+                      </span>
+                      <span className="meta-item">
+                        <FaMapMarkerAlt size={12} /> {seller.address}
+                      </span>
+                      <span className="meta-item br-number">
+                        BR No: {seller.br_no}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 
-                <div style={styles.actionButtons}>
+                <div className="action-buttons">
                   <button 
-                    style={styles.approveBtn} 
+                    className="approve-btn" 
                     onClick={() => handleStatusUpdate(seller.id, 'ACTIVE')}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
                   >
                     <FaCheck /> Approve
                   </button>
                   
                   <button 
-                    style={styles.rejectBtn} 
+                    className="reject-btn" 
                     onClick={() => handleStatusUpdate(seller.id, 'REJECTED')}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
                   >
                     <FaTimes /> Reject
                   </button>
                 </div>
               </div>
+              
             </div>
           ))
         )}
       </div>
     </div>
   );
-};
-
-// Styles
-const styles = {
-  pageContainer: { 
-    padding: '40px',
-    position: 'relative',
-    zIndex: 1,
-    marginLeft: '300px'
-  },
-  headerSection: { 
-    marginBottom: '30px' 
-  },
-  backBtn: { 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: '8px', 
-    background: 'none', 
-    border: 'none', 
-    color: '#4f46e5', 
-    fontWeight: 'bold', 
-    cursor: 'pointer', 
-    marginBottom: '10px',
-    fontSize: '14px',
-    transition: 'color 0.2s'
-  },
-  mainTitle: { 
-    fontSize: '36px', 
-    fontWeight: '700', 
-    color: '#010911',
-    margin: '0 0 8px 0'
-  },
-  subTitle: {
-    fontSize: '14px',
-    color: '#64748b',
-    margin: 0,
-    marginBottom: '20px'
-  },
-  
-  // Stats Summary
-  statsContainer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-    marginBottom: '30px'
-  },
-  statCard: {
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    padding: '20px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    textAlign: 'center'
-  },
-  statNumber: {
-    fontSize: '32px',
-    fontWeight: '700',
-    color: '#ef4444',
-    margin: '0 0 8px 0'
-  },
-  statLabel: {
-    fontSize: '14px',
-    color: '#64748b',
-    margin: 0
-  },
-  
-  cardListWrapper: { 
-    display: 'flex', 
-    flexDirection: 'column', 
-    gap: '20px' 
-  },
-  emptyState: {
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    padding: '60px 20px',
-    textAlign: 'center'
-  },
-  emptyText: {
-    color: '#94a3b8',
-    fontSize: '16px',
-    margin: 0
-  },
-  cardWrapper: { 
-    background: '#fff', 
-    borderRadius: '16px', 
-    padding: '25px', 
-    boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
-    border: '1px solid #f1f5f9',
-    position: 'relative',
-    zIndex: 1,
-    transition: 'all 0.2s'
-  },
-  cardContent: { 
-    display: 'flex', 
-    justifyContent: 'space-between', 
-    alignItems: 'center',
-    gap: '20px',
-    flexWrap: 'wrap'
-  },
-  shopName: { 
-    margin: '0 0 10px 0', 
-    fontSize: '24px', 
-    fontWeight: '700',
-    color: '#111827'
-  },
-  metaGrid: { 
-    display: 'grid', 
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-    gap: '15px', 
-    color: '#64748b', 
-    fontSize: '14px' 
-  },
-  metaItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  },
-  actionButtons: { 
-    display: 'flex', 
-    gap: '10px',
-    flexWrap: 'wrap'
-  },
-  approveBtn: { 
-    display: 'flex', 
-    gap: '8px', 
-    alignItems: 'center', 
-    padding: '12px 20px', 
-    backgroundColor: '#10b981', 
-    color: '#fff', 
-    border: 'none', 
-    borderRadius: '8px', 
-    cursor: 'pointer', 
-    fontWeight: '600',
-    transition: 'background 0.2s',
-    fontSize: '14px'
-  },
-  rejectBtn: { 
-    display: 'flex', 
-    gap: '8px', 
-    alignItems: 'center', 
-    padding: '12px 20px', 
-    backgroundColor: '#ef4444', 
-    color: '#fff', 
-    border: 'none', 
-    borderRadius: '8px', 
-    cursor: 'pointer', 
-    fontWeight: '600',
-    transition: 'background 0.2s',
-    fontSize: '14px'
-  }
 };
 
 export default PendingPartners;
