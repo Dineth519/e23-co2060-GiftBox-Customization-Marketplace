@@ -7,12 +7,7 @@ const Sidebar = () => {
   return (
     <div className="sidebar-container">
       
-      {/* Sidebar Branding/Header */}
-      <div className="sidebar-header">
-        <FaGift className="sidebar-logo-icon" />
-        <span className="sidebar-brand">Giftore</span>
-      </div>
-      
+
       {/* Navigation Menu */}
       <nav className="sidebar-nav">
         
