@@ -1,57 +1,142 @@
-___
-# DELETE THIS INSTRUCTIONS AND ADD AN INTRODUCTION ABOUT YOUR PROJECT
-___
+# 🎁 Giftora — Personalized Gift Box Marketplace
 
-# eYY-co2060-project-template
+> A centralized multi-vendor platform where customers can browse items from multiple vendors, assemble customized gift boxes, and have them quality-checked, professionally packaged, and delivered — all through one seamless experience.
 
-This is a sample repository you can use for your Software Systems Design Project. Once you followed these instructions, remove the text and add a brief introduction to here.
+---
 
-### Enable GitHub Pages
+## 👥 Team Nexus
 
-You can put the things to be shown in GitHub pages into the _docs/_ folder. Both html and md file formats are supported. You need to go to settings and enable GitHub pages and select _main_ branch and _docs_ folder from the dropdowns, as shown in the below image.
+| Student ID | Name | Email |
+|------------|------|-------|
+| E/23/167 | Karunarathna A. V. P. J. P. | [e23167@eng.pdn.ac.lk](mailto:e23167@eng.pdn.ac.lk) |
+| E/23/351 | Sanjuna K. D. | [e23351@eng.pdn.ac.lk](mailto:e23351@eng.pdn.ac.lk) |
+| E/23/412 | Vidanya A. P. S. | [e23412@eng.pdn.ac.lk](mailto:e23412@eng.pdn.ac.lk) |
+| E/23/416 | Vishwaka A. G. S. | [e23416@eng.pdn.ac.lk](mailto:e23416@eng.pdn.ac.lk) |
 
-![image](https://user-images.githubusercontent.com/11540782/98789936-028d3600-2429-11eb-84be-aaba665fdc75.png)
+**Module:** CO2060 — Software Design Project  
+**Department:** Computer Engineering, University of Peradeniya
 
-### Special Configurations
+---
 
-These projects will be automatically added into [https://projects.ce.pdn.ac.lk](). If you like to show more details about your project on this site, you can fill the parameters in the file, _/docs/index.json_
+## 🚩 The Problem
+
+Online gift-giving is broken. When someone wants to send a thoughtful, multi-item gift, they're forced to:
+
+- Place **separate orders** across multiple vendor websites
+- **Manually coordinate** delivery timelines
+- Hope that packaging quality is consistent
+- Deal with **multiple tracking systems** for one gift
+
+This is especially painful when gifts are time-sensitive and non-returnable.
+
+---
+
+## 💡 Our Solution
+
+Giftora introduces a **centralized assembly workflow**:
+
+1. Customer browses a unified catalogue from multiple vendors
+2. Customer builds a custom gift box in a single session
+3. Vendors are notified and dispatch their items to our assembly hub
+4. Assembly team **quality-checks, packages, and dispatches** the complete gift box
+5. Customer tracks every milestone — from order placement to doorstep delivery
+
+---
+
+## ✨ Key Features
+
+- **Multi-Vendor Gift Box Builder** — select items from different vendors into one box
+- **Role-Based Access Control** — separate portals for Customers, Vendors, and Admins
+- **Order Splitting Engine** — one checkout auto-splits into per-vendor sub-orders
+- **Centralized Assembly Workflow** — quality inspection and professional packaging
+- **Milestone-Based Order Tracking** — 5+ trackable stages with real-time updates
+- **Vendor Portal** — product listing, inventory management, and order queue
+- **Admin Dashboard** — vendor approval, operational monitoring, and reporting
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React.js (v18+) |
+| Backend | Spring Boot (Java, v3+) |
+| Database | MySQL (v8+) |
+| Authentication | JWT (JSON Web Tokens) |
+| Communication | RESTful APIs over HTTPS |
+| Containerization | Docker |
+| Version Control | Git / GitHub |
+
+---
+
+## 🏗️ System Architecture
+
+The platform follows a clean three-tier architecture:
 
 ```
-{
-  "title": "This is the title of the project",
-  "team": [
-    {
-      "name": "Team Member Name 1",
-      "email": "email@eng.pdn.ac.lk",
-      "eNumber": "E/yy/xxx"
-    },
-    {
-      "name": "Team Member Name 2",
-      "email": "email@eng.pdn.ac.lk",
-      "eNumber": "E/yy/xxx"
-    },
-    {
-      "name": "Team Member Name 3",
-      "email": "email@eng.pdn.ac.lk",
-      "eNumber": "E/yy/xxx"
-    }
-  ],
-  "supervisors": [
-    {
-      "name": "Dr. Supervisor 1",
-      "email": "email@eng.pdn.ac.lk"
-    },
-    {
-      "name": "Supervisor 2",
-      "email": "email@eng.pdn.ac.lk"
-    }
-  ],
-  "tags": ["Web", "Software Systems", "CO2060"]
-}
+[React.js Frontend]  ←→  [Spring Boot REST API]  ←→  [MySQL Database]
+        ↕                          ↕
+  [Customer / Vendor]     [JWT Auth | RBAC | Order Engine]
 ```
 
-Once you filled this _index.json_ file, please verify the syntax is correct. (You can use [this](https://jsonlint.com/) tool).
+A single customer order flows through:
+`Order Placed → Sub-orders Created → Vendor Dispatch → Hub Receipt → Quality Check → Assembly → Delivery`
 
-### Page Theme
+---
 
-A custom theme integrated with this GitHub Page, which is based on [github.com/cepdnaclk/eYY-project-theme](https://github.com/cepdnaclk/eYY-project-theme). If you like to remove this default theme, you can remove the file, _docs/\_config.yml_ and use HTML based website.
+## 🗓️ Project Timeline
+
+| Phase | Weeks | Focus |
+|-------|-------|-------|
+| Phase 1 | 1–5 | Foundation: Auth, RBAC, Vendor Registration |
+| Phase 2 | 6–11 | Core Marketplace: Browsing, Filtering, Cart, Checkout |
+| Phase 3 | 12–17 | Assembly & Logistics Workflow |
+| Phase 4 | 18–22 | Admin Tools, Notifications, UI Polish |
+| Phase 5 | 23–28 | Testing, Optimization & Final Submission |
+
+**Final Deadline:** July 26, 2026
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- Java JDK (v17+)
+- MySQL (v8+)
+- Docker (optional, for containerized deployment)
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/cepdnaclk/e23-co2060-GiftBox-CustomizationMarketplace.git
+cd e23-co2060-GiftBox-CustomizationMarketplace
+
+# Frontend setup
+cd frontend
+npm install
+npm start
+
+# Backend setup (in a new terminal)
+cd backend
+./mvnw spring-boot:run
+```
+
+Configure your MySQL connection in `backend/src/main/resources/application.properties` before starting.
+
+---
+
+## 📄 Documentation
+
+- [📋 Software Requirements Specification (SRS)](./docs/Giftora_SRS.pdf)
+- [📅 Workflow & Timeline](./docs/CO2060_WorkflowTimeline_Nexus.pdf)
+- [🌐 Project Page](https://cepdnaclk.github.io/e23-co2060-GiftBox-CustomizationMarketplace/)
+
+---
+
+## 🔗 Links
+
+- [Department of Computer Engineering](http://www.ce.pdn.ac.lk/)
+- [University of Peradeniya](https://eng.pdn.ac.lk/)
+- [CE Projects Portal](https://projects.ce.pdn.ac.lk)
