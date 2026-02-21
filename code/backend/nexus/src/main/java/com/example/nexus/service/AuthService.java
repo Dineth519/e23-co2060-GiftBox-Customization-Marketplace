@@ -51,20 +51,34 @@ public class AuthService {
     }
 
     // 3. Send 4-Digit OTP (Using Email)
-    public String sendResetOtp(String email) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) return "User not found";
+public String sendResetOtp(String email) {
+    // 1. Clean the input immediately
+    if (email == null) return "Email is required";
+    String cleanEmail = email.trim().toLowerCase(); 
 
-        User user = userOpt.get();
-        String otp = String.format("%04d", new Random().nextInt(10000)); 
-        
-        user.setResetOtp(otp);
-        user.setResetOtpExpireAt(LocalDateTime.now().plusMinutes(15)); // Valid for 15 mins
-        userRepository.save(user);
-
-        sendEmail(email, "Your Password Reset Code", "Your 4-digit OTP is: " + otp);
-        return "OTP sent";
+    // 2. Use a case-insensitive search
+    Optional<User> userOpt = userRepository.findByEmailIgnoreCase(cleanEmail);
+    
+    if (userOpt.isEmpty()) {
+        System.out.println("DEBUG: Search failed for email: [" + cleanEmail + "]");
+        return "User not found";
     }
+
+    User user = userOpt.get();
+    String otp = String.format("%04d", new Random().nextInt(10000)); 
+    
+    user.setResetOtp(otp);
+    user.setResetOtpExpireAt(LocalDateTime.now().plusMinutes(15));
+    userRepository.save(user);
+
+    try {
+        sendEmail(user.getEmail(), "Your Password Reset Code", "Your 4-digit OTP is: " + otp);
+        return "OTP sent";
+    } catch (Exception e) {
+        System.err.println("Email Error: " + e.getMessage());
+        return "Error sending email, but OTP was generated";
+    }
+}
 
     // 4. Verify OTP
     public String verifyOtp(String email, String otp) {

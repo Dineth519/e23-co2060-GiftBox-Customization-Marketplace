@@ -12,6 +12,7 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const toggleState = () => {
     setState(state === 'Sign Up' ? 'Login' : 'Sign Up');
@@ -20,9 +21,9 @@ const Login = () => {
     setUsername('');
     setEmail('');
     setPassword('');
+    setShowPassword(false);
   };
-
-  // 2. Create the function to send data to Spring Boot
+// 2. Create the function to send data to Spring Boot
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
@@ -36,7 +37,8 @@ const Login = () => {
           password
         });
 
-        if (response.data.success === "true") {
+        // FIX: Check for boolean true, not string "true"
+        if (response.data.success === true) { 
           alert("Registration Successful! Please login.");
           setState('Login'); // Flip card to login side
         } else {
@@ -45,17 +47,18 @@ const Login = () => {
 
       } else {
         // --- LOGIN API CALL ---
-        const response = await axios.post('http://localhost:8080/login', {
+        // FIX: Updated the URL to match our new AuthController
+        const response = await axios.post('http://localhost:8080/api/auth/login', {
           username,
           password
         });
 
-        // Our Spring Boot LoginController returns a raw String, so we check the text
-        if (typeof response.data === 'string' && response.data.includes("Login Successful")) {
-          alert(response.data); // "Login Successful! Welcome [Name]"
+        // FIX: Check the JSON 'success' property instead of a string
+        if (response.data.success === true) {
+          alert(response.data.message); // "Login Successful"
           navigate('/'); // Send user to the dashboard/home page!
         } else {
-          alert(response.data); // "Login Failed..."
+          alert(response.data.message); // "Incorrect Password" or "User not found"
         }
       }
     } catch (error) {
@@ -93,17 +96,31 @@ const Login = () => {
                 />
               </div>
 
-              <div className='flex items-center gap-3 w-full px-5 py-3 rounded-full bg-neutral-800 mb-4 focus-within:ring-1 focus-within:ring-amber-500 transition-all'>
-                <img src={assets.lock_icon} className="w-5" alt="" />
-                <input 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  value={password} 
-                  className='bg-transparent outline-none w-full text-white' 
-                  type="password" 
-                  placeholder='Password' 
-                  required
+            <div className='flex items-center gap-3 w-full px-5 py-3 rounded-full bg-neutral-800 mb-4 focus-within:ring-1 focus-within:ring-amber-500 transition-all'>
+              <img src={assets.lock_icon} className="w-5" alt="" />
+  
+              <input 
+                onChange={(e) => setPassword(e.target.value)} 
+                value={password} 
+                className='bg-transparent outline-none w-full text-white' 
+                type={showPassword ? "text" : "password"} 
+                placeholder='Password' 
+                required
+              />
+
+              {/* ICON TOGGLE BUTTON */}
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className='outline-none'
+              >
+                <img 
+                  src={showPassword ? assets.Open_Eye : assets.Close_Eye} 
+                  className="w-5 opacity-60 hover:opacity-100 transition-opacity cursor-pointer invert" 
+                  alt="Toggle Visibility" 
                 />
-              </div>
+              </button>
+            </div> 
               
               <p onClick={() => navigate('/email-verify')} className='text-sm text-amber-500 cursor-pointer hover:text-amber-300 mb-4 ml-2 w-fit transition-colors'>
                 Forgot Password?
