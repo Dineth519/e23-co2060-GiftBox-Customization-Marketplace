@@ -1,0 +1,397 @@
+/* ============================================
+   PREMIUM PENDING PARTNERS - GIFTORA THEME
+   ============================================ */
+
+.pending-container {
+  padding: 40px;
+  min-height: calc(100vh - 64px);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.pending-header {
+  margin-bottom: 32px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #C9A961;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(201, 169, 97, 0.1);
+  transform: translateX(-4px);
+}
+
+.page-title {
+  font-size: 36px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #C9A961 0%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ============================================
+   STATS
+   ============================================ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(201, 169, 97, 0.1);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(201, 169, 97, 0.2);
+}
+
+.stat-card.pending {
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.stat-icon::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 18px;
+  background: inherit;
+  opacity: 0.2;
+  filter: blur(8px);
+  z-index: -1;
+}
+
+.stat-card.pending .stat-icon {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.stat-card.pending .stat-number {
+  color: #F59E0B;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #6B7280;
+  margin: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   PENDING LIST
+   ============================================ */
+
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ============================================
+   PENDING CARD
+   ============================================ */
+
+.pending-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAFAFA 100%);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(201, 169, 97, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pending-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%);
+}
+
+.pending-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(201, 169, 97, 0.15);
+  border-color: #F59E0B;
+}
+
+.card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.shop-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.shop-avatar {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+  position: relative;
+}
+
+.shop-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: inherit;
+  border-radius: 18px;
+  opacity: 0.3;
+  filter: blur(10px);
+  z-index: -1;
+}
+
+.shop-details {
+  flex: 1;
+}
+
+.shop-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1F2937;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.3px;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  color: #6B7280;
+  font-size: 14px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.meta-item.br-number {
+  font-weight: 700;
+  color: #374151;
+}
+
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.approve-btn,
+.reject-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.approve-btn {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+}
+
+.approve-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+}
+
+.reject-btn {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+}
+
+.reject-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.empty-state {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 24px;
+  padding: 80px 40px;
+  text-align: center;
+  border: 2px dashed rgba(245, 158, 11, 0.3);
+}
+
+.empty-icon-wrapper {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.empty-icon {
+  color: #F59E0B;
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.empty-text {
+  color: #9CA3AF;
+  font-size: 15px;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .pending-container {
+    padding: 20px;
+  }
+  
+  .page-title {
+    font-size: 28px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .shop-info {
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: auto;
+  }
+  
+  .action-buttons {
+    width: 100%;
+  }
+  
+  .approve-btn,
+  .reject-btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .pending-container {
+    padding: 16px;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .pending-card {
+    padding: 20px;
+  }
+  
+  .meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
