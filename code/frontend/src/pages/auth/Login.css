@@ -1,8 +1,6 @@
-/* ============================================
-   Login.css — Pure CSS replica of Tailwind Login
-   ============================================ */
+/* Login and authentication page styles with 3D flip animation */
 
-/* ── Page wrapper ───────────────────────────── */
+/* Main page container with gradient background */
 .login-page {
   display: flex;
   flex-direction: column;
@@ -14,7 +12,7 @@
   position: relative;
 }
 
-/* ── Logo ───────────────────────────────────── */
+/* Logo positioning at top left of page */
 .login-logo {
   position: absolute;
   left: 20px;
@@ -30,7 +28,7 @@
   }
 }
 
-/* ── Card container (3D flip wrapper) ───────── */
+/* 3D flip card container with perspective */
 .login-card-wrapper {
   width: 100%;
   max-width: 384px;
@@ -38,7 +36,7 @@
   perspective: 1000px;
 }
 
-/* ── Inner flip container ───────────────────── */
+/* Inner container for 3D flip animation */
 .login-card-inner {
   position: relative;
   width: 100%;
@@ -51,7 +49,7 @@
   transform: rotateY(180deg);
 }
 
-/* ── Shared card face styles ────────────────── */
+/* Shared styles for both login and signup card faces */
 .login-card-front,
 .login-card-back {
   position: absolute;
@@ -90,7 +88,7 @@
   margin-bottom: 24px;
 }
 
-/* ── Input row ──────────────────────────────── */
+/* Input field row with icon and text input */
 .login-input-row {
   display: flex;
   align-items: center;
@@ -129,7 +127,7 @@
   color: rgba(255, 255, 255, 0.35);
 }
 
-/* ── Password toggle button ─────────────────── */
+/* Password visibility toggle button */
 .login-eye-btn {
   background: none;
   border: none;
@@ -151,7 +149,7 @@
   opacity: 1;
 }
 
-/* ── Forgot password ────────────────────────── */
+/* Forgot password link */
 .login-forgot {
   font-size: 14px;
   color: #f59e0b;
@@ -166,7 +164,7 @@
   color: #fcd34d;
 }
 
-/* ── Submit button ──────────────────────────── */
+/* Submit button for login and signup forms */
 .login-submit-btn {
   width: 100%;
   padding: 10px 0;
@@ -187,7 +185,7 @@
   transform: scale(1.05);
 }
 
-/* ── Toggle link ────────────────────────────── */
+/* Form toggle link to switch between login and signup */
 .login-toggle-text {
   text-align: center;
   margin-top: 16px;

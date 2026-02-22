@@ -1,6 +1,6 @@
-/* Giftora Customer Home - Premium Gift Marketplace */
+/* Customer home page styles for premium gift marketplace */
 
-/* Import elegant fonts */
+/* Import elegant Google Fonts for typography */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 * {
@@ -33,7 +33,7 @@ body {
   position: relative;
 }
 
-/* ===== HERO SECTION ===== */
+/* Hero section with full viewport height and gradient background */
 .hero-section {
   position: relative;
   min-height: 100vh;
@@ -310,7 +310,7 @@ body {
   50% { transform: translateY(-20px) rotate(5deg); }
 }
 
-/* ===== SECTIONS ===== */
+/* Major page sections with padding and responsive spacing */
 section {
   padding: 120px 60px;
 }
@@ -335,7 +335,7 @@ section {
   font-weight: 400;
 }
 
-/* ===== CATEGORIES ===== */
+/* Gift categories grid displaying occasion-based shopping options */
 .categories-section {
   background: var(--light-gray);
 }
@@ -418,7 +418,7 @@ section {
   transform: translateX(0);
 }
 
-/* ===== FEATURED BOXES ===== */
+/* Best-selling gift box cards with product images and pricing */
 .featured-section {
   background: white;
 }
@@ -561,7 +561,7 @@ section {
   transform: scale(1.1);
 }
 
-/* ===== HOW IT WORKS ===== */
+/* Process steps showing how to create and receive custom gift boxes */
 .how-it-works {
   background: linear-gradient(135deg, var(--dark-navy) 0%, var(--deep-blue) 100%);
   color: white;
@@ -645,7 +645,7 @@ section {
   opacity: 0.3;
 }
 
-/* ===== TESTIMONIALS ===== */
+/* Customer testimonials and reviews section */
 .testimonials-section {
   background: var(--light-gray);
 }
@@ -733,7 +733,7 @@ section {
   color: var(--text-gray);
 }
 
-/* ===== VENDORS ===== */
+/* Trusted vendor partners grid displaying quality suppliers */
 .vendors-section {
   background: white;
 }
@@ -798,7 +798,7 @@ section {
   font-weight: 600;
 }
 
-/* ===== CTA SECTION ===== */
+/* Call-to-action section with strong visual emphasis and button */
 .cta-section {
   background: linear-gradient(135deg, var(--gold) 0%, var(--light-gold) 100%);
   padding: 120px 60px;
@@ -871,7 +871,7 @@ section {
   transform: translateX(6px);
 }
 
-/* ===== FOOTER ===== */
+/* Footer section with company information and navigation links */
 .footer {
   background: var(--dark-navy);
   color: white;
@@ -944,7 +944,7 @@ section {
   font-size: 24px;
 }
 
-/* ===== RESPONSIVE ===== */
+/* Responsive design media queries for mobile and tablet layouts */
 @media (max-width: 1200px) {
   .hero-visual {
     display: none;

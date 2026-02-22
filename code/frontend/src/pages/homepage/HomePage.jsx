@@ -1,10 +1,15 @@
+// Core libraries and routing
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
+// Page components
 import Header from '../../components/homepage/Header.jsx';
 import Footer from '../../components/homepage/Footer.jsx';
+
+// Stylesheet
 import './HomePage.css';
 
-// ── Sample data ────────────────────────────────────────────
+// Sample category data for gift browsing
 const CATEGORIES = [
   { icon: '📦', label: 'Build Your Box' },
   { icon: '🎀', label: 'Gift Bundles'   },
@@ -14,12 +19,14 @@ const CATEGORIES = [
   { icon: '🌸', label: 'Seasonal'       },
 ];
 
+// Feature highlights displayed in hero section
 const FEATURES = [
   { icon: '🎨', title: 'Fully Custom',   desc: 'Build your own box from scratch' },
   { icon: '🚀', title: 'Fast Delivery',  desc: 'Same day delivery available'     },
   { icon: '💝', title: 'Luxury Packing', desc: 'Premium gift wrapping included'  },
 ];
 
+// Featured gift products with pricing and vendor information
 const PRODUCTS = [
   { id: 1, emoji: '🍫', tag: 'Best Seller', name: 'Premium Choco Box',    vendor: 'Choco Heaven',    price: 'LKR 2,400' },
   { id: 2, emoji: '🌹', tag: 'New',         name: 'Romantic Rose Bundle', vendor: 'Flower Paradise', price: 'LKR 3,800' },
@@ -27,23 +34,22 @@ const PRODUCTS = [
   { id: 4, emoji: '🎁', tag: 'Custom',      name: 'Build Your Own Box',   vendor: 'Giftora',         price: 'From LKR 1,500' },
 ];
 
+// Steps showing the gift creation and delivery process
 const STEPS = [
   { icon: '🛍️', title: 'Browse & Pick',    desc: 'Choose items from any of our trusted local vendors'    },
   { icon: '📦', title: 'We Pack It',        desc: 'We hand-assemble everything into a beautiful gift box' },
   { icon: '🎀', title: 'Add a Message',     desc: 'Personalise with a handwritten card or ribbon'         },
-  // Fixed the apostrophe issue below by wrapping the string in double quotes
   { icon: '🚚', title: 'Fast Delivery',     desc: "Delivered to your loved one's door island-wide"        },
 ];
 
-// ── Hero Section ───────────────────────────────────────────
+// Hero section component with main call-to-action and value proposition
 const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
     <section className="hero">
       <div className="hero__inner">
-
-        {/* Left — copy */}
+        {/* Text content and call-to-action buttons */}
         <div className="hero__content">
           <div className="hero__badge">
             <span>✨</span>
@@ -83,7 +89,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Right — cards */}
+        {/* Feature cards and vendor call-to-action */}
         <div className="hero__cards">
           {FEATURES.map((f, i) => (
             <button key={i} className="hero__feature-card">
@@ -114,7 +120,7 @@ const HeroSection = () => {
   );
 };
 
-// ── Categories Strip ───────────────────────────────────────
+// Categories navigation strip for browsing by occasion
 const CategoriesStrip = () => (
   <section className="categories-strip">
     <h2 className="categories-strip__title">Shop by Category</h2>
@@ -129,7 +135,7 @@ const CategoriesStrip = () => (
   </section>
 );
 
-// ── Featured Products ──────────────────────────────────────
+// Featured products section displaying best sellers and trending items
 const FeaturedProducts = () => {
   const navigate = useNavigate();
 
@@ -166,7 +172,7 @@ const FeaturedProducts = () => {
   );
 };
 
-// ── How It Works ───────────────────────────────────────────
+// How it works section explaining the gift creation process
 const HowItWorks = () => (
   <section className="how-it-works">
     <h2 className="how-it-works__title">How Giftora Works</h2>
@@ -186,7 +192,7 @@ const HowItWorks = () => (
   </section>
 );
 
-// ── Page Assembly ──────────────────────────────────────────
+// Main home page component assembling all sections with header and footer
 const HomePage = () => (
   <div className="home-page">
     <Header />

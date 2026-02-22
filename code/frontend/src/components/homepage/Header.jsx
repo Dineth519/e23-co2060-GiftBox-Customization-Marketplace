@@ -1,8 +1,11 @@
+// Core libraries and routing
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+// Stylesheet
 import './Header.css';
 
-// ── Small reusable icon button ─────────────────────────────
+// Reusable icon button component with optional badge
 const IconBtn = ({ children, label, badge }) => (
   <button className="icon-btn" aria-label={label} title={label}>
     {children}
@@ -10,7 +13,7 @@ const IconBtn = ({ children, label, badge }) => (
   </button>
 );
 
-// ── Navbar ─────────────────────────────────────────────────
+// Navigation bar component with logo, search, and action buttons
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
@@ -24,13 +27,13 @@ const Navbar = () => {
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
 
-      {/* Logo */}
+      {/* Logo section */}
       <div className="navbar__logo" onClick={() => navigate('/')}>
         <div className="navbar__logo-icon">🎁</div>
         <span className="navbar__logo-text">Giftora</span>
       </div>
 
-      {/* Search */}
+      {/* Search bar with icon and submit button */}
       <div className="navbar__search">
         <span className="navbar__search-icon">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5">
@@ -46,7 +49,7 @@ const Navbar = () => {
         <button className="navbar__search-btn">Search</button>
       </div>
 
-      {/* Right Actions */}
+      {/* Right section with wishlist, cart, and authentication buttons */}
       <div className="navbar__actions">
 
         <IconBtn label="Wishlist">
@@ -73,7 +76,7 @@ const Navbar = () => {
   );
 };
 
-// ── Category Bar ───────────────────────────────────────────
+// Category navigation bar with shopping categories and vendor CTA
 const CategoryBar = () => {
   const navigate = useNavigate();
 
@@ -122,7 +125,7 @@ const CategoryBar = () => {
   );
 };
 
-// ── Export ─────────────────────────────────────────────────
+// Main header component combining navbar and category bar
 const Header = () => (
   <header>
     <Navbar />
