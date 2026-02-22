@@ -1,45 +1,15 @@
 # ═══════════════════════════════════════════════════════
-# Maven & Build
-# ═══════════════════════════════════════════════════════
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-pom.xml.tag
-pom.xml.releaseBackup
-release.properties
-HELP.md
-
-# ═══════════════════════════════════════════════════════
-# Java & Compiled Files
-# ═══════════════════════════════════════════════════════
-*.class
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# ═══════════════════════════════════════════════════════
-# IDE - IntelliJ
+# IDE - IntelliJ / JetBrains
 # ═══════════════════════════════════════════════════════
 .idea/
 .idea_modules/
 *.iml
 *.iws
 *.ipr
+*.class
+*.jar
 out/
-
-# ═══════════════════════════════════════════════════════
-# IDE - Eclipse
-# ═══════════════════════════════════════════════════════
-.settings/
-.classpath
-.factorypath
-.project
-.springBeans
-.sts4-cache
+*.swp
 
 # ═══════════════════════════════════════════════════════
 # IDE - VS Code
@@ -47,30 +17,24 @@ out/
 .vscode/
 .vscode-test/
 *.code-workspace
+.history/
 
 # ═══════════════════════════════════════════════════════
-# IDE - NetBeans
+# IDE - Sublime Text
 # ═══════════════════════════════════════════════════════
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+*.sublime-project
+*.sublime-workspace
 
 # ═══════════════════════════════════════════════════════
-# IDE - STS
+# IDE - Other
 # ═══════════════════════════════════════════════════════
-.apt_generated
-.apt_generated_tests
-.classpath
-.factorypath
+.DS_Store
+Thumbs.db
 .project
-.settings
-.springBeans
-.sts4-cache
+.settings/
+*.swp
+*~
+.#*
 
 # ═══════════════════════════════════════════════════════
 # Environment & Secrets (CRITICAL!)
@@ -78,9 +42,30 @@ build/
 .env
 .env.local
 .env.*.local
-application.properties
-application-local.properties
-application-dev.properties
+.env.*.example
+
+# ═══════════════════════════════════════════════════════
+# Node & NPM
+# ═══════════════════════════════════════════════════════
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ═══════════════════════════════════════════════════════
+# Build Output
+# ═══════════════════════════════════════════════════════
+/dist/
+/build/
+/target/
+/out/
+*.bak
+*.swp
+*.swo
 
 # ═══════════════════════════════════════════════════════
 # Logs
@@ -88,61 +73,56 @@ application-dev.properties
 logs/
 *.log
 *.log.*
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # ═══════════════════════════════════════════════════════
 # OS Files
 # ═══════════════════════════════════════════════════════
 .DS_Store
-Thumbs.db
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+Thumbs.db
 Desktop.ini
 
 # ═══════════════════════════════════════════════════════
-# Database Files
-# ═══════════════════════════════════════════════════════
-*.sqlite
-*.sqlite3
-*.db
-*.h2.db
-data/
-
-# ═══════════════════════════════════════════════════════
-# Runtime & Temporary
+# Temporary Files
 # ═══════════════════════════════════════════════════════
 *.tmp
 *.temp
 .cache/
-.m2/
-.gradle/
 tmp/
 temp/
 
 # ═══════════════════════════════════════════════════════
-# Node/NPM (if using anywhere)
+# XML Files (general)
 # ═══════════════════════════════════════════════════════
-node_modules/
-package-lock.json
-npm-debug.log
+/shelf/
+/workspace.xml
+/compiler.xml
+/vss.xml
+*.xml
+
+# ═══════════════════════════════════════════════════════
+# Database
+# ═══════════════════════════════════════════════════════
+*.sqlite
+*.sqlite3
+*.db
+data/
+*.backup
 
 # ═══════════════════════════════════════════════════════
 # Testing
 # ═══════════════════════════════════════════════════════
 coverage/
 .nyc_output/
-junit.xml
 
 # ═══════════════════════════════════════════════════════
-# Misc
+# Virtual Environment (Python)
 # ═══════════════════════════════════════════════════════
-*.sw?
-*~
-.#*
-.*.swp
-*.swo
+.venv
+venv/
+env/
+ENV/

@@ -127,14 +127,6 @@ Configure your MySQL connection in `backend/src/main/resources/application.prope
 
 ---
 
-## 📄 Documentation
-
-- [📋 Software Requirements Specification (SRS)](./docs/Giftora_SRS.pdf)
-- [📅 Workflow & Timeline](./docs/CO2060_WorkflowTimeline_Nexus.pdf)
-- [🌐 Project Page](https://cepdnaclk.github.io/e23-co2060-GiftBox-CustomizationMarketplace/)
-
----
-
 ## 🔗 Links
 
 - [Department of Computer Engineering](http://www.ce.pdn.ac.lk/)
