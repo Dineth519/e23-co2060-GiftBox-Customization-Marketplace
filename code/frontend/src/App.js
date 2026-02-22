@@ -9,6 +9,7 @@ import Sidebar from './components/admin/Sidebar.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx'; 
 import Partners from './pages/admin/Partners.jsx'; 
 import Dashboard from './pages/admin/Dashboard.jsx';
+import LandingPage from './pages/LandingPage.jsx';
 import Home from './pages/user/Home.jsx';
 import UserDashboard from './pages/user/UserDashboard.jsx';
 
@@ -40,6 +41,39 @@ import SellerDashboard from './pages/seller/SellerDashboard.jsx';
 function App() {
   return (
     <Router>
+      <Routes>
+        
+        {/* --- PUBLIC ROUTE --- */}
+        {/* This is the first page users will see (http://localhost:5173/) */}
+        {/* It does NOT have the Sidebar */}
+        <Route path="/" element={<LandingPage />} />
+
+
+        {/* --- ADMIN ROUTES --- */}
+        {/* Any URL starting with "/admin" will be handled here.
+            We wrap these routes in the Sidebar layout.
+        */}
+        <Route path="/admin/*" element={
+          <div style={{ display: 'flex', minHeight: '100vh' }}>
+            
+            {/* Sidebar is only visible for admin routes */}
+            <Sidebar /> 
+
+            {/* Main Content Area for Admin */}
+            <div style={{ flex: 1, background: '#deebf7' }}>
+              <Routes>
+                {/* Default Admin Page (Dashboard) - matches "/admin" */}
+                <Route path="/" element={<Dashboard />} />
+                
+                {/* Other Admin Pages - matches "/admin/partners", etc. */}
+                <Route path="partners" element={<Partners />} />
+                <Route path="settings" element={<Settings />} />
+              </Routes>
+            </div>
+
+          </div>
+        } />
+
       <div style={{ minHeight: '100vh' }}>
         
         <Routes>
