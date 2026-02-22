@@ -1,23 +1,33 @@
+// Core libraries and routing
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 
-// --- COMPONENT IMPORTS ---
-import Login from './pages/auth/Login.jsx'; 
-import Register from './pages/auth/Register.jsx';
-// --- ADMIN IMPORTS ---
+// Public and user pages
+import HomePage from './pages/homepage/HomePage.jsx';
+import CustomerHome from './pages/user/CustomerHome.jsx';
+import Verify from './pages/user/Verify.jsx';
+
+// Authentication pages
+import Login from './pages/auth/Login.jsx';
+
+// Admin components and pages
 import Sidebar from './components/admin/Sidebar.jsx';
-import AdminLayout from './layouts/AdminLayout.jsx'; 
-import Partners from './pages/admin/Partners.jsx'; 
+import AdminLayout from './layouts/AdminLayout.jsx';
+import Partners from './pages/admin/Partners.jsx';
+import PendingPartners from './pages/admin/PendingPartners.jsx';
+import Customers from './pages/admin/Customers.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
-import LandingPage from './pages/LandingPage.jsx';
-import Home from './pages/user/Home.jsx';
-import UserDashboard from './pages/user/UserDashboard.jsx';
+import Settings from './pages/admin/Settings.jsx';
 
+// Seller pages
+import SellerDashboard from './pages/seller/SellerDashboard.jsx';
+
+// Layout wrapper component for general and user routes
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
 
-  // This will print the current path in your Browser Console (F12)
+  // Log current path and admin status for debugging
   useEffect(() => {
     console.log("Current Path:", location.pathname);
     console.log("Is Admin View:", isAdminPath);
@@ -25,117 +35,30 @@ const LayoutWrapper = ({ children }) => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* If this doesn't show, check if Sidebar.jsx has errors */}
+      {/* Display sidebar on admin paths */}
       {isAdminPath && <Sidebar />} 
-import PendingPartners from './pages/admin/PendingPartners.jsx';
-import Customers from './pages/admin/Customers.jsx';
-
-// --- SELLER IMPORTS ---
-
-import SellerDashboard from './pages/seller/SellerDashboard.jsx';
-
-/**
- * Main App Component
-  * This component sets up the routing for both the Admin and Seller sections of the application.
- */
-function App() {
-  return (
-    <Router>
-      <Routes>
-        
-        {/* --- PUBLIC ROUTE --- */}
-        {/* This is the first page users will see (http://localhost:5173/) */}
-        {/* It does NOT have the Sidebar */}
-        <Route path="/" element={<LandingPage />} />
-
-
-        {/* --- ADMIN ROUTES --- */}
-        {/* Any URL starting with "/admin" will be handled here.
-            We wrap these routes in the Sidebar layout.
-        */}
-        <Route path="/admin/*" element={
-          <div style={{ display: 'flex', minHeight: '100vh' }}>
-            
-            {/* Sidebar is only visible for admin routes */}
-            <Sidebar /> 
-
-            {/* Main Content Area for Admin */}
-            <div style={{ flex: 1, background: '#deebf7' }}>
-              <Routes>
-                {/* Default Admin Page (Dashboard) - matches "/admin" */}
-                <Route path="/" element={<Dashboard />} />
-                
-                {/* Other Admin Pages - matches "/admin/partners", etc. */}
-                <Route path="partners" element={<Partners />} />
-                <Route path="settings" element={<Settings />} />
-              </Routes>
-            </div>
-
-          </div>
-        } />
-
-      <div style={{ minHeight: '100vh' }}>
-        
-        <Routes>
-          {/* --- ADMIN SECTION --- */}
-          {/* / */}
-          <Route 
-            path="/admin/*" 
-            element={
-              <div style={{ display: 'flex' }}>
-                <Sidebar /> 
-                <div style={{ flex: 1, background: '#deebf7' }}>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="partners" element={<Partners />} />
-                    <Route path="settings" element={<Settings />} />
-                  </Routes>
-                </div>
-              </div>
-            } 
-          />
-
-          {/* --- SELLER SECTION --- */}
-          <Route path="/seller" element={<SellerDashboard />} />
-
-          {/* --- DEFAULT REDIRECT --- */}
-
-          <Route path="/" element={<Navigate to="/admin" />} />
-          
-          
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-
-      <div style={{ 
-        flex: 1, 
-        background: isAdminPath ? '#deebf7' : '#ffffff' 
-      }}>
+      <div style={{ flex: 1, background: isAdminPath ? '#deebf7' : '#ffffff' }}>
         {children}
       </div>
     </div>
   );
 };
 
-function App() {
-  return (
-    <Router>
-      <LayoutWrapper>
-        <Routes>
-          <Route path="/user-dashboard" element={<UserDashboard />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/admin" element={<Dashboard />} />
-          <Route path="/admin/partners" element={<Partners />} />
-          <Route path="/admin/settings" element={<Settings />} />
-        </Routes>
-      </LayoutWrapper>
+// Main application component that sets up routing for admin, user, and seller sections
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Public and user routes */}
+        <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
+        <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
+        <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
+        <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
 
-        {/* Admin Routes with AdminLayout */}
+        {/* Seller routes */}
+        <Route path="/seller" element={<LayoutWrapper><SellerDashboard /></LayoutWrapper>} />
+
+        {/* Admin routes using AdminLayout for sidebar and styling */}
         <Route path="/admin/*" element={
           <AdminLayout>
             <Routes>
@@ -143,12 +66,14 @@ function App() {
               <Route path="partners" element={<Partners />} />
               <Route path="partners/pending" element={<PendingPartners />} />
               <Route path="customers" element={<Customers />} />
+              <Route path="settings" element={<Settings />} />
             </Routes>
           </AdminLayout>
         } />
 
-        {/* Default Redirect */}
-        <Route path="/" element={<Navigate to="/admin" />} />
+        {/* Catch-all route that redirects to home page */}
+        <Route path="*" element={<Navigate to="/" />} />
+        
       </Routes>
     </Router>
   );

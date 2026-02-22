@@ -2,8 +2,14 @@ import React from 'react';
 import { FaUsers, FaBoxOpen, FaShoppingCart, FaDollarSign, FaTruck, FaStar } from 'react-icons/fa';
 import './Dashboard.css';
 
+/**
+ * Dashboard Component
+ * Displays admin dashboard with key metrics and activity overview
+ * Shows statistics cards, recent orders, and top vendors
+ */
 const Dashboard = () => {
   
+  // Static dashboard statistics data with icons and trends
   const statsData = [
     { icon: <FaUsers />, title: 'Total Customers', value: '2,847', change: '+12.5%', trend: 'up' },
     { icon: <FaBoxOpen />, title: 'Gift Boxes Created', value: '1,234', change: '+8.2%', trend: 'up' },
@@ -14,7 +20,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       
-      {/* Welcome Section */}
+      {/* Welcome header section with greeting message */}
       <div className="dashboard-header">
         <div className="header-content">
           <h1 className="dashboard-title">Welcome back, Mathew! 👋</h1>
@@ -22,7 +28,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Statistics grid displaying key metrics with icons and trend indicators */}
       <div className="stats-grid">
         {statsData.map((stat, index) => (
           <div className="stat-card" key={index}>
@@ -38,8 +44,9 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Recent Activity */}
+      {/* Activity section with recent orders and top vendors cards */}
       <div className="activity-section">
+        {/* Recent orders card with list of current orders */}
         <div className="activity-card">
           <div className="card-header">
             <h2 className="card-title">Recent Orders</h2>
@@ -61,6 +68,7 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Top vendors card showing best performing vendors with ratings */}
         <div className="activity-card">
           <div className="card-header">
             <h2 className="card-title">Top Vendors</h2>

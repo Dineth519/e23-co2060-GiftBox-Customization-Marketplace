@@ -7,19 +7,27 @@ import {
 } from 'react-icons/fa';
 import './Partners.css';
 
+/**
+ * Partners Component
+ * Displays active partners/sellers with expandable details
+ * Shows pending requests count and allows navigation to pending page
+ */
 const Partners = () => {
   const navigate = useNavigate();
   const [expandedId, setExpandedId] = useState(null);
   const [activeSellers, setActiveSellers] = useState([]); 
   const [pendingCount, setPendingCount] = useState(0);
 
+  // Fetch active and pending partners from backend API on mount
   useEffect(() => {
     fetch('http://localhost:8080/api/partners')
       .then(res => res.json())
       .then(data => {
+        // Count pending partners
         const pending = data.filter(p => p.status === 'PENDING').length;
         setPendingCount(pending);
 
+        // Filter and map active partners to local state structure
         const active = data
           .filter(p => p.status === 'ACTIVE')
           .map(p => ({
@@ -38,6 +46,11 @@ const Partners = () => {
       .catch(err => console.error("Error fetching partners:", err));
   }, []);
 
+  /**
+   * Toggle expanded state for partner card
+   * Shows/hides detailed information section
+   * @param {number} id - Partner ID to toggle
+   */
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
   };
@@ -45,14 +58,14 @@ const Partners = () => {
   return (
     <div className="partners-container">
       
-      {/* Header Section */}
+      {/* Page header with title and pending alert notification */}
       <div className="partners-header">
         <div className="header-text">
           <h1 className="page-title">Partners Management</h1>
           <p className="page-subtitle">Manage your business partners and monitor pending requests</p>
         </div>
 
-        {/* Professional Pending Request Button */}
+        {/* Pending request alert button with notification badge */}
         {pendingCount > 0 && (
           <div className="pending-alert-wrapper">
             <button 
@@ -78,7 +91,7 @@ const Partners = () => {
         )}
       </div>
 
-      {/* Stats Summary */}
+      {/* Statistics cards showing partner overview */}
       <div className="stats-grid">
         <div className="stat-card active-card">
           <div className="stat-icon active">
@@ -120,7 +133,7 @@ const Partners = () => {
         </div>
       </div>
 
-      {/* Section Header with Quick Actions */}
+      {/* Section header with filter actions */}
       <div className="section-header">
         <h3 className="section-title">Active Partners</h3>
         <div className="section-actions">
@@ -131,7 +144,7 @@ const Partners = () => {
         </div>
       </div>
 
-      {/* Partners List */}
+      {/* List of active partners with expandable details */}
       <div className="partners-list">
         {activeSellers.length === 0 ? (
           <div className="empty-state">
@@ -148,7 +161,7 @@ const Partners = () => {
               className={`partner-card ${expandedId === seller.id ? 'expanded' : ''}`}
             >
               
-              {/* Card Header */}
+              {/* Partner card header with shop info and expand toggle */}
               <div 
                 onClick={() => toggleExpand(seller.id)} 
                 className="card-header"
@@ -180,7 +193,7 @@ const Partners = () => {
                 </div>
               </div>
 
-              {/* Expanded Details */}
+              {/* Expanded details section with contact and action buttons */}
               {expandedId === seller.id && (
                 <div className="details-section">
                   <div className="details-grid">

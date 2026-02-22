@@ -3,7 +3,7 @@ layout: home
 permalink: index.html
 
 # Please update this with your repository name and project title
-repository-name: e23-2YP-GiftBox-Customization-Marketplace
+repository-name: e23-co2060-GiftBox-Customization-Marketplace
 title: GiftBox-Customization-Marketplace
 ---
 
@@ -45,65 +45,87 @@ A HTML template integrated with the given GitHub repository templates, based on 
 ## Introduction
 
 ### Problem Statement
-In today's digital age, online gift-giving has become increasingly popular. However, the current e-commerce ecosystem presents significant challenges for customers who wish to send personalized, multi-item gift packages. Existing platforms force users to:
 
-- lace separate orders from different vendors
+Online gift-giving has grown rapidly, yet existing e-commerce platforms offer no native way to select items from multiple vendors and combine them into a single gift package. Customers are forced to:
+
+- Place separate orders across different stores
 - Manually coordinate delivery timelines
-- Handle inconsistent packaging quality
-- Deal with multiple shipping addresses and tracking systems
-- Risk delayed or mismatched deliveries for time-sensitive occasions
+- Accept inconsistent packaging and quality
+- Manage multiple tracking systems for one occasion
 
-These limitations create a fragmented and frustrating experience, particularly problematic given that gifts are typically non-returnable and time-critical. The absence of quality assurance mechanisms and centralized coordination results in unpredictable outcomes that can undermine the thoughtfulness of gift-giving.
+These gaps are especially painful for time-sensitive, non-returnable gifts where quality and punctuality are critical.
 
 ### Proposed Solution
-Our platform revolutionizes the online gifting experience by introducing a centralized multi-vendor gift box customization marketplace. The system enables customers to:
 
-Select items from multiple registered vendors through a single unified interface
-Create fully personalized gift boxes with curated selections
-Benefit from centralized quality control and professional assembly
-Track orders seamlessly from selection to delivery
-Add personalized messages to enhance the gifting experience
+**Giftora** is a centralized multi-vendor gift box customization marketplace. Customers build a single personalized gift box by selecting items from any number of registered vendors, check out once, and receive one professionally assembled, quality-checked delivery.
 
-The platform's core innovation lies in its centralized assembly workflow, where a dedicated team collects items from various vendors, performs quality checks, assembles them into professionally packaged gift boxes, and ensures timely delivery. This approach eliminates coordination challenges while maintaining high quality standards.
+The platform introduces a **centralized assembly workflow**: a dedicated team collects items from vendors, inspects and assembles them, and dispatches the final gift box — ensuring consistent packaging standards and reliable delivery timelines.
 
 ### Impact
-For Customers:
 
-Saves time by consolidating multi-vendor shopping into one seamless experience
-Ensures consistent quality through standardized assembly procedures
-Provides peace of mind with comprehensive order tracking
-Enables truly personalized gifts without logistical complexity
+**For Customers** — One checkout, one delivery, zero coordination headache. Personalized gifts without logistical complexity.
 
-For Vendors:
+**For Vendors** — Broader customer reach, reduced individual shipping overhead, and clear order workflow integration.
 
-Access to a broader customer base through the marketplace
-Reduced individual packaging and shipping overhead
-Participation in premium gift box offerings
-Clear workflow integration with defined responsibilities
+**For the Gift Industry** — A scalable model for multi-vendor collaboration with built-in quality assurance.
 
-For the Gift Industry:
-
-Sets new standards for multi-vendor collaboration
-Demonstrates scalable quality assurance in curated gifting
-Provides a blueprint for coordinated e-commerce ecosystems
+---
 
 ## Solution Architecture
 
-High level diagram + description
+Giftora is a full-stack web application structured around three tiers:
 
-## Software Designs
+- **Frontend** — A React.js (v18+) single-page application serving role-specific dashboards for Customers, Vendors, Assembly Staff, and Administrators over HTTPS
+- **Backend** — A Spring Boot (Java, v3+) RESTful API layer handling business logic, JWT-based authentication, RBAC enforcement, order splitting, and assembly workflow coordination
+- **Database** — A MySQL (v8+) relational database storing users, products, orders, sub-orders, assembly records, and tracking milestones
 
-Detailed designs with many sub-sections
+A single customer order is split internally into **sub-orders per vendor**, each tracked independently and merged for the customer-facing milestone view. Real-time status updates are delivered via API polling or WebSocket connections.
+
+---
+
+## Software Design
+
+### Core Modules
+
+**User Management** — Secure registration and login for Customers, Vendors, and Administrators. JWT-based stateless authentication, BCrypt password hashing, and role-based access control (RBAC) enforced at both API and UI layers.
+
+**Gift Box Customisation Engine** — An interactive canvas where customers browse a searchable, filterable multi-vendor catalogue, add items from different sellers into one gift box, view a real-time cost total, attach a personalised message, and save drafts for later.
+
+**Vendor & Item Management** — A dedicated vendor portal for creating, editing, and managing product listings with images, pricing, and stock levels. Stock is automatically decremented on order confirmation.
+
+**Order Management & Splitting** — On checkout, a master order record is created and automatically split into one sub-order per vendor. Vendors are notified immediately; administrators manage the assembly hub workflow.
+
+**Milestone-Based Order Tracking** — Customers see a clear timeline across five stages: *Order Placed → Vendor Processing → Items Dispatched to Hub → Quality Inspection → Out for Delivery*, each with a recorded timestamp.
+
+### Technology Stack
+
+| Layer | Technology             |
+|---|------------------------|
+| Frontend | React.js v18+          |
+| Backend | Spring Boot v3+ (Java) |
+| Database | MySQL v8+              |
+| Auth | JWT + BCrypt           |
+| Version Control | Git / GitHub           |
+
+---
 
 ## Testing
 
-Testing done on software : detailed + summarized results
+The system is verified across four strategies:
+
+- **Unit Tests** — Backend service/utility methods with JUnit; frontend components with Jest
+- **Integration Tests** — API endpoint behaviour verified against the SRS using Postman collections
+- **System Tests** — End-to-end user journey scenarios on a deployed staging environment
+- **Security Tests** — JWT validation, RBAC enforcement, and input sanitisation via targeted API tests
+
+Automated regression tests run on every pull request to the main branch. Final User Acceptance Testing (UAT) simulates the full gift customization lifecycle with real user scenarios.
+
+---
 
 ## Conclusion
 
-This project represents more than a software application. It demonstrates our capability to identify real-world problems, architect comprehensive solutions, and execute complex technical implementations. The multi-vendor gift box customization marketplace addresses a genuine market need while showcasing modern web development practices, secure system design, and user-centered thinking.
-The successful completion of this project has equipped our team with practical skills in full-stack development, database design, API architecture, testing methodologies and project management—competencies that will prove invaluable in our future careers as software engineers.
-We are proud of what we have achieved and excited about the platform's potential for real-world deployment and commercial success.
+Giftora addresses a genuine gap in the online gifting market by combining multi-vendor item selection, centralized assembly, and milestone-based tracking into one seamless platform. The project demonstrates practical application of full-stack web development, secure system design, RESTful API architecture, and Agile project management — and provides a foundation for future enhancements including AI-powered gift recommendations, mobile applications, and multi-currency support.
+
 ## Links
 
 - [Project Repository](https://github.com/cepdnaclk/{{ page.repository-name }}){:target="_blank"}

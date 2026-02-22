@@ -6,14 +6,21 @@ import {
 } from 'react-icons/fa';
 import './PendingPartners.css';
 
+/**
+ * PendingPartners Component
+ * Displays a list of pending partner/seller applications
+ * Allows admin to approve or reject partnership requests
+ */
 const PendingPartners = () => {
   const navigate = useNavigate();
   const [pendingSellers, setPendingSellers] = useState([]);
 
+  // Fetch pending partners from backend API on component mount
   useEffect(() => {
     fetch('http://localhost:8080/api/partners')
       .then(res => res.json())
       .then(data => {
+        // Filter for pending partners and map to local state structure
         const pending = data
           .filter(p => p.status === 'PENDING')
           .map(p => ({
@@ -29,6 +36,13 @@ const PendingPartners = () => {
       .catch(err => console.error("Error fetching data:", err));
   }, []);
 
+  /**
+   * Update partner status via API call
+   * Sends approval/rejection request to backend
+   * Removes processed request from list on success
+   * @param {number} id - Partner ID
+   * @param {string} newStatus - New status (ACTIVE or REJECTED)
+   */
   const handleStatusUpdate = (id, newStatus) => {
     fetch(`http://localhost:8080/api/partners/${id}/status?status=${newStatus}`, {
       method: 'PUT',
@@ -50,7 +64,7 @@ const PendingPartners = () => {
   return (
     <div className="pending-container">
       
-      {/* Header */}
+      {/* Page header with navigation and title */}
       <div className="pending-header">
         <button onClick={() => navigate(-1)} className="back-btn">
           <FaArrowLeft /> Back to Partners
@@ -59,7 +73,7 @@ const PendingPartners = () => {
         <p className="page-subtitle">Review and approve new partner applications</p>
       </div>
 
-      {/* Stats */}
+      {/* Statistics card showing pending request count */}
       <div className="stats-grid">
         <div className="stat-card pending">
           <div className="stat-icon">
@@ -72,7 +86,7 @@ const PendingPartners = () => {
         </div>
       </div>
 
-      {/* Pending List */}
+      {/* List of pending partner requests */}
       <div className="pending-list">
         {pendingSellers.length === 0 ? (
           <div className="empty-state">
@@ -83,7 +97,9 @@ const PendingPartners = () => {
           pendingSellers.map((seller) => (
             <div key={seller.id} className="pending-card">
               
+              {/* Card content with shop info and action buttons */}
               <div className="card-content">
+                {/* Shop details section with avatar and information */}
                 <div className="shop-info">
                   <div className="shop-avatar">
                     <FaStore size={20} />
@@ -107,6 +123,7 @@ const PendingPartners = () => {
                   </div>
                 </div>
                 
+                {/* Approve and reject action buttons */}
                 <div className="action-buttons">
                   <button 
                     className="approve-btn" 

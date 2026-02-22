@@ -1,0 +1,346 @@
+/* Login and authentication page styles with 3D flip animation */
+
+/* Main page container with gradient background */
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 40%, #f59e0b 100%);
+  position: relative;
+}
+
+/* Logo positioning at top left of page */
+.login-logo {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  width: 112px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.login-logo:hover {
+  transform: scale(1.05);
+}
+
+@media (min-width: 640px) {
+  .login-logo {
+    left: 80px;
+    width: 128px;
+  }
+}
+
+/* 3D flip card container with perspective */
+.login-card-wrapper {
+  width: 100%;
+  max-width: 384px;
+  height: 500px;
+  perspective: 1000px;
+}
+
+/* Inner container for 3D flip animation */
+.login-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s ease;
+  transform-style: preserve-3d;
+}
+
+.login-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+/* Shared styles for both login and signup card faces */
+.login-card-front,
+.login-card-back {
+  position: absolute;
+  inset: 0;
+  background-color: #171717;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(217, 119, 6, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+.login-card-back {
+  transform: rotateY(180deg);
+}
+
+/* ── Headings ───────────────────────────────── */
+.login-card-front h2,
+.login-card-back h2 {
+  font-size: 30px;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.login-card-front p.login-sub,
+.login-card-back p.login-sub {
+  text-align: center;
+  color: rgba(253, 230, 138, 0.7);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+/* Input field row with icon and text input */
+.login-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 9999px;
+  background-color: #262626;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.login-input-row:focus-within {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 1px #f59e0b;
+}
+
+.login-input-row img {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.login-input-row input {
+  background: transparent;
+  outline: none;
+  border: none;
+  width: 100%;
+  color: white;
+  font-size: 14px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.login-input-row input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.login-input-row input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error message styling */
+.login-error {
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: -12px;
+  margin-bottom: 12px;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: slideDown 0.2s ease-out;
+}
+
+.login-general-error {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin: 0 0 16px 0;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Password visibility toggle button */
+.login-eye-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.login-eye-btn img {
+  width: 20px;
+  opacity: 0.6;
+  filter: invert(1);
+  transition: opacity 0.2s;
+}
+
+.login-eye-btn:hover:not(:disabled) img {
+  opacity: 1;
+}
+
+.login-eye-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Forgot password link */
+.login-forgot {
+  font-size: 14px;
+  color: #f59e0b;
+  cursor: pointer;
+  margin-bottom: 16px;
+  margin-left: 8px;
+  width: fit-content;
+  transition: color 0.2s;
+}
+
+.login-forgot:hover {
+  color: #fcd34d;
+}
+
+/* Submit button for login and signup forms */
+.login-submit-btn {
+  width: 100%;
+  padding: 10px 0;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #92400e, #ca8a04);
+  color: white;
+  font-weight: 500;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.login-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(to right, #b45309, #eab308);
+  transform: scale(1.05);
+}
+
+.login-submit-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.login-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Loading spinner animation */
+.spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Form toggle link to switch between login and signup */
+.login-toggle-text {
+  text-align: center;
+  margin-top: 16px;
+  color: #737373;
+  font-size: 14px;
+}
+
+.login-toggle-link {
+  color: #fbbf24;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.login-toggle-link:hover {
+  color: #fde68a;
+}
+
+/* ── Smaller gap for signup (more fields) ────── */
+.login-card-back .login-input-row {
+  margin-bottom: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-card-wrapper {
+    max-width: 90%;
+    height: auto;
+  }
+
+  .login-card-front,
+  .login-card-back {
+    padding: 32px 24px;
+    max-height: none;
+  }
+
+  .login-card-front h2,
+  .login-card-back h2 {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-logo {
+    width: 96px;
+    left: 12px;
+    top: 12px;
+  }
+
+  .login-card-wrapper {
+    max-width: calc(100% - 24px);
+    margin: 0 12px;
+  }
+
+  .login-card-front,
+  .login-card-back {
+    padding: 28px 20px;
+    border-radius: 10px;
+  }
+
+  .login-card-front h2,
+  .login-card-back h2 {
+    font-size: 22px;
+  }
+
+  .login-card-front p.login-sub,
+  .login-card-back p.login-sub {
+    font-size: 13px;
+  }
+
+  .login-input-row {
+    padding: 10px 16px;
+    margin-bottom: 12px;
+  }
+
+  .login-submit-btn {
+    padding: 9px 0;
+    font-size: 14px;
+  }
+}

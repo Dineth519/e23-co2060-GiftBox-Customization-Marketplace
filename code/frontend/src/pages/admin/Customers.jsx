@@ -4,12 +4,18 @@ import {
 } from 'react-icons/fa';
 import './Customers.css';
 
+/**
+ * Customers Component
+ * Displays a list of all customers with search and filter functionality
+ * Fetches customer data from the backend API and displays them in a grid layout
+ */
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
+    // Fetch all users from backend API and filter for customers
     fetch('http://localhost:8080/api/users') 
       .then(res => res.json())
       .then(data => {
@@ -23,6 +29,7 @@ const Customers = () => {
       });
   }, []);
 
+  // Filter customers based on search term (username or email)
   const filteredCustomers = customers.filter(customer =>
     customer.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -31,14 +38,14 @@ const Customers = () => {
   return (
     <div className="customers-container">
       
-      {/* Header */}
+      {/* Page header section with title and search bar */}
       <div className="customers-header">
         <div className="header-text">
           <h1 className="page-title">Customers</h1>
           <p className="page-subtitle">Manage and view all customer accounts</p>
         </div>
         
-        {/* Search Bar */}
+        {/* Search input field for filtering customers */}
         <div className="search-wrapper">
           <FaSearch className="search-icon" />
           <input 
@@ -51,7 +58,7 @@ const Customers = () => {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Display statistics cards for customer overview */}
       <div className="stats-grid">
         <div className="stat-card customers">
           <div className="stat-icon">
@@ -86,7 +93,7 @@ const Customers = () => {
         </div>
       </div>
 
-      {/* Content */}
+      {/* Main content area with loading state or customer grid */}
       {loading ? (
         <div className="loading-container">
           <div className="loading-spinner"></div>
@@ -103,14 +110,14 @@ const Customers = () => {
             filteredCustomers.map((customer) => (
               <div key={customer.user_id} className="customer-card">
                 
-                {/* Avatar */}
+                {/* Customer avatar section */}
                 <div className="card-avatar">
                   <div className="avatar-circle">
                     <FaUser size={22} />
                   </div>
                 </div>
 
-                {/* User Info */}
+                {/* Customer information display */}
                 <div className="card-body">
                   <h3 className="customer-name">{customer.username}</h3>
                   <div className="role-badge">Customer</div>
@@ -128,7 +135,7 @@ const Customers = () => {
                   </div>
                 </div>
 
-                {/* Action Button */}
+                {/* View profile action button */}
                 <div className="card-footer">
                   <button className="view-profile-btn">
                     View Profile
