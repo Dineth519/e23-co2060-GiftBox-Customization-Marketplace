@@ -1,0 +1,22 @@
+.squareCard {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  position: relative;
+  margin-left: 300px;
+  z-index: 1;
+}
+
+.cardStats h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #010911;
+  margin: 0;
+}
+
+.cardStats p {
+  font-size: 14px;
+  margin: 0;
+}

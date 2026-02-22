@@ -1,0 +1,198 @@
+/* Premium Admin TopBar - Giftora Theme */
+
+.topbar-container {
+  height: 64px;
+  background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  border-bottom: 2px solid rgba(201, 169, 97, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  width: 100%;
+  backdrop-filter: blur(10px);
+}
+
+/* Brand Section with Logo */
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(201, 169, 97, 0.4));
+  transition: transform 0.3s ease;
+}
+
+.topbar-logo:hover {
+  transform: scale(1.05);
+}
+
+.brand-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topbar-title {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #C9A961 0%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
+}
+
+.topbar-tagline {
+  font-size: 11px;
+  color: #5DADE2;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Actions Section */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Notification Button */
+.notification-btn {
+  position: relative;
+  padding: 10px;
+  border-radius: 50%;
+  background: rgba(93, 173, 226, 0.1);
+  border: 1px solid rgba(93, 173, 226, 0.3);
+  cursor: pointer;
+  color: #5DADE2;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-btn:hover {
+  background: rgba(93, 173, 226, 0.2);
+  border-color: #5DADE2;
+  transform: scale(1.05);
+}
+
+.notification-icon {
+  height: 20px;
+  width: 20px;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  border: 2px solid #1A1A2E;
+  animation: pulse-notification 2s infinite;
+}
+
+@keyframes pulse-notification {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+/* Profile Section */
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 40px;
+  background: rgba(93, 173, 226, 0.08);
+  border-radius: 50px;
+  border: 1px solid rgba(93, 173, 226, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-section:hover {
+  background: rgba(93, 173, 226, 0.15);
+  border-color: #5DADE2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(93, 173, 226, 0.3);
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.profile-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: 0.3px;
+}
+
+.profile-role {
+  font-size: 11px;
+  color: #C9A961;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.profile-avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #C9A961 0%, #D4AF37 100%);
+  border: 2px solid rgba(93, 173, 226, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1A1A2E;
+  box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .topbar-container {
+    padding: 0 20px;
+  }
+  
+  .topbar-logo {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .topbar-title {
+    font-size: 20px;
+  }
+  
+  .brand-text-wrapper {
+    display: none;
+  }
+  
+  .profile-info {
+    display: none;
+  }
+}
