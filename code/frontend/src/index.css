@@ -1,0 +1,76 @@
+/* ============================================
+   index.css — Giftora Global Reset & Base Styles
+   ============================================ */
+
+/* ── Reset ──────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ── Base ───────────────────────────────────── */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #ffffff;
+  color: #1A1A2E;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Typography ─────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Buttons & Inputs ───────────────────────── */
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* ── Images ─────────────────────────────────── */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ── Scrollbar (optional nice touch) ────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C9A961;
+  border-radius: 10px;
+}
