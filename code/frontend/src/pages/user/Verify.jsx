@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
-import './verify.css';
+import './Verify.css';
 
 const Verify = () => {
   const [email, setEmail] = useState('');

@@ -1,8 +1,3 @@
-/* ============================================
-   Header.css — Giftora Navbar + Category Bar
-   Colors: #C9A961 | #5DADE2 | #1A1A2E | #D4AF37 | #16213E
-   ============================================ */
-
 /* ── Navbar ─────────────────────────────────── */
 .navbar {
   display: flex;
@@ -162,7 +157,7 @@
 }
 
 /* Auth buttons */
-.btn-login {
+.btn-login-register {
   padding: 9px 22px;
   background: none;
   border: 2px solid rgba(201, 169, 97, 0.4);
@@ -175,28 +170,9 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
-.btn-login:hover {
+.btn-login-register:hover {
   border-color: #C9A961;
   background: rgba(201, 169, 97, 0.08);
-}
-
-.btn-register {
-  padding: 9px 22px;
-  background: linear-gradient(135deg, #C9A961 0%, #D4AF37 100%);
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: white;
-  box-shadow: 0 4px 12px rgba(201, 169, 97, 0.35);
-  transition: all 0.2s;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.btn-register:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(201, 169, 97, 0.45);
 }
 
 /* ── Category Bar ───────────────────────────── */
@@ -321,8 +297,7 @@
     font-size: 18px;
   }
 
-  .btn-login,
-  .btn-register {
+  .btn-login-register {
     padding: 7px 14px;
     font-size: 13px;
   }

@@ -1,8 +1,6 @@
-// Core libraries and routing
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Stylesheet
 import './Header.css';
 
 // Reusable icon button component with optional badge
@@ -68,8 +66,7 @@ const Navbar = () => {
 
         <div className="navbar__divider" />
 
-        <button className="btn-login"    onClick={() => navigate('/login')}>Login</button>
-        <button className="btn-register" onClick={() => navigate('/register')}>Register</button>
+        <button className="btn-login-register"    onClick={() => navigate('/login')}>Login / Register</button>
 
       </div>
     </nav>

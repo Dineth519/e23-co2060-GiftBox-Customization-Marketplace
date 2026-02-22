@@ -19,6 +19,11 @@
   top: 20px;
   width: 112px;
   cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.login-logo:hover {
+  transform: scale(1.05);
 }
 
 @media (min-width: 640px) {
@@ -64,6 +69,8 @@
   justify-content: center;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  overflow-y: auto;
+  max-height: 600px;
 }
 
 .login-card-back {
@@ -127,6 +134,44 @@
   color: rgba(255, 255, 255, 0.35);
 }
 
+.login-input-row input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error message styling */
+.login-error {
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: -12px;
+  margin-bottom: 12px;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: slideDown 0.2s ease-out;
+}
+
+.login-general-error {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin: 0 0 16px 0;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Password visibility toggle button */
 .login-eye-btn {
   background: none;
@@ -136,6 +181,7 @@
   outline: none;
   display: flex;
   align-items: center;
+  transition: opacity 0.2s;
 }
 
 .login-eye-btn img {
@@ -145,8 +191,13 @@
   transition: opacity 0.2s;
 }
 
-.login-eye-btn img:hover {
+.login-eye-btn:hover:not(:disabled) img {
   opacity: 1;
+}
+
+.login-eye-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Forgot password link */
@@ -178,11 +229,38 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
   font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.login-submit-btn:hover {
+.login-submit-btn:hover:not(:disabled) {
   background: linear-gradient(to right, #b45309, #eab308);
   transform: scale(1.05);
+}
+
+.login-submit-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.login-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Loading spinner animation */
+.spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Form toggle link to switch between login and signup */
@@ -207,4 +285,62 @@
 /* ── Smaller gap for signup (more fields) ────── */
 .login-card-back .login-input-row {
   margin-bottom: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-card-wrapper {
+    max-width: 90%;
+    height: auto;
+  }
+
+  .login-card-front,
+  .login-card-back {
+    padding: 32px 24px;
+    max-height: none;
+  }
+
+  .login-card-front h2,
+  .login-card-back h2 {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-logo {
+    width: 96px;
+    left: 12px;
+    top: 12px;
+  }
+
+  .login-card-wrapper {
+    max-width: calc(100% - 24px);
+    margin: 0 12px;
+  }
+
+  .login-card-front,
+  .login-card-back {
+    padding: 28px 20px;
+    border-radius: 10px;
+  }
+
+  .login-card-front h2,
+  .login-card-back h2 {
+    font-size: 22px;
+  }
+
+  .login-card-front p.login-sub,
+  .login-card-back p.login-sub {
+    font-size: 13px;
+  }
+
+  .login-input-row {
+    padding: 10px 16px;
+    margin-bottom: 12px;
+  }
+
+  .login-submit-btn {
+    padding: 9px 0;
+    font-size: 14px;
+  }
 }
