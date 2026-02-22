@@ -9,7 +9,6 @@ import Verify from './pages/user/Verify.jsx';
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
-import Register from './pages/auth/Register.jsx';
 
 // Admin components and pages
 import Sidebar from './components/admin/Sidebar.jsx';
@@ -54,7 +53,6 @@ function App() {
         <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
         <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
         <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
-        <Route path="/register" element={<LayoutWrapper><Register /></LayoutWrapper>} />
         <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
 
         {/* Seller routes */}

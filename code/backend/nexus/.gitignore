@@ -1,25 +1,56 @@
-HELP.md
+# ═══════════════════════════════════════════════════════
+# Maven & Build
+# ═══════════════════════════════════════════════════════
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+release.properties
+HELP.md
 
-### STS ###
-.apt_generated
+# ═══════════════════════════════════════════════════════
+# Java & Compiled Files
+# ═══════════════════════════════════════════════════════
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# ═══════════════════════════════════════════════════════
+# IDE - IntelliJ
+# ═══════════════════════════════════════════════════════
+.idea/
+.idea_modules/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ═══════════════════════════════════════════════════════
+# IDE - Eclipse
+# ═══════════════════════════════════════════════════════
+.settings/
 .classpath
 .factorypath
 .project
-.settings
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# ═══════════════════════════════════════════════════════
+# IDE - VS Code
+# ═══════════════════════════════════════════════════════
+.vscode/
+.vscode-test/
+*.code-workspace
 
-### NetBeans ###
+# ═══════════════════════════════════════════════════════
+# IDE - NetBeans
+# ═══════════════════════════════════════════════════════
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,5 +60,89 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# ═══════════════════════════════════════════════════════
+# IDE - STS
+# ═══════════════════════════════════════════════════════
+.apt_generated
+.apt_generated_tests
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ═══════════════════════════════════════════════════════
+# Environment & Secrets (CRITICAL!)
+# ═══════════════════════════════════════════════════════
+.env
+.env.local
+.env.*.local
+application.properties
+application-local.properties
+application-dev.properties
+
+# ═══════════════════════════════════════════════════════
+# Logs
+# ═══════════════════════════════════════════════════════
+logs/
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ═══════════════════════════════════════════════════════
+# OS Files
+# ═══════════════════════════════════════════════════════
+.DS_Store
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# ═══════════════════════════════════════════════════════
+# Database Files
+# ═══════════════════════════════════════════════════════
+*.sqlite
+*.sqlite3
+*.db
+*.h2.db
+data/
+
+# ═══════════════════════════════════════════════════════
+# Runtime & Temporary
+# ═══════════════════════════════════════════════════════
+*.tmp
+*.temp
+.cache/
+.m2/
+.gradle/
+tmp/
+temp/
+
+# ═══════════════════════════════════════════════════════
+# Node/NPM (if using anywhere)
+# ═══════════════════════════════════════════════════════
+node_modules/
+package-lock.json
+npm-debug.log
+
+# ═══════════════════════════════════════════════════════
+# Testing
+# ═══════════════════════════════════════════════════════
+coverage/
+.nyc_output/
+junit.xml
+
+# ═══════════════════════════════════════════════════════
+# Misc
+# ═══════════════════════════════════════════════════════
+*.sw?
+*~
+.#*
+.*.swp
+*.swo
