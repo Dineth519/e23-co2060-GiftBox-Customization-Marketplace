@@ -1,16 +1,14 @@
-/* ============================================
-   PREMIUM PARTNERS PAGE - GIFTORA THEME
-   ============================================ */
+/*
+ * Partners Page Styles - Giftora Theme
+ * Styling for partner management dashboard with expandable partner cards
+ */
 
 .partners-container {
   padding: 40px;
   min-height: calc(100vh - 64px);
 }
 
-/* ============================================
-   HEADER SECTION
-   ============================================ */
-
+/* Page header section with title and alerts */
 .partners-header {
   display: flex;
   justify-content: space-between;
@@ -43,15 +41,13 @@
   line-height: 1.6;
 }
 
-/* ============================================
-   PROFESSIONAL PENDING ALERT BUTTON
-   ============================================ */
-
+/* Alert notification button for pending requests */
 .pending-alert-wrapper {
   position: relative;
   z-index: 10;
 }
 
+/* Styled alert button with animations */
 .pending-alert-btn {
   display: flex;
   align-items: center;
@@ -92,7 +88,7 @@
   transform: translateY(0);
 }
 
-/* Alert Icon Section */
+/* Alert icon wrapper with gradient background */
 .alert-icon-wrapper {
   position: relative;
   width: 48px;
@@ -106,6 +102,7 @@
   flex-shrink: 0;
 }
 
+/* Bell icon with ringing animation */
 .bell-icon {
   color: white;
   font-size: 20px;
@@ -127,6 +124,7 @@
   }
 }
 
+/* Pulsing notification dot badge */
 .pulse-dot {
   position: absolute;
   top: -4px;
@@ -150,7 +148,7 @@
   }
 }
 
-/* Alert Content */
+/* Alert message content layout */
 .alert-content {
   display: flex;
   flex-direction: column;
@@ -186,7 +184,7 @@
   font-weight: 500;
 }
 
-/* Alert Arrow */
+/* Right arrow icon in alert button */
 .alert-arrow {
   color: #D97706;
   font-size: 16px;
@@ -198,10 +196,7 @@
   transform: translateX(4px);
 }
 
-/* ============================================
-   STATS GRID - ENHANCED WITH GIFTORA COLORS
-   ============================================ */
-
+/* Statistics grid layout with responsive columns */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -209,6 +204,7 @@
   margin-bottom: 40px;
 }
 
+/* Individual statistics card styling */
 .stat-card {
   background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
   border-radius: 20px;
@@ -223,6 +219,7 @@
   overflow: hidden;
 }
 
+/* Left border accent on stat cards */
 .stat-card::before {
   content: '';
   position: absolute;
@@ -357,10 +354,7 @@
   color: #C9A961;
 }
 
-/* ============================================
-   SECTION HEADER
-   ============================================ */
-
+/* Section header with title and filter actions */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -370,6 +364,7 @@
   gap: 16px;
 }
 
+/* Section title styling */
 .section-title {
   font-size: 24px;
   font-weight: 700;
@@ -378,11 +373,13 @@
   letter-spacing: -0.3px;
 }
 
+/* Filter action buttons layout */
 .section-actions {
   display: flex;
   gap: 12px;
 }
 
+/* Filter button styling */
 .filter-btn {
   display: flex;
   align-items: center;
@@ -404,17 +401,14 @@
   color: #C9A961;
 }
 
-/* ============================================
-   PARTNERS LIST
-   ============================================ */
-
+/* Partners list container */
 .partners-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* Empty State - Enhanced */
+/* Empty state container */
 .empty-state {
   background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
   border-radius: 24px;
@@ -423,6 +417,7 @@
   border: 2px dashed rgba(201, 169, 97, 0.3);
 }
 
+/* Empty state icon wrapper */
 .empty-icon-wrapper {
   width: 100px;
   height: 100px;
@@ -434,11 +429,13 @@
   margin: 0 auto 24px;
 }
 
+/* Empty state icon styling */
 .empty-icon {
   color: #C9A961;
   opacity: 0.6;
 }
 
+/* Empty state title text */
 .empty-title {
   font-size: 22px;
   font-weight: 700;
@@ -446,6 +443,7 @@
   margin: 0 0 8px 0;
 }
 
+/* Empty state descriptive text */
 .empty-text {
   color: #9CA3AF;
   font-size: 15px;
@@ -453,10 +451,7 @@
   font-weight: 500;
 }
 
-/* ============================================
-   PARTNER CARD - GIFTORA THEME
-   ============================================ */
-
+/* Partner card container with styling */
 .partner-card {
   background: linear-gradient(135deg, #FFFFFF 0%, #FAFAFA 100%);
   border-radius: 24px;
@@ -467,6 +462,7 @@
   position: relative;
 }
 
+/* Top accent border on partner card */
 .partner-card::before {
   content: '';
   position: absolute;
@@ -497,7 +493,7 @@
   opacity: 1;
 }
 
-/* Card Header */
+/* Card header section clickable area */
 .card-header {
   padding: 32px;
   display: flex;
@@ -512,6 +508,7 @@
   background: rgba(201, 169, 97, 0.03);
 }
 
+/* Left header content with avatar and info */
 .header-left {
   display: flex;
   align-items: center;
@@ -520,6 +517,7 @@
   min-width: 0;
 }
 
+/* Shop avatar icon container */
 .shop-avatar {
   width: 64px;
   height: 64px;
@@ -534,6 +532,7 @@
   position: relative;
 }
 
+/* Avatar blur shadow effect */
 .shop-avatar::after {
   content: '';
   position: absolute;
@@ -545,11 +544,13 @@
   z-index: -1;
 }
 
+/* Header information layout */
 .header-info {
   flex: 1;
   min-width: 0;
 }
 
+/* Shop name heading */
 .shop-name {
   font-size: 24px;
   font-weight: 800;
@@ -558,6 +559,7 @@
   letter-spacing: -0.5px;
 }
 
+/* Card metadata items */
 .card-meta {
   display: flex;
   gap: 24px;
@@ -566,6 +568,7 @@
   flex-wrap: wrap;
 }
 
+/* Metadata item styling */
 .meta-item {
   display: flex;
   align-items: center;
@@ -573,6 +576,7 @@
   font-weight: 500;
 }
 
+/* Right header content with status and expand */
 .header-right {
   display: flex;
   align-items: center;
@@ -580,6 +584,7 @@
   flex-shrink: 0;
 }
 
+/* Status badge styling */
 .status-badge {
   padding: 8px 16px;
   border-radius: 12px;
@@ -589,12 +594,14 @@
   letter-spacing: 0.5px;
 }
 
+/* Active status badge */
 .status-badge.active {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
   color: #059669;
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
+/* Expand/collapse icon */
 .expand-icon {
   color: #6B7280;
   transition: all 0.3s ease;
@@ -612,7 +619,7 @@
   color: #C9A961;
 }
 
-/* Details Section */
+/* Expanded details section */
 .details-section {
   padding: 0 32px 32px 32px;
   border-top: 1px solid rgba(201, 169, 97, 0.15);
@@ -620,6 +627,7 @@
   animation: slideDown 0.3s ease-out;
 }
 
+/* Slide down animation for details */
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -631,6 +639,7 @@
   }
 }
 
+/* Details grid layout */
 .details-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -638,12 +647,14 @@
   margin: 28px 0;
 }
 
+/* Information block container */
 .info-block {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* Information label styling */
 .info-label {
   font-size: 12px;
   color: #9CA3AF;
@@ -655,10 +666,12 @@
   gap: 6px;
 }
 
+/* Label icon color */
 .label-icon {
   color: #C9A961;
 }
 
+/* Information value display */
 .info-value {
   font-size: 16px;
   color: #1F2937;
@@ -669,7 +682,7 @@
   border: 1px solid rgba(201, 169, 97, 0.15);
 }
 
-/* Card Actions */
+/* Card action buttons layout */
 .card-actions {
   display: flex;
   justify-content: flex-end;
@@ -679,6 +692,7 @@
   flex-wrap: wrap;
 }
 
+/* Action button styling */
 .action-btn {
   padding: 12px 28px;
   border: none;
@@ -692,6 +706,7 @@
   gap: 8px;
 }
 
+/* Secondary action button */
 .action-btn.secondary {
   background: white;
   color: #C9A961;
@@ -703,6 +718,7 @@
   border-color: #C9A961;
 }
 
+/* Primary action button */
 .action-btn.primary {
   background: linear-gradient(135deg, #C9A961 0%, #D4AF37 100%);
   color: white;
@@ -714,16 +730,14 @@
   box-shadow: 0 8px 24px rgba(201, 169, 97, 0.45);
 }
 
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-
+/* Responsive design adjustments for large screens */
 @media (max-width: 1200px) {
   .stats-grid {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   }
 }
 
+/* Responsive design adjustments for tablets */
 @media (max-width: 768px) {
   .partners-container {
     padding: 20px;
@@ -777,6 +791,7 @@
   }
 }
 
+/* Responsive design adjustments for mobile devices */
 @media (max-width: 480px) {
   .partners-container {
     padding: 16px;
