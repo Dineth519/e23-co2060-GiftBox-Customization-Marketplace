@@ -1,10 +1,10 @@
 package com.example.nexus.service;
 
+import com.example.nexus.dto.*;
+import com.example.nexus.model.Role;
 import com.example.nexus.model.User;
 import com.example.nexus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,106 +15,130 @@ import java.util.Random;
 @Service
 public class AuthService {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private JavaMailSender mailSender;
+    @Autowired
+    private UserRepository userRepository;
 
-    // 1. Register User
-    public String register(User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return "Username already exists";
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
+
+    // ── Register ───────────────────────────────
+    public AuthResponse register(RegisterRequest request) {
+
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return new AuthResponse(false, "Username already exists");
         }
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return "Email already exists";
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return new AuthResponse(false, "Email already registered");
         }
-        
-        // Encrypt password before saving
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Generate 6-digit OTP
+        String code = String.format("%06d", new Random().nextInt(999999));
+
+        // Build user — not verified yet
+        User user = new User();
+        user.setName(request.getName());
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.CUSTOMER);
+        user.setVerified(false);
+        user.setVerificationCode(code);
+        user.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10)); // 10 min expiry
+
         userRepository.save(user);
-        return "Account Created";
+
+        // Send email
+        emailService.sendVerificationCode(request.getEmail(), code);
+
+        return new AuthResponse(true, "Registration successful! Check your email for the verification code.");
     }
 
-    // 2. Login (Using Username)
-    public String login(String username, String password) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            // Securely compare the raw password with the hashed database password
-            if (passwordEncoder.matches(password, user.getPassword())) {
-                return "Login Successful"; 
-            } else {
-                return "Incorrect Password";
-            }
+    // ── Verify Email ───────────────────────────
+    public AuthResponse verifyEmail(VerifyRequest request) {
+
+        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
+
+        if (userOpt.isEmpty()) {
+            return new AuthResponse(false, "User not found");
         }
-        return "User not found";
-    }
-
-    // 3. Send 4-Digit OTP (Using Email)
-public String sendResetOtp(String email) {
-    // 1. Clean the input immediately
-    if (email == null) return "Email is required";
-    String cleanEmail = email.trim().toLowerCase(); 
-
-    // 2. Use a case-insensitive search
-    Optional<User> userOpt = userRepository.findByEmailIgnoreCase(cleanEmail);
-    
-    if (userOpt.isEmpty()) {
-        System.out.println("DEBUG: Search failed for email: [" + cleanEmail + "]");
-        return "User not found";
-    }
-
-    User user = userOpt.get();
-    String otp = String.format("%04d", new Random().nextInt(10000)); 
-    
-    user.setResetOtp(otp);
-    user.setResetOtpExpireAt(LocalDateTime.now().plusMinutes(15));
-    userRepository.save(user);
-
-    try {
-        sendEmail(user.getEmail(), "Your Password Reset Code", "Your 4-digit OTP is: " + otp);
-        return "OTP sent";
-    } catch (Exception e) {
-        System.err.println("Email Error: " + e.getMessage());
-        return "Error sending email, but OTP was generated";
-    }
-}
-
-    // 4. Verify OTP
-    public String verifyOtp(String email, String otp) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) return "User not found";
 
         User user = userOpt.get();
-        if (user.getResetOtp() == null || !user.getResetOtp().equals(otp)) {
-            return "Invalid OTP";
+
+        // Already verified?
+        if (user.isVerified()) {
+            return new AuthResponse(false, "Email already verified");
         }
-        if (user.getResetOtpExpireAt() == null || user.getResetOtpExpireAt().isBefore(LocalDateTime.now())) {
-            return "OTP Expired";
+
+        // Code expired?
+        if (LocalDateTime.now().isAfter(user.getCodeExpiresAt())) {
+            return new AuthResponse(false, "Verification code expired. Please register again.");
         }
-        return "OTP Verified";
+
+        // Wrong code?
+        if (!user.getVerificationCode().equals(request.getCode())) {
+            return new AuthResponse(false, "Invalid verification code");
+        }
+
+        // All good — mark as verified
+        user.setVerified(true);
+        user.setVerificationCode(null);  // clear code after use
+        user.setCodeExpiresAt(null);
+        userRepository.save(user);
+
+        return new AuthResponse(true, "Email verified successfully! You can now login.");
     }
 
-    // 5. Save New Password
-    public String resetPassword(String email, String newPassword) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) return "User not found";
+    // ── Login ──────────────────────────────────
+    public AuthResponse login(LoginRequest request) {
+
+        Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
+
+        if (userOpt.isEmpty()) {
+            return new AuthResponse(false, "User not found");
+        }
 
         User user = userOpt.get();
-        user.setPassword(passwordEncoder.encode(newPassword));
-        user.setResetOtp(null); // Clear OTP
-        user.setResetOtpExpireAt(null);
-        userRepository.save(user);
-        
-        return "Password reset successfully";
+
+        // Block login if not verified
+        if (!user.isVerified()) {
+            return new AuthResponse(false, "Please verify your email before logging in");
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return new AuthResponse(false, "Incorrect password");
+        }
+
+        // 👈 වෙනස් කරපු තැන: Role එක යවනවා
+        return new AuthResponse(true, "Login Successful", user.getRole().name());
     }
 
-    // Helper method to send email
-    private void sendEmail(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
-        mailSender.send(message);
+    // ── Resend Code ────────────────────────────
+    public AuthResponse resendCode(String email) {
+
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        if (userOpt.isEmpty()) {
+            return new AuthResponse(false, "User not found");
+        }
+
+        User user = userOpt.get();
+
+        if (user.isVerified()) {
+            return new AuthResponse(false, "Email already verified");
+        }
+
+        // Generate new code
+        String newCode = String.format("%06d", new Random().nextInt(999999));
+        user.setVerificationCode(newCode);
+        user.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
+
+        emailService.sendVerificationCode(email, newCode);
+
+        return new AuthResponse(true, "New verification code sent!");
     }
 }

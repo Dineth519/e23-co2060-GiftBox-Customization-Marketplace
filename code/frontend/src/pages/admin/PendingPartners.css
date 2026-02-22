@@ -1,20 +1,20 @@
-/* ============================================
-   PREMIUM PENDING PARTNERS - GIFTORA THEME
-   ============================================ */
+/*
+ * Pending Partners Page Styles - Giftora Theme
+ * Styling for pending partner request management interface
+ */
 
 .pending-container {
   padding: 40px;
   min-height: calc(100vh - 64px);
 }
 
-/* ============================================
-   HEADER
-   ============================================ */
+/* Header section with navigation and page title */
 
 .pending-header {
   margin-bottom: 32px;
 }
 
+/* Back button with navigation styling */
 .back-btn {
   display: flex;
   align-items: center;
@@ -54,10 +54,7 @@
   line-height: 1.6;
 }
 
-/* ============================================
-   STATS
-   ============================================ */
-
+/* Statistics grid layout with responsive columns */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -65,6 +62,7 @@
   margin-bottom: 32px;
 }
 
+/* Individual statistics card styling */
 .stat-card {
   background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
   border-radius: 20px;
@@ -86,6 +84,7 @@
   border-color: rgba(245, 158, 11, 0.25);
 }
 
+/* Statistics icon styling */
 .stat-icon {
   width: 64px;
   height: 64px;
@@ -109,11 +108,13 @@
   z-index: -1;
 }
 
+/* Pending status icon with gradient background */
 .stat-card.pending .stat-icon {
   background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
   box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
 }
 
+/* Statistics content area */
 .stat-content {
   flex: 1;
 }
@@ -139,20 +140,14 @@
   letter-spacing: 0.5px;
 }
 
-/* ============================================
-   PENDING LIST
-   ============================================ */
-
+/* List container for pending requests */
 .pending-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* ============================================
-   PENDING CARD
-   ============================================ */
-
+/* Pending request card styling */
 .pending-card {
   background: linear-gradient(135deg, #FFFFFF 0%, #FAFAFA 100%);
   border-radius: 20px;
@@ -164,6 +159,7 @@
   overflow: hidden;
 }
 
+/* Left accent border on pending card */
 .pending-card::before {
   content: '';
   position: absolute;
@@ -174,12 +170,14 @@
   background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%);
 }
 
+/* Card hover state with elevation */
 .pending-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 28px rgba(201, 169, 97, 0.15);
   border-color: #F59E0B;
 }
 
+/* Card content layout with flex */
 .card-content {
   display: flex;
   justify-content: space-between;
@@ -188,6 +186,7 @@
   flex-wrap: wrap;
 }
 
+/* Shop information section */
 .shop-info {
   display: flex;
   align-items: center;
@@ -196,6 +195,7 @@
   min-width: 300px;
 }
 
+/* Shop avatar icon container */
 .shop-avatar {
   width: 56px;
   height: 56px;
@@ -210,6 +210,7 @@
   position: relative;
 }
 
+/* Blur shadow effect for avatar */
 .shop-avatar::after {
   content: '';
   position: absolute;
@@ -221,10 +222,12 @@
   z-index: -1;
 }
 
+/* Shop information details */
 .shop-details {
   flex: 1;
 }
 
+/* Shop name heading */
 .shop-name {
   font-size: 22px;
   font-weight: 700;
@@ -233,6 +236,7 @@
   letter-spacing: -0.3px;
 }
 
+/* Metadata grid for shop information */
 .meta-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -253,16 +257,14 @@
   color: #374151;
 }
 
-/* ============================================
-   ACTION BUTTONS
-   ============================================ */
-
+/* Action buttons layout */
 .action-buttons {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
 }
 
+/* Approve and reject button styling */
 .approve-btn,
 .reject-btn {
   display: flex;
@@ -278,30 +280,31 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
+/* Approve button with green gradient */
 .approve-btn {
   background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   color: white;
 }
 
+/* Approve button hover state */
 .approve-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
 }
 
+/* Reject button with red gradient */
 .reject-btn {
   background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
   color: white;
 }
 
+/* Reject button hover state */
 .reject-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
 }
 
-/* ============================================
-   EMPTY STATE
-   ============================================ */
-
+/* Empty state container */
 .empty-state {
   background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
   border-radius: 24px;
@@ -310,6 +313,7 @@
   border: 2px dashed rgba(245, 158, 11, 0.3);
 }
 
+/* Empty state icon wrapper */
 .empty-icon-wrapper {
   width: 100px;
   height: 100px;
@@ -321,11 +325,13 @@
   margin: 0 auto 24px;
 }
 
+/* Empty state icon styling */
 .empty-icon {
   color: #F59E0B;
   opacity: 0.6;
 }
 
+/* Empty state title */
 .empty-title {
   font-size: 22px;
   font-weight: 700;
@@ -333,6 +339,7 @@
   margin: 0 0 8px 0;
 }
 
+/* Empty state descriptive text */
 .empty-text {
   color: #9CA3AF;
   font-size: 15px;
@@ -340,9 +347,7 @@
   font-weight: 500;
 }
 
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
+/* Responsive design adjustments for tablets and mobile devices */
 
 @media (max-width: 768px) {
   .pending-container {
