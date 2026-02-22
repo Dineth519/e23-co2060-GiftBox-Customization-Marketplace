@@ -2,11 +2,12 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 
 import HomePage from './pages/homepage/HomePage.jsx'; 
+import CustomerHome from './pages/user/CustomerHome.jsx'; 
+import Verify from './pages/user/Verify.jsx';
 
 // --- COMPONENT IMPORTS ---
 import Login from './pages/auth/Login.jsx'; 
 import Register from './pages/auth/Register.jsx';
-import Home from './pages/user/Home.jsx';
 import UserDashboard from './pages/user/UserDashboard.jsx';
 
 // --- ADMIN IMPORTS ---
@@ -56,9 +57,10 @@ function App() {
         
         {/* --- PUBLIC & USER ROUTES --- */}
         <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
-        <Route path="/home" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
+        <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
         <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
         <Route path="/register" element={<LayoutWrapper><Register /></LayoutWrapper>} />
+        <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
         <Route path="/user-dashboard" element={<LayoutWrapper><UserDashboard /></LayoutWrapper>} />
 
         {/* --- SELLER ROUTES --- */}
