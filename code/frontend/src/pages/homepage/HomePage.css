@@ -1,9 +1,8 @@
-/* ============================================
-   HomePage.css — Giftora Public Home Page
-   Colors: #C9A961 | #5DADE2 | #1A1A2E | #D4AF37 | #16213E
-   ============================================ */
+/* Home page styles for public gift marketplace landing page */
 
-/* ── Page wrapper ───────────────────────────── */
+/* Color palette: Gold #C9A961, Cyan #5DADE2, Navy #1A1A2E, Light Gold #D4AF37, Deep Blue #16213E */
+
+/* Main page wrapper with flexbox layout */
 .home-page {
   font-family: 'Segoe UI', sans-serif;
   min-height: 100vh;
@@ -11,7 +10,7 @@
   flex-direction: column;
 }
 
-/* ── Hero Section ───────────────────────────── */
+/* Hero section with full-height gradient background and decorative glows */
 .hero {
   background: linear-gradient(135deg, #1A1A2E 0%, #16213E 55%, #0f1a33 100%);
   padding: 80px 48px;
@@ -20,7 +19,7 @@
   flex: 1;
 }
 
-/* Decorative glows */
+/* Decorative background glow effects using pseudo-elements */
 .hero::before,
 .hero::after {
   content: '';
@@ -279,7 +278,7 @@
   opacity: 0.9;
 }
 
-/* ── Categories Strip ───────────────────────── */
+/* Categories navigation strip with horizontal grid layout */
 .categories-strip {
   background: #ffffff;
   padding: 48px;
@@ -340,7 +339,7 @@
   transition: color 0.25s;
 }
 
-/* ── Featured Products ──────────────────────── */
+/* Featured products section with product card grid */
 .featured {
   padding: 64px 48px;
   background: #faf9f7;
@@ -547,7 +546,7 @@
   max-width: 200px;
 }
 
-/* ── Responsive ─────────────────────────────── */
+/* Responsive design media queries for tablet and mobile layouts */
 @media (max-width: 1024px) {
   .hero__inner {
     grid-template-columns: 1fr;

@@ -1,19 +1,26 @@
+// Core libraries and routing
 import React, { useState } from 'react';
-import { assets } from '../../assets/login/assets';
 import { useNavigate } from 'react-router-dom';
+
+// Assets and resources
+import { assets } from '../../assets/login/assets';
+
+// Stylesheet
 import './Login.css';
 
+// Login and signup form component with 3D flip animation
 const Login = () => {
   const [state, setState] = useState('Login');
   const navigate = useNavigate();
 
+  // Form field states for login and registration
   const [name, setName]               = useState('');
   const [username, setUsername]       = useState('');
   const [email, setEmail]             = useState('');
   const [password, setPassword]       = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  // Toggle between Login and Sign Up forms
+  // Toggle between login and signup form views
   const toggleState = () => {
     setState(state === 'Sign Up' ? 'Login' : 'Sign Up');
     setName('');
@@ -39,7 +46,7 @@ const Login = () => {
 
         if (data.success === true) {
           alert('Registration Successful! Please check your email for the verification code.');
-          // 👈 Redirect to verify page and pass the email state
+          // Redirect to email verification page with email state
           navigate('/verify', { state: { email: email } }); 
         } else {
           alert(data.message);
@@ -58,11 +65,12 @@ const Login = () => {
         if (data.success === true) {
           alert(data.message);
           
+          // Get user role from server response
           const userRole = data.role; 
           localStorage.setItem('userRole', userRole);
           localStorage.setItem('username', username);
 
-          // Route user based on their role
+          // Route user to appropriate dashboard based on role
           if (userRole === 'ADMIN') {
             navigate('/admin');
           } else if (userRole === 'SELLER' || userRole === 'PARTNER') {
@@ -85,6 +93,7 @@ const Login = () => {
     }
   };
 
+  // Render login and signup form with 3D flip animation
   return (
     <div className="login-page">
       <img src={assets.logo} alt="Giftora Logo" className="login-logo" />
@@ -92,7 +101,7 @@ const Login = () => {
       <div className="login-card-wrapper">
         <div className={`login-card-inner ${state === 'Sign Up' ? 'flipped' : ''}`}>
 
-          {/* ================= LOGIN SIDE ================= */}
+          {/* Login form side of flip card */}
           <div className="login-card-front">
             <h2>Welcome Back</h2>
             <p className="login-sub">Login to your account</p>
@@ -114,7 +123,7 @@ const Login = () => {
             <p className="login-toggle-text">Don't have an account? <span className="login-toggle-link" onClick={toggleState}>Sign Up</span></p>
           </div>
 
-          {/* ================= SIGN UP SIDE ================= */}
+          {/* Sign up form side of flip card */}
           <div className="login-card-back">
             <h2>Create Account</h2>
             <p className="login-sub">Join us to customize your gifts</p>

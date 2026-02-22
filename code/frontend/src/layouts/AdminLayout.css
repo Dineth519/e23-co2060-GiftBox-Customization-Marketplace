@@ -1,5 +1,6 @@
-/* Premium Admin Layout - Giftora Theme */
+/* Admin dashboard layout with sidebar and top navigation */
 
+/* Main admin layout container with fixed positioning */
 .admin-layout {
   margin: 0;
   padding: 0;
@@ -12,6 +13,7 @@
   background: linear-gradient(135deg, #F5F1E8 0%, #EDE8DC 100%);
 }
 
+/* Main layout wrapper with sidebar and content area */
 .layout-wrapper {
   display: flex;
   margin-top: 64px;
@@ -19,6 +21,7 @@
   width: 100%;
 }
 
+/* Main content area with scrollable overflow */
 .main-content {
   margin-left: 280px;
   flex: 1;
@@ -30,7 +33,7 @@
   position: relative;
 }
 
-/* Custom Scrollbar for Main Content */
+/* Custom scrollbar styling for main content area */
 .main-content::-webkit-scrollbar {
   width: 8px;
 }

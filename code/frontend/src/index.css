@@ -1,8 +1,6 @@
-/* ============================================
-   index.css — Giftora Global Reset & Base Styles
-   ============================================ */
+/* Global reset and base styles for Giftora application */
 
-/* ── Reset ──────────────────────────────────── */
+/* Reset default margins, paddings, and box-sizing for all elements */
 *,
 *::before,
 *::after {
@@ -19,7 +17,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Base ───────────────────────────────────── */
+/* Base body styles and typography settings */
 body {
   font-family: 'Segoe UI', sans-serif;
   background-color: #ffffff;
@@ -28,7 +26,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Typography ─────────────────────────────── */
+/* Heading and text styles */
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
   font-weight: 700;
@@ -43,7 +41,7 @@ a {
   color: inherit;
 }
 
-/* ── Buttons & Inputs ───────────────────────── */
+/* Button and form input styles */
 button {
   font-family: inherit;
   cursor: pointer;
@@ -55,13 +53,13 @@ select {
   font-family: inherit;
 }
 
-/* ── Images ─────────────────────────────────── */
+/* Image responsive styles */
 img {
   max-width: 100%;
   display: block;
 }
 
-/* ── Scrollbar (optional nice touch) ────────── */
+/* Custom scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
 }

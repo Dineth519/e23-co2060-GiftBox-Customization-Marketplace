@@ -1,11 +1,20 @@
+// Core libraries
 import React, { useState, useEffect } from 'react';
+
+// Icons for UI components
 import { FaGift, FaHeart, FaTruck, FaShieldAlt, FaStar, FaArrowRight, FaQuoteLeft } from 'react-icons/fa';
+
+// Stylesheet for customer home page
 import './CustomerHome.css';
 
+// Customer home page component displaying gift marketplace with categories, products, and vendors
 const CustomerHome = () => {
+  // Track active category for filtering
   const [activeCategory, setActiveCategory] = useState(0);
+  // Track scroll position for header styling
   const [scrolled, setScrolled] = useState(false);
 
+  // Handle scroll event to update header styling
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -14,6 +23,7 @@ const CustomerHome = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Product categories for gift selection
   const categories = [
     { name: 'Birthday Bliss', emoji: '🎂', description: 'Celebrate with joy' },
     { name: 'Romance', emoji: '💝', description: 'Express your love' },
@@ -23,6 +33,7 @@ const CustomerHome = () => {
     { name: 'Gourmet', emoji: '🍫', description: 'Delicious delights' }
   ];
 
+  // Best-selling gift boxes with ratings and pricing
   const featuredBoxes = [
     {
       name: 'The Luxe Collection',
@@ -47,6 +58,7 @@ const CustomerHome = () => {
     }
   ];
 
+  // Customer testimonials and reviews
   const testimonials = [
     {
       name: 'Sarah Johnson',
@@ -68,6 +80,7 @@ const CustomerHome = () => {
     }
   ];
 
+  // Verified partner vendors providing quality items
   const vendors = [
     { name: 'Sweet Delights', specialty: 'Artisan Chocolates', icon: '🍫' },
     { name: 'Flower Paradise', specialty: 'Fresh Blooms', icon: '🌸' },
@@ -75,10 +88,10 @@ const CustomerHome = () => {
     { name: 'Gift Gallery', specialty: 'Curated Items', icon: '🎨' }
   ];
 
+  // Render complete customer home page with all sections
   return (
     <div className="customer-home">
-      
-      {/* Hero Section */}
+      {/* Hero section with main call-to-action and value proposition */}
       <section className="hero-section">
         <div className="hero-glow"></div>
         <div className="hero-content">
@@ -136,7 +149,7 @@ const CustomerHome = () => {
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Categories section for browsing gifts by occasion */}
       <section className="categories-section">
         <div className="section-header">
           <h2 className="section-title">Shop by Occasion</h2>
@@ -158,7 +171,7 @@ const CustomerHome = () => {
         </div>
       </section>
 
-      {/* Featured Boxes */}
+      {/* Featured bestselling gift boxes with ratings and prices */}
       <section className="featured-section">
         <div className="section-header">
           <h2 className="section-title">Bestselling Collections</h2>
@@ -200,7 +213,7 @@ const CustomerHome = () => {
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* Process steps explaining how customers create and receive gift boxes */}
       <section className="how-it-works">
         <div className="section-header">
           <h2 className="section-title">Creating Magic is Simple</h2>
@@ -236,7 +249,7 @@ const CustomerHome = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Customer testimonials and success stories */}
       <section className="testimonials-section">
         <div className="section-header">
           <h2 className="section-title">Stories of Joy</h2>
@@ -270,7 +283,7 @@ const CustomerHome = () => {
         </div>
       </section>
 
-      {/* Featured Vendors */}
+      {/* Trusted vendor partners providing quality items for gift boxes */}
       <section className="vendors-section">
         <div className="section-header">
           <h2 className="section-title">Our Trusted Partners</h2>
@@ -294,7 +307,7 @@ const CustomerHome = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Call-to-action section encouraging user engagement */}
       <section className="cta-section">
         <div className="cta-content">
           <h2 className="cta-title">Ready to Create Something Special?</h2>
@@ -309,7 +322,7 @@ const CustomerHome = () => {
         <div className="cta-glow"></div>
       </section>
 
-      {/* Footer */}
+      {/* Footer with links, information, and company details */}
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-section">
