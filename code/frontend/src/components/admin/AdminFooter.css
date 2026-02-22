@@ -1,0 +1,38 @@
+/* Update AdminFooter.css */
+
+.admin-footer {
+  background: linear-gradient(180deg, #F5F1E8 0%, #EDE8DC 100%);
+  border-top: 2px solid rgba(201, 169, 97, 0.2);
+}
+
+.footer-brand {
+  background: linear-gradient(135deg, #C9A961 0%, #5DADE2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-link::after {
+  background: linear-gradient(90deg, #C9A961 0%, #5DADE2 100%);
+}
+
+.footer-link:hover {
+  color: #C9A961;
+}
+
+.footer-version {
+  background: rgba(201, 169, 97, 0.1);
+  border: 1px solid rgba(201, 169, 97, 0.2);
+}
+```
+
+---
+
+## 📁 **Logo File Setup:**
+```
+src/
+├── assets/
+│   └── logo-removebg-preview.png  (Put your logo here)
+├── components/
+│   └── admin/
+│       ├── TopBar.jsx
+│       └── TopBar.css
