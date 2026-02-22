@@ -11,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/partners")
 // Allows your React app (running on port 3000) to communicate with this backend
-@CrossOrigin(origins = "http://localhost:3000") 
 public class PartnerController {
 
     @Autowired
