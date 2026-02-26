@@ -1,44 +1,57 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import '../admin/Sidebar.css'; // Utilizing shared CSS classes from your teammates
 
 const SellerSidebar = () => {
-  // Sidebar container style matching the dark admin theme
+  const location = useLocation();
+
+  // Navigation items for the seller panel
+  const menuItems = [
+    { name: 'Dashboard', path: '/seller' },
+    { name: 'My Items', path: '/seller/items' },
+    { name: 'Orders', path: '/seller/orders' },
+    { name: 'Settings', path: '/seller/settings' }
+  ];
+
+  // Styling to match the premium dark theme of Giftora
   const sidebarStyle = {
     width: '260px',
     height: '100vh',
-    background: '#041020', 
-    color: 'white',
-    padding: '25px 15px',
-    position: 'fixed',
-    left: 0,
-    top: 0
+    background: '#0f172a', // Deep navy background from homepage
+    color: '#fff',
+    padding: '30px 20px',
+    position: 'fixed'
   };
 
-  const menuItemStyle = {
-    padding: '12px 15px',
-    margin: '8px 0',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    transition: 'background 0.3s'
-  };
-
-  // Active menu item highlight matching the admin panel
-  const activeItemStyle = {
-    ...menuItemStyle,
-    background: '#293546',   // Darker background for active item
-    fontWeight: '500'
+  const brandStyle = {
+    color: '#d4af37', // Gold accent color for the brand
+    fontSize: '1.8rem',
+    fontWeight: 'bold',
+    marginBottom: '40px',
+    textAlign: 'center'
   };
 
   return (
     <div style={sidebarStyle}>
-      <h2 style={{ fontSize: '1.4rem', marginBottom: '40px', paddingLeft: '15px', fontWeight: 'bold' }}>
-        Seller Panel
-      </h2>
+      <div style={brandStyle}>Giftora</div>
       <ul style={{ listStyle: 'none', padding: 0 }}>
-        <li style={activeItemStyle}>Dashboard</li>
-        <li style={menuItemStyle}>My Items</li>
-        <li style={menuItemStyle}>Orders</li>
-        <li style={menuItemStyle}>Settings</li>
+        {menuItems.map((item) => (
+          <li 
+            key={item.name} 
+            style={{
+              margin: '15px 0',
+              padding: '12px 20px',
+              borderRadius: '12px',
+              // Highlight active link with a subtle transparent white
+              background: location.pathname === item.path ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+              cursor: 'pointer'
+            }}
+          >
+            <Link to={item.path} style={{ color: '#fff', textDecoration: 'none', fontWeight: '500' }}>
+              {item.name}
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
   );
