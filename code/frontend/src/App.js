@@ -22,6 +22,9 @@ import Settings from './pages/admin/Settings.jsx';
 // Seller pages
 import SellerDashboard from './pages/seller/SellerDashboard.jsx';
 
+// Homepage
+import ProductsPage from './pages/homepage/ProductsPage.jsx';
+
 // Layout wrapper component for general and user routes
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
@@ -51,6 +54,7 @@ function App() {
       <Routes>
         {/* Public and user routes */}
         <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
+        <Route path="/products" element={<ProductsPage />} />
         <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
         <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
         <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
