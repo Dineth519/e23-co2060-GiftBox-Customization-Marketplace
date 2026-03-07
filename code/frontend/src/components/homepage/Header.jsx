@@ -77,16 +77,6 @@ const Navbar = () => {
 const CategoryBar = () => {
   const navigate = useNavigate();
 
-  const categories = [
-    { label: 'Build Your Box',  icon: '📦' },
-    { label: 'Gift Bundles',    icon: '🎀' },
-    { label: 'For Him',         icon: '👔' },
-    { label: 'For Her',         icon: '👑' },
-    { label: 'Corporate Gifts', icon: '🏢' },
-    { label: 'Our Vendors',     icon: '🏪', gold: true },
-    { label: 'Join With Us',    icon: '✨', cta: true  },
-  ];
-
   const getClass = (cat) => {
     if (cat.cta)  return 'category-bar__item category-bar__item--cta';
     if (cat.gold) return 'category-bar__item category-bar__item--gold';
@@ -107,16 +97,7 @@ const CategoryBar = () => {
 
       <div className="category-bar__divider" />
 
-      {categories.map((cat, i) => (
-        <button
-          key={i}
-          className={getClass(cat)}
-          onClick={() => cat.cta && navigate('/join-us')}
-        >
-          <span>{cat.icon}</span>
-          {cat.label}
-        </button>
-      ))}
+
 
     </div>
   );
