@@ -12,12 +12,12 @@ import './HomePage.css';
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const CATEGORIES = [
-  { icon: '📦', label: 'Build Your Box',  gradient: 'linear-gradient(135deg,#C9A961,#D4AF37)' },
-  { icon: '🎀', label: 'Gift Bundles',    gradient: 'linear-gradient(135deg,#5DADE2,#2E86C1)' },
-  { icon: '👔', label: 'For Him',         gradient: 'linear-gradient(135deg,#1A1A2E,#16213E)' },
-  { icon: '👑', label: 'For Her',         gradient: 'linear-gradient(135deg,#C9A961,#E8C97A)' },
-  { icon: '🏢', label: 'Corporate',       gradient: 'linear-gradient(135deg,#16213E,#1A1A2E)' },
-  { icon: '🌸', label: 'Seasonal',        gradient: 'linear-gradient(135deg,#5DADE2,#C9A961)' },
+  { icon: '📦', label: 'Build Your Box',  gradient: 'linear-gradient(135deg,#C9A961,#D4AF37)', route: '/build'                       },
+  { icon: '🎀', label: 'Gift Bundles',    gradient: 'linear-gradient(135deg,#5DADE2,#2E86C1)', route: '/products'                    },
+  { icon: '👔', label: 'For Him',         gradient: 'linear-gradient(135deg,#1A1A2E,#16213E)', route: '/products?category=Watches'   },
+  { icon: '👑', label: 'For Her',         gradient: 'linear-gradient(135deg,#C9A961,#E8C97A)', route: '/products?category=Bangles'   },
+  { icon: '🏢', label: 'Corporate',       gradient: 'linear-gradient(135deg,#16213E,#1A1A2E)', route: '/products?category=Wine'      },
+  { icon: '🌸', label: 'Seasonal',        gradient: 'linear-gradient(135deg,#5DADE2,#C9A961)', route: '/products?category=Chocolates'},
 ];
 
 const FEATURES = [
@@ -182,6 +182,7 @@ const TrustBar = () => {
 // ─── Categories ───────────────────────────────────────────────────────────────
 
 const CategoriesStrip = () => {
+  const navigate = useNavigate();
   const [ref, visible] = useReveal();
   return (
     <section className={`categories-strip section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
@@ -197,6 +198,7 @@ const CategoriesStrip = () => {
             key={i}
             className="category-tile"
             style={{ '--cat-gradient': cat.gradient, animationDelay: `${i * 0.08}s` }}
+            onClick={() => navigate(cat.route)} 
           >
             <div className="category-tile__orb" />
             <span className="category-tile__icon">{cat.icon}</span>
@@ -403,7 +405,7 @@ const BuilderCTA = () => {
           <span>Start Building Now</span>
           <span className="btn-arrow">→</span>
         </button>
-      </div>
+      </div>p
     </section>
   );
 };
