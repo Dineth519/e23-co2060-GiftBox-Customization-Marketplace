@@ -1,6 +1,12 @@
 // Core libraries and routing
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+// Layout components
+import Header from '../../components/homepage/Header';
+import Footer from '../../components/homepage/Footer';
+
+// Stylesheet
 import './HomePage.css';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -68,39 +74,6 @@ function useReveal(threshold = 0.15) {
 
   return [ref, visible];
 }
-
-// ─── Header ───────────────────────────────────────────────────────────────────
-
-const Header = () => {
-  const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  return (
-    <header className={`giftora-header ${scrolled ? 'scrolled' : ''}`}>
-      <div className="header-inner">
-        <div className="header-logo" onClick={() => navigate('/')}>
-          <span className="logo-icon">🎁</span>
-          <span className="logo-text">Giftora</span>
-        </div>
-        <nav className="header-nav">
-          {['Products', 'Build a Box', 'Vendors', 'About'].map(item => (
-            <button key={item} className="nav-link">{item}</button>
-          ))}
-        </nav>
-        <div className="header-actions">
-          <button className="header-btn-ghost" onClick={() => navigate('/login')}>Sign In</button>
-          <button className="header-btn-gold" onClick={() => navigate('/build')}>🎀 Start Building</button>
-        </div>
-      </div>
-    </header>
-  );
-};
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
@@ -237,10 +210,38 @@ const CategoriesStrip = () => {
 
 // ─── Featured Products (masonry-style) ───────────────────────────────────────
 
+// For codes, write comments in English.
+
+// ... (Other imports and components like Header, HeroSection remain the same) ...
+
 const FeaturedProducts = () => {
   const navigate = useNavigate();
   const [ref, visible] = useReveal();
   const [hovered, setHovered] = useState(null);
+
+  // 1. Create a state to hold the products from the database
+  const [dbProducts, setDbProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 2. Fetch data from Spring Boot API when the component mounts
+useEffect(() => {
+  fetch('http://localhost:8080/api/products')
+    .then(response => {
+      console.log('Status:', response.status);        // ← add
+      console.log('OK:', response.ok);                // ← add
+      return response.json();
+    })
+    .then(data => {
+      console.log('Full data:', data); 
+      console.log('First product:', data[0]);         // already there
+      setDbProducts(data.slice(0, 6));
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error('FETCH ERROR:', error.message);   // ← add .message
+      setLoading(false);
+    });
+}, []);
 
   return (
     <section className={`featured section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
@@ -255,44 +256,60 @@ const FeaturedProducts = () => {
           </button>
         </div>
 
-        <div className="featured__grid">
-          {PRODUCTS.map((p, i) => (
-            <div
-              key={p.id}
-              className={`product-card ${i === 0 || i === 5 ? 'product-card--tall' : ''}`}
-              onMouseEnter={() => setHovered(p.id)}
-              onMouseLeave={() => setHovered(null)}
-              style={{ animationDelay: `${i * 0.09}s` }}
-            >
-              <div className="product-card__image">
-                <div className="product-card__emoji">{p.emoji}</div>
-                <div className="product-card__hover-actions">
-                  <button className="product-action-btn">🛒 Add to Cart</button>
-                  <button className="product-action-btn product-action-btn--outline">Quick View</button>
+        {/* Show a loading message while fetching data */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '50px', color: 'var(--gold)' }}>
+            Loading premium gifts...
+          </div>
+        ) : (
+          <div className="featured__grid">
+            {/* 3. Map over the dbProducts instead of the mock PRODUCTS array */}
+            {dbProducts.map((p, i) => (
+              <div
+                key={p.id}
+                className={`product-card ${i === 0 || i === 5 ? 'product-card--tall' : ''}`}
+                onMouseEnter={() => setHovered(p.id)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ animationDelay: `${i * 0.09}s` }}
+              >
+                <div className="product-card__image">
+                  {/* Replace the emoji with the actual image from Cloudinary */}
+                  <img 
+                    src={p.imageUrl} 
+                    alt={p.name} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  />
+                  <div className="product-card__hover-actions">
+                    <button className="product-action-btn">🛒 Add to Cart</button>
+                    <button className="product-action-btn product-action-btn--outline">Quick View</button>
+                  </div>
+                </div>
+                <div className="product-card__body">
+                  <span className="product-card__tag">Premium</span>
+                  <div className="product-card__name">{p.name}</div>
+                  {/* Hardcoded vendor for now, as it's not in the DB yet */}
+                  <div className="product-card__vendor">by Giftora Exclusive</div>
+                  <div className="product-card__meta">
+                    <span className="product-card__stars">
+                      ★★★★★
+                      <span className="product-card__rating-text">5.0 (New)</span>
+                    </span>
+                  </div>
+                  <div className="product-card__footer">
+                    <span className="product-card__price">LKR {p.price.toLocaleString()}</span>
+                    <button className="btn-add-cart" title="Add to cart">+</button>
+                  </div>
                 </div>
               </div>
-              <div className="product-card__body">
-                <span className="product-card__tag">{p.tag}</span>
-                <div className="product-card__name">{p.name}</div>
-                <div className="product-card__vendor">by {p.vendor}</div>
-                <div className="product-card__meta">
-                  <span className="product-card__stars">
-                    {'★'.repeat(Math.floor(p.rating))}
-                    <span className="product-card__rating-text">{p.rating} ({p.reviews})</span>
-                  </span>
-                </div>
-                <div className="product-card__footer">
-                  <span className="product-card__price">{p.price}</span>
-                  <button className="btn-add-cart" title="Add to cart">+</button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 };
+
+// ... (Rest of the file like HowItWorks, Footer remains the same) ...
 
 // ─── How It Works ─────────────────────────────────────────────────────────────
 
@@ -388,49 +405,6 @@ const BuilderCTA = () => {
         </button>
       </div>
     </section>
-  );
-};
-
-// ─── Footer ───────────────────────────────────────────────────────────────────
-
-const Footer = () => {
-  const navigate = useNavigate();
-  return (
-    <footer className="giftora-footer">
-      <div className="footer-inner">
-        <div className="footer-brand">
-          <div className="footer-logo">
-            <span className="logo-icon">🎁</span>
-            <span className="logo-text">Giftora</span>
-          </div>
-          <p className="footer-tagline">Sri Lanka's premium gift marketplace — curating joy since 2023.</p>
-          <div className="footer-socials">
-            {['Instagram', 'Facebook', 'TikTok'].map(s => (
-              <button key={s} className="social-btn">{s[0]}</button>
-            ))}
-          </div>
-        </div>
-
-        <div className="footer-links">
-          {[
-            { heading: 'Shop',     links: ['Gift Bundles', 'Build a Box', 'Featured', 'New Arrivals'] },
-            { heading: 'Vendors',  links: ['Join Giftora', 'Vendor Login', 'Guidelines', 'Benefits']   },
-            { heading: 'Support',  links: ['Help Center', 'Order Tracking', 'Returns', 'Contact Us']   },
-          ].map(col => (
-            <div key={col.heading} className="footer-col">
-              <div className="footer-col__heading">{col.heading}</div>
-              {col.links.map(link => (
-                <button key={link} className="footer-col__link">{link}</button>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="footer-bottom">
-        <span>© 2025 Giftora. All rights reserved.</span>
-        <span>Made with 💛 in Sri Lanka</span>
-      </div>
-    </footer>
   );
 };
 
