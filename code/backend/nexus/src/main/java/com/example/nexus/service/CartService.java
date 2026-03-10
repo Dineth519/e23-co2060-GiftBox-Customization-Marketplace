@@ -1,13 +1,7 @@
 package com.example.nexus.service;
 
-// ═══════════════════════════════════════════════════════
-// Issue #39 — Session Structure
-// Issue #40 — Cart API logic
-// Issue #41 — Cart Total Calculation
-// ═══════════════════════════════════════════════════════
-
-import com.example.nexus.dto.AddToCartDTO;
-import com.example.nexus.dto.CartResponseDTO;
+import com.example.nexus.dto.AddToCart;
+import com.example.nexus.dto.CartResponse;
 import com.example.nexus.model.CartItem;
 import com.example.nexus.model.SessionCartManager;
 import jakarta.servlet.http.HttpSession;
@@ -18,21 +12,13 @@ import java.util.List;
 @Service
 public class CartService {
 
-    // ════════════════════════════════════════════════════
-    // Issue #39 — Session Cart Initialization
-    // ════════════════════════════════════════════════════
-
     // Session cart ගන්නවා (නැත්නම් initialize කරනවා)
     public List<CartItem> getCartItems(HttpSession session) {
         return SessionCartManager.getOrCreateCart(session);
     }
 
-    // ════════════════════════════════════════════════════
-    // Issue #40 — Cart Operations
-    // ════════════════════════════════════════════════════
-
     // ── Add item ─────────────────────────────────────────
-    public CartResponseDTO addItem(HttpSession session, AddToCartDTO dto) {
+    public CartResponse addItem(HttpSession session, AddToCart dto) {
         List<CartItem> cart = getCartItems(session);
 
         // Already cart එකේ තියෙනවාද?
@@ -59,7 +45,7 @@ public class CartService {
     }
 
     // ── Remove item ──────────────────────────────────────
-    public CartResponseDTO removeItem(HttpSession session, int productId) {
+    public CartResponse removeItem(HttpSession session, int productId) {
         List<CartItem> cart = getCartItems(session);
 
         cart.removeIf(item -> item.getProductId() == productId);
@@ -69,7 +55,7 @@ public class CartService {
     }
 
     // ── Update quantity (+ / - buttons) ─────────────────
-    public CartResponseDTO updateQuantity(HttpSession session,
+    public CartResponse updateQuantity(HttpSession session,
                                           int productId,
                                           int newQty) {
         List<CartItem> cart = getCartItems(session);
@@ -91,14 +77,10 @@ public class CartService {
     }
 
     // ── Clear entire cart ────────────────────────────────
-    public CartResponseDTO clearCart(HttpSession session) {
+    public CartResponse clearCart(HttpSession session) {
         SessionCartManager.destroyCart(session);
         return buildResponse(List.of(), "Cart cleared.");
     }
-
-    // ════════════════════════════════════════════════════
-    // Issue #41 — Cart Total Calculation
-    // ════════════════════════════════════════════════════
 
     // සම්පූර්ණ cart total calculate කරනවා
     // හැම item: price × quantity → sum කරනවා
@@ -126,11 +108,11 @@ public class CartService {
     // ── Build response helper ────────────────────────────
     // හැම operation කෙනෙකෙන් පස්සේ React ට
     // updated cart + total + badge count එකක් දෙනවා
-    private CartResponseDTO buildResponse(List<CartItem> cart,
+    private CartResponse buildResponse(List<CartItem> cart,
                                           String message) {
         double total     = calculateTotal(cart);
         int    itemCount = calculateItemCount(cart);
 
-        return new CartResponseDTO(cart, total, itemCount, message);
+        return new CartResponse(cart, total, itemCount, message);
     }
 }
