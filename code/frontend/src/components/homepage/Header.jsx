@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
+import CartBadge from './CartBadge.jsx';
+
 
 const Header = () => {
   const navigate = useNavigate();
@@ -20,9 +22,23 @@ const Header = () => {
           <span className="logo-text">Giftora</span>
         </div>
         <nav className="header-nav">
-          {['Products', 'Build a Box', 'Vendors', 'About'].map(item => (
-            <button key={item} className="nav-link">{item}</button>
+          {[
+            { label: 'Products',    route: '/products' },
+            { label: 'Build a Box', route: '/build'    },
+            { label: 'Vendors',     route: '/vendors'  },
+            { label: 'About',       route: '/about'    },
+          ].map(item => (
+            <button
+              key={item.label}
+              className="nav-link"
+              onClick={() => navigate(item.route)}
+            >
+              {item.label}
+            </button>
           ))}
+
+          {/* #44 — Cart badge button */}
+          <CartBadge />
         </nav>
         <div className="header-actions">
           <button className="header-btn-ghost" onClick={() => navigate('/login')}>Sign In / Sign Up</button>
