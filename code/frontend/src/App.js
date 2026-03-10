@@ -25,6 +25,9 @@ import SellerDashboard from './pages/seller/SellerDashboard.jsx';
 // Homepage
 import ProductsPage from './pages/homepage/ProductsPage.jsx';
 
+import { CartProvider } from './context/CartContext.jsx';
+import CartPage from './pages/homepage/CartPage.jsx';
+
 // Layout wrapper component for general and user routes
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
@@ -48,38 +51,42 @@ const LayoutWrapper = ({ children }) => {
 };
 
 // Main application component that sets up routing for admin, user, and seller sections
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Public and user routes */}
-        <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
-        <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
-        <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
+    <CartProvider>                                      
+      <Router>
+        <Routes>
+          {/* Public and user routes */}
+          <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
+          <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
+          <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
+          <Route path="/cart" element={<CartPage />} />
 
-        {/* Seller routes */}
-        <Route path="/seller" element={<LayoutWrapper><SellerDashboard /></LayoutWrapper>} />
+          {/* Seller routes */}
+          <Route path="/seller" element={<LayoutWrapper><SellerDashboard /></LayoutWrapper>} />
 
-        {/* Admin routes using AdminLayout for sidebar and styling */}
-        <Route path="/admin/*" element={
-          <AdminLayout>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="partners" element={<Partners />} />
-              <Route path="partners/pending" element={<PendingPartners />} />
-              <Route path="customers" element={<Customers />} />
-              <Route path="settings" element={<Settings />} />
-            </Routes>
-          </AdminLayout>
-        } />
+          {/* Admin routes using AdminLayout for sidebar and styling */}
+          <Route path="/admin/*" element={
+            <AdminLayout>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="partners" element={<Partners />} />
+                <Route path="partners/pending" element={<PendingPartners />} />
+                <Route path="customers" element={<Customers />} />
+                <Route path="settings" element={<Settings />} />
+              </Routes>
+            </AdminLayout>
+          } />
 
-        {/* Catch-all route that redirects to home page */}
-        <Route path="*" element={<Navigate to="/" />} />
-        
-      </Routes>
-    </Router>
+          {/* Catch-all route that redirects to home page */}
+          <Route path="*" element={<Navigate to="/" />} />
+
+        </Routes>
+      </Router>
+    </CartProvider>                                     
   );
 }
 

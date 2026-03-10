@@ -6,6 +6,9 @@ import Header from '../../components/homepage/Header';
 import Footer from '../../components/homepage/Footer';
 import './ProductsPage.css';
 
+// ── #43 Add to Cart — CartContext import ──────────────────────
+import { useCart } from '../../context/CartContext';
+
 // ─── Config ───────────────────────────────────────────────────────────────────
 const CATEGORY_MAP = { 1:'Wine', 2:'Watches', 3:'Perfume', 4:'Teddy Bears', 5:'Bangles', 6:'Chocolates' };
 const CAT_ICONS    = { All:'🛍️', Wine:'🍷', Watches:'⌚', Perfume:'🌸', 'Teddy Bears':'🧸', Bangles:'💍', Chocolates:'🍫' };
@@ -44,6 +47,9 @@ const ProductsPage = () => {
   const [quickView, setQuickView]     = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ref, heroVisible]            = useReveal(0.05);
+
+  // ── #43 — cart functions ──────────────────────────────────────
+  const { addToCart, addedId } = useCart();
 
   useEffect(() => { setActiveCategory(urlCategory); }, [urlCategory]);
 
@@ -279,8 +285,10 @@ const ProductsPage = () => {
           {!loading && !error && displayProducts.length > 0 && (
             <div className="pp-grid">
               {displayProducts.map((p, i) => {
-                const catName = CATEGORY_MAP[p.categoryId] || 'Gift';
-                const catIcon = CAT_ICONS[catName] || '🎁';
+                const catName  = CATEGORY_MAP[p.categoryId] || 'Gift';
+                const catIcon  = CAT_ICONS[catName] || '🎁';
+                const justAdded = addedId === p.id;
+
                 return (
                   <div key={p.id} className="ppc" style={{ animationDelay:`${Math.min(i,8)*0.05}s` }}>
                     {/* Wishlist */}
@@ -292,7 +300,12 @@ const ProductsPage = () => {
                     <div className="ppc-img">
                       <img src={p.imageUrl} alt={p.name} loading="lazy" />
                       <div className="ppc-overlay">
-                        <button className="ppc-action ppc-action--primary">🛒 Add to Cart</button>
+                        <button
+                          className="ppc-action ppc-action--primary"
+                          onClick={() => addToCart(p)}
+                        >
+                          {justAdded ? '✓ Added!' : '🛒 Add to Cart'}
+                        </button>
                         <button className="ppc-action ppc-action--ghost" onClick={() => setQuickView(p)}>Quick View</button>
                       </div>
                       <div className="ppc-badge">
@@ -310,8 +323,15 @@ const ProductsPage = () => {
                       </div>
                       <div className="ppc-footer">
                         <span className="ppc-price">LKR {Number(p.price).toLocaleString()}</span>
-                        <button className="ppc-add">
-                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                        <button
+                          className={`ppc-add ${justAdded ? 'ppc-add--added' : ''}`}
+                          onClick={() => addToCart(p)}
+                          title="Add to cart"
+                        >
+                          {justAdded
+                            ? <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                            : <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                          }
                         </button>
                       </div>
                     </div>
@@ -345,7 +365,12 @@ const ProductsPage = () => {
                 {['🎀 Gift Wrapped','✍️ Personal Note','🚚 Island-wide Delivery'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
               </div>
               <div className="qv-actions">
-                <button className="qv-cta qv-cta--primary">🛒 Add to Cart</button>
+                <button
+                  className="qv-cta qv-cta--primary"
+                  onClick={() => { addToCart(quickView); setQuickView(null); }}
+                >
+                  🛒 Add to Cart
+                </button>
                 <button className="qv-cta qv-cta--outline" onClick={() => { setQuickView(null); navigate('/products'); }}>View All →</button>
               </div>
             </div>
