@@ -9,10 +9,10 @@ import java.util.List;
 
 public class CartResponse {
 
-    private List<CartItem> items;       // cart items list
-    private double         total;       // Issue #41 — total price (LKR)
-    private int            itemCount;   // Header badge number
-    private String         message;     // success / error message
+    private List<CartItem> items;       
+    private double         total;       
+    private int            itemCount;  
+    private String         message;    
 
     // ── Constructor ──────────────────────────────────────
     public CartResponse(List<CartItem> items,
