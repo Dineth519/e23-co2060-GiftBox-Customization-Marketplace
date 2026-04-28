@@ -21,9 +21,7 @@ import Settings from './pages/admin/Settings.jsx';
 
 // Seller components and pages
 import SellerDashboard from './pages/seller/SellerDashboard.jsx';
-import AdminLayout from './layouts/SellerLayout.jsx';
-import Topbar from './components/seller/TopBar.jsx';
-import SellerSidebar from './components/seller/Sidebar.jsx';
+import SellerLayout from './layouts/SellerLayout.jsx';
 
 // Homepage
 import ProductsPage from './pages/homepage/ProductsPage.jsx';
@@ -69,7 +67,6 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
 
           {/* Seller routes */}
-          {/* Seller routes - දැන් අපි LayoutWrapper වෙනුවට SellerLayout භාවිතා කරමු */}
           <Route path="/seller/*" element={
             <SellerLayout>
               <Routes>

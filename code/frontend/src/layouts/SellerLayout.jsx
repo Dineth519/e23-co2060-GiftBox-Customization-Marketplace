@@ -9,7 +9,7 @@ import TopBar from '../components/seller/TopBar';
 import './AdminLayout.css';
 
 // Admin layout wrapper component providing sidebar and top navigation
-const AdminLayout = ({ children }) => {
+const SellerLayout = ({ children }) => {
   return (
     <div className="admin-layout">
       {/* Top navigation bar */}
