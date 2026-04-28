@@ -12,7 +12,7 @@ const Sidebar = () => {
       <nav className="sidebar-nav">
         
         <NavLink 
-          to="/admin" 
+          to="/seller" 
           end
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
@@ -21,7 +21,7 @@ const Sidebar = () => {
         </NavLink>
         
         <NavLink 
-          to="/admin/staff-management" 
+          to="/seller/my-items" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
           <FaUsersCog size={18} /> 
@@ -29,7 +29,7 @@ const Sidebar = () => {
         </NavLink>
 
         <NavLink 
-          to="/admin/partners" 
+          to="/seller/orders" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
           <FaStore size={18} /> 
@@ -37,7 +37,7 @@ const Sidebar = () => {
         </NavLink>
         
         <NavLink 
-          to="/admin/customers" 
+          to="/seller/add-items" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
           <FaShoppingBag size={18} /> 
@@ -45,7 +45,7 @@ const Sidebar = () => {
         </NavLink>
 
         <NavLink 
-          to="/admin/settings" 
+          to="/seller/settings" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
           <FaCog size={18} /> 

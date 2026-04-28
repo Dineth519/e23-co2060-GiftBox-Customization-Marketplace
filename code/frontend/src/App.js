@@ -22,6 +22,10 @@ import Settings from './pages/admin/Settings.jsx';
 // Seller components and pages
 import SellerDashboard from './pages/seller/SellerDashboard.jsx';
 import SellerLayout from './layouts/SellerLayout.jsx';
+import MyItems from './pages/seller/MyItems.jsx';
+import AddItems from './pages/seller/AddItems.jsx';
+import Orders from './pages/seller/Orders.jsx';
+import SellerSettings from './pages/seller/Settings.jsx';
 
 // Homepage
 import ProductsPage from './pages/homepage/ProductsPage.jsx';
@@ -71,6 +75,10 @@ function App() {
             <SellerLayout>
               <Routes>
                 <Route path="/" element={<SellerDashboard />} />
+                <Route path="my-items" element={<MyItems />} />
+                <Route path="add-items" element={<AddItems />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="settings" element={<SellerSettings />} />
               </Routes>
             </SellerLayout>
           } />

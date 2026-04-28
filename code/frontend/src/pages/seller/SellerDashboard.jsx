@@ -1,93 +1,97 @@
-import React, { useState } from 'react';
-import SellerSidebar from '../../components/seller/Sidebar.jsx';
+import React from 'react';
+import { FaUsers, FaBoxOpen, FaShoppingCart, FaDollarSign, FaTruck, FaStar } from 'react-icons/fa';
+import './Dashboard.css';
 
+/**
+ * Dashboard Component
+ * Displays admin dashboard with key metrics and activity overview
+ * Shows statistics cards, recent orders, and top vendors
+ */
 const SellerDashboard = () => {
-  const [items, setItems] = useState([
-    { id: 1, name: 'Personalized Mug', price: 1500, status: 'Order Placed' },
-  ]);
-
-  const [newItem, setNewItem] = useState({ name: '', price: '' });
-
-  const handleAddItem = (e) => {
-    e.preventDefault();
-    setItems([...items, { ...newItem, id: Date.now(), status: 'Order Placed' }]);
-    setNewItem({ name: '', price: '' });
-    alert("Item added successfully!");
-  };
-
-  const handleStatusUpdate = (orderId) => {
-    alert("Status Updated: Item Dispatched by Vendor");
-  };
+  
+  // Static dashboard statistics data with icons and trends
+  const statsData = [
+    { icon: <FaUsers />, title: 'Total Customers', value: '2,847', change: '+12.5%', trend: 'up' },
+    { icon: <FaBoxOpen />, title: 'Gift Boxes Created', value: '1,234', change: '+8.2%', trend: 'up' },
+    { icon: <FaShoppingCart />, title: 'Orders Today', value: '89', change: '+23.1%', trend: 'up' },
+    { icon: <FaDollarSign />, title: 'Revenue (LKR)', value: '485,600', change: '+15.3%', trend: 'up' },
+  ];
 
   return (
-    // Main background matching the light blue admin theme
-    <div style={{ display: 'flex', background: '#f4f7fe', minHeight: '100vh' }}>
-      <SellerSidebar />
+    <div className="dashboard-container">
       
-      {/* Content offset by sidebar width */}
-      <div style={{ flex: 1, padding: '30px', marginLeft: '260px' }}>
-        <h1 style={{ color: '#1a1f2b', marginBottom: '25px', fontSize: '1.8rem' }}>Vendor Management Portal</h1>
-
-        [cite_start]{/* Add New Item Section [cite: 16, 23] */}
-        <div style={{ background: 'white', padding: '25px', borderRadius: '12px', marginBottom: '30px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-          <h3 style={{ color: '#1a1f2b', marginTop: 0, marginBottom: '20px' }}>Add New Item</h3>
-          <form onSubmit={handleAddItem} style={{ display: 'flex', gap: '15px' }}>
-            <input 
-              type="text" 
-              placeholder="Item Name" 
-              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e0e6ed', flex: 1 }}
-              value={newItem.name}
-              onChange={(e) => setNewItem({...newItem, name: e.target.value})}
-              required 
-            />
-            <input 
-              type="number" 
-              placeholder="Price (LKR)" 
-              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e0e6ed', width: '180px' }}
-              value={newItem.price}
-              onChange={(e) => setNewItem({...newItem, price: e.target.value})}
-              required 
-            />
-            <button type="submit" style={{ padding: '12px 25px', cursor: 'pointer', background: '#2ecc71', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}>
-              Add Item
-            </button>
-          </form>
-        </div>
-
-        [cite_start]{/* Pending Orders Section [cite: 24, 47, 51] */}
-        <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-          <h3 style={{ color: '#1a1f2b', marginTop: 0, marginBottom: '20px' }}>Pending Orders & Inventory</h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ background: '#1a1f2b', color: '#f0f7ff' }}> {/* Dark header matching sidebar */}
-                <th style={{ padding: '15px', borderRadius: '8px 0 0 0' }}>Item Details</th>
-                <th style={{ padding: '15px' }}>Status</th>
-                <th style={{ padding: '15px', borderRadius: '0 8px 0 0' }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(item => (
-                <tr key={item.id} style={{ borderBottom: '1px solid #f0f2f5' }}>
-                  <td style={{ padding: '15px', color: '#4a5568' }}>{item.name} - LKR {item.price}</td>
-                  <td style={{ padding: '15px' }}>
-                    <span style={{ background: '#fff4e5', color: '#d48344', padding: '5px 12px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '500' }}>
-                      {item.status}
-                    </span>
-                  </td>
-                  <td style={{ padding: '15px' }}>
-                    <button 
-                      onClick={() => handleStatusUpdate(item.id)}
-                      style={{ padding: '8px 16px', cursor: 'pointer', background: 'white', border: '1px solid #e0e6ed', borderRadius: '8px', fontSize: '0.85rem' }}
-                    >
-                      Mark as Dispatched
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Welcome header section with greeting message */}
+      <div className="dashboard-header">
+        <div className="header-content">
+          <h1 className="dashboard-title">Welcome back, Mathew! 👋</h1>
+          <p className="dashboard-subtitle">Here's what's happening with your gift marketplace today.</p>
         </div>
       </div>
+
+      {/* Statistics grid displaying key metrics with icons and trend indicators */}
+      <div className="stats-grid">
+        {statsData.map((stat, index) => (
+          <div className="stat-card" key={index}>
+            <div className="stat-icon-wrapper">
+              <div className="stat-icon">{stat.icon}</div>
+            </div>
+            <div className="stat-details">
+              <p className="stat-title">{stat.title}</p>
+              <h3 className="stat-value">{stat.value}</h3>
+              <span className={`stat-change ${stat.trend}`}>{stat.change}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Activity section with recent orders and top vendors cards */}
+      <div className="activity-section">
+        {/* Recent orders card with list of current orders */}
+        <div className="activity-card">
+          <div className="card-header">
+            <h2 className="card-title">Recent Orders</h2>
+            <button className="view-all-btn">View All</button>
+          </div>
+          <div className="card-content">
+            {[1, 2, 3, 4].map((item) => (
+              <div className="activity-item" key={item}>
+                <div className="activity-icon">
+                  <FaTruck />
+                </div>
+                <div className="activity-info">
+                  <p className="activity-text">Order #GB{1000 + item} - Premium Gift Box</p>
+                  <span className="activity-time">2 hours ago</span>
+                </div>
+                <span className="activity-badge">Processing</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Top vendors card showing best performing vendors with ratings */}
+        <div className="activity-card">
+          <div className="card-header">
+            <h2 className="card-title">Top Vendors</h2>
+            <button className="view-all-btn">View All</button>
+          </div>
+          <div className="card-content">
+            {['Sweet Delights', 'Flower Paradise', 'Choco Heaven', 'Gift Gallery'].map((vendor, idx) => (
+              <div className="activity-item" key={idx}>
+                <div className="vendor-avatar">{vendor.charAt(0)}</div>
+                <div className="activity-info">
+                  <p className="activity-text">{vendor}</p>
+                  <span className="activity-time">{150 - idx * 10} products</span>
+                </div>
+                <div className="rating">
+                  <FaStar className="star-icon" />
+                  <span>4.{9 - idx}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };

@@ -1,0 +1,327 @@
+/*
+ * Dashboard Page Styles - Giftora Theme
+ * Styling for admin dashboard with statistics and activity cards
+ */
+
+.dashboard-container {
+  padding: 40px;
+  min-height: calc(100vh - 64px);
+}
+
+/* Welcome header section with greeting */
+.dashboard-header {
+  margin-bottom: 32px;
+  padding: 32px;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9F9F9 100%);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(201, 169, 97, 0.1);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+}
+
+.header-content {
+  max-width: 100%;
+}
+
+.dashboard-title {
+  font-size: 36px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #C9A961 0%, #5DADE2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.dashboard-subtitle {
+  font-size: 16px;
+  color: #6B7280;
+  font-weight: 400;
+}
+
+/* Statistics grid layout with responsive columns */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Individual statistics card */
+.stat-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAFAFA 100%);
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(201, 169, 97, 0.1);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Left border accent on stat card */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #C9A961 0%, #5DADE2 100%);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(201, 169, 97, 0.2);
+}
+
+.stat-card:hover::before {
+  transform: scaleY(1);
+}
+
+/* Stat icon wrapper container */
+.stat-icon-wrapper {
+  flex-shrink: 0;
+}
+
+/* Statistics icon with gradient background */
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #C9A961 0%, #D4AF37 100%);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
+  position: relative;
+}
+
+/* Icon shadow blur effect */
+.stat-icon::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: inherit;
+  border-radius: 16px;
+  opacity: 0.3;
+  filter: blur(8px);
+  z-index: -1;
+}
+
+/* Statistics details section */
+.stat-details {
+  flex: 1;
+}
+
+/* Statistics label text */
+.stat-title {
+  font-size: 13px;
+  color: #9CA3AF;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+/* Statistics value display */
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+
+/* Statistics change percentage indicator */
+.stat-change {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+}
+
+/* Positive trend styling */
+.stat-change.up {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+}
+
+/* Activity section with two-column layout */
+.activity-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 24px;
+}
+
+/* Activity card container */
+.activity-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAFAFA 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(201, 169, 97, 0.1);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+  overflow: hidden;
+}
+
+/* Card header with title and action button */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(201, 169, 97, 0.15);
+}
+
+/* Card title styling */
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1F2937;
+  letter-spacing: -0.3px;
+}
+
+/* View all action button */
+.view-all-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #C9A961 0%, #D4AF37 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(201, 169, 97, 0.3);
+}
+
+/* View all button hover state */
+.view-all-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(201, 169, 97, 0.4);
+}
+
+/* Card content wrapper */
+.card-content {
+  padding: 16px 28px 24px;
+}
+
+/* Activity list item styling */
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(201, 169, 97, 0.08);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+/* Activity icon container */
+.activity-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, rgba(201, 169, 97, 0.15) 0%, rgba(93, 173, 226, 0.15) 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #C9A961;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Activity information section */
+.activity-info {
+  flex: 1;
+}
+
+/* Activity description text */
+.activity-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1F2937;
+  margin-bottom: 4px;
+}
+
+/* Activity timestamp */
+.activity-time {
+  font-size: 13px;
+  color: #9CA3AF;
+}
+
+/* Status badge styling */
+.activity-badge {
+  padding: 6px 14px;
+  background: rgba(93, 173, 226, 0.15);
+  color: #5DADE2;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(93, 173, 226, 0.25);
+}
+
+/* Vendor avatar circle */
+.vendor-avatar {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #C9A961 0%, #D4AF37 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(201, 169, 97, 0.3);
+}
+
+/* Vendor rating display */
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #C9A961;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Star icon styling */
+.star-icon {
+  font-size: 16px;
+}
+
+/* Responsive design for large screens */
+@media (max-width: 1200px) {
+  .activity-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive design for tablets */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 20px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-title {
+    font-size: 28px;
+  }
+}
