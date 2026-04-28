@@ -21,6 +21,7 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -34,6 +35,7 @@ const Login = () => {
     setUsername('');
     setEmail('');
     setPassword('');
+    setConfirmPassword('');
     setShowPassword(false);
     setErrors({});
   };
@@ -48,7 +50,7 @@ const Login = () => {
     if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+    };
 
   // Validate signup form
   const validateSignupForm = () => {
@@ -60,9 +62,11 @@ const Login = () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = 'Please enter a valid email';
     if (!password) newErrors.password = 'Password is required';
     if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (!confirmPassword) newErrors.confirmPassword = 'Please confirm your password';
+    if (confirmPassword && password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+    };
 
   // ── Form Submit Handler ─────────────────────────────────────────────────
   const onSubmitHandler = async (e) => {
@@ -347,6 +351,23 @@ const Login = () => {
                 />
               </div>
               {errors.password && <p className="login-error">{errors.password}</p>}
+
+              {/* Confirm Password Input */}
+              <div className="login-input-row">
+                <img src={assets.lock_icon} alt="" />
+                <input
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }));
+                  }}
+                  value={confirmPassword}
+                  type="password"
+                  placeholder="Confirm Password"
+                  disabled={loading}
+                  required
+                />
+              </div>
+              {errors.confirmPassword && <p className="login-error">{errors.confirmPassword}</p>}
 
               {/* Submit Button */}
               <button type="submit" className="login-submit-btn" disabled={loading}>
