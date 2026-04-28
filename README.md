@@ -64,7 +64,6 @@ Giftora introduces a **centralized assembly workflow**:
 | Database | MySQL (v8+) |
 | Authentication | JWT (JSON Web Tokens) |
 | Communication | RESTful APIs over HTTPS |
-| Containerization | Docker |
 | Version Control | Git / GitHub |
 
 ---
