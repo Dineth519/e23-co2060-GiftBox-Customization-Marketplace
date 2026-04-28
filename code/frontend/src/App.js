@@ -19,9 +19,10 @@ import Customers from './pages/admin/Customers.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
 import Settings from './pages/admin/Settings.jsx';
 
-// Seller pages
+// Seller components and pages
 import SellerDashboard from './pages/seller/SellerDashboard.jsx';
 import Topbar from './components/seller/TopBar.jsx';
+import SellerSidebar from './components/seller/Sidebar.jsx';
 
 // Homepage
 import ProductsPage from './pages/homepage/ProductsPage.jsx';
@@ -54,12 +55,10 @@ const LayoutWrapper = ({ children }) => {
 const SellerLayout = ({ children }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      {/* 1. මෙතනට තමයි Topbar එක එන්නේ */}
       <Topbar /> 
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* 2. Sidebar එක ඊළඟ පියවරේදී හදමු */}
-        {/* <Sidebar /> */}
+        <SellerSidebar /> 
         
         <main style={{ flex: 1, padding: '20px', overflowY: 'auto', background: '#f8f9fa' }}>
           {children}

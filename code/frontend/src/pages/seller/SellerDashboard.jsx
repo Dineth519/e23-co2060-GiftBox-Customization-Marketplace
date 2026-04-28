@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SellerSidebar from '../../components/seller/SellerSidebar';
+import SellerSidebar from '../../components/seller/Sidebar.jsx';
 
 const SellerDashboard = () => {
   const [items, setItems] = useState([
