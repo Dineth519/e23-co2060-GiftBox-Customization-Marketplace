@@ -23,6 +23,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // ← NEW
   const [loading, setLoading] = useState(false);
 
   // Form validation errors
@@ -37,6 +38,7 @@ const Login = () => {
     setPassword('');
     setConfirmPassword('');
     setShowPassword(false);
+    setShowConfirmPassword(false); // ← NEW
     setErrors({});
   };
 
@@ -50,7 +52,7 @@ const Login = () => {
     if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-    };
+  };
 
   // Validate signup form
   const validateSignupForm = () => {
@@ -66,7 +68,7 @@ const Login = () => {
     if (confirmPassword && password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-    };
+  };
 
   // ── Form Submit Handler ─────────────────────────────────────────────────
   const onSubmitHandler = async (e) => {
@@ -142,8 +144,8 @@ const Login = () => {
           const userRole = data.role;
           localStorage.setItem('userRole', userRole);
           localStorage.setItem('username', username);
-          localStorage.setItem('token', data.token); // Store JWT token if provided
-          localStorage.setItem('userId', data.userId); // Store user ID if provided
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userId', data.userId);
 
           // Route user to appropriate dashboard based on role
           if (userRole === 'ADMIN') {
@@ -344,11 +346,20 @@ const Login = () => {
                     if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
                   }}
                   value={password}
-                  type="password"
+                  type={showPassword ? 'text' : 'password'} // ← UPDATED
                   placeholder="Password"
                   disabled={loading}
                   required
                 />
+                {/* ← NEW eye button */}
+                <button
+                  type="button"
+                  className="login-eye-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                >
+                  <img src={showPassword ? assets.Open_Eye : assets.Close_Eye} alt="Toggle Visibility" />
+                </button>
               </div>
               {errors.password && <p className="login-error">{errors.password}</p>}
 
@@ -361,11 +372,20 @@ const Login = () => {
                     if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }));
                   }}
                   value={confirmPassword}
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'} // ← UPDATED
                   placeholder="Confirm Password"
                   disabled={loading}
                   required
                 />
+                {/* ← NEW eye button */}
+                <button
+                  type="button"
+                  className="login-eye-btn"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={loading}
+                >
+                  <img src={showConfirmPassword ? assets.Open_Eye : assets.Close_Eye} alt="Toggle Visibility" />
+                </button>
               </div>
               {errors.confirmPassword && <p className="login-error">{errors.confirmPassword}</p>}
 
