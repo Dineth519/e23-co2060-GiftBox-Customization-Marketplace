@@ -18,6 +18,7 @@ import PendingPartners from './pages/admin/PendingPartners.jsx';
 import Customers from './pages/admin/Customers.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
 import Settings from './pages/admin/Settings.jsx';
+import StaffManagement from './pages/admin/StaffManagement.jsx';
 
 // Seller pages
 import SellerDashboard from './pages/seller/SellerDashboard.jsx';
@@ -77,6 +78,7 @@ function App() {
                 <Route path="partners/pending" element={<PendingPartners />} />
                 <Route path="customers" element={<Customers />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="staff-management" element={<StaffManagement />} />
               </Routes>
             </AdminLayout>
           } />
