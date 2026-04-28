@@ -344,3 +344,44 @@
     font-size: 14px;
   }
 }
+/* ── Password Strength Indicator ── */
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 4px 0;
+}
+
+.strength-bars {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+}
+
+.strength-bar {
+  height: 5px;
+  flex: 1;
+  border-radius: 3px;
+  background-color: #444;
+  transition: background-color 0.3s ease;
+}
+
+.strength-label {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* ── Password Requirements Checklist ── */
+.password-requirements {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 8px 0;
+}
+
+.password-requirements li {
+  font-size: 11px;
+  transition: color 0.3s ease;
+  padding: 1px 0;
+}
