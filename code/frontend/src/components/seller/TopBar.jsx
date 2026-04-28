@@ -12,7 +12,7 @@ const TopBar = () => {
         <img src={logo} alt="Giftora Logo" className="topbar-logo" />
         <div className="brand-text-wrapper">
           <span className="topbar-title">Giftora</span>
-          <span className="topbar-tagline">Admin Panel</span>
+          <span className="topbar-tagline">Vendor Panel</span>
         </div>
       </div>
 
@@ -29,7 +29,7 @@ const TopBar = () => {
         <div className="profile-section">
           <div className="profile-info">
             <span className="profile-name">Mathew Anderson</span>
-            <span className="profile-role">Administrator</span>
+            <span className="profile-role">Vendor</span>
           </div>
           <div className="profile-avatar">
             <User size={18} />
