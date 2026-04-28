@@ -23,7 +23,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // ← NEW
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
   const [loading, setLoading] = useState(false);
 
   // Form validation errors
@@ -38,7 +38,7 @@ const Login = () => {
     setPassword('');
     setConfirmPassword('');
     setShowPassword(false);
-    setShowConfirmPassword(false); // ← NEW
+    setShowConfirmPassword(false);
     setErrors({});
   };
 
@@ -346,7 +346,7 @@ const Login = () => {
                     if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
                   }}
                   value={password}
-                  type={showPassword ? 'text' : 'password'} // ← UPDATED
+                  type={showPassword ? 'text' : 'password'} 
                   placeholder="Password"
                   disabled={loading}
                   required
@@ -372,7 +372,7 @@ const Login = () => {
                     if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }));
                   }}
                   value={confirmPassword}
-                  type={showConfirmPassword ? 'text' : 'password'} // ← UPDATED
+                  type={showConfirmPassword ? 'text' : 'password'} 
                   placeholder="Confirm Password"
                   disabled={loading}
                   required
