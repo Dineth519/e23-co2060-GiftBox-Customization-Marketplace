@@ -21,6 +21,7 @@ import Settings from './pages/admin/Settings.jsx';
 
 // Seller components and pages
 import SellerDashboard from './pages/seller/SellerDashboard.jsx';
+import AdminLayout from './layouts/SellerLayout.jsx';
 import Topbar from './components/seller/TopBar.jsx';
 import SellerSidebar from './components/seller/Sidebar.jsx';
 
@@ -52,22 +53,6 @@ const LayoutWrapper = ({ children }) => {
   );
 };
 
-const SellerLayout = ({ children }) => {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <Topbar /> 
-
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        <SellerSidebar /> 
-        
-        <main style={{ flex: 1, padding: '20px', overflowY: 'auto', background: '#f8f9fa' }}>
-          {children}
-        </main>
-      </div>
-    </div>
-  );
-};
-
 // Main application component that sets up routing for admin, user, and seller sections
 
 function App() {
@@ -89,7 +74,6 @@ function App() {
             <SellerLayout>
               <Routes>
                 <Route path="/" element={<SellerDashboard />} />
-                {/* ඉදිරියේදී මෙහි තවත් seller පිටු එකතු කළ හැක */}
               </Routes>
             </SellerLayout>
           } />
