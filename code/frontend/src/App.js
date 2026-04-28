@@ -21,6 +21,7 @@ import Settings from './pages/admin/Settings.jsx';
 
 // Seller pages
 import SellerDashboard from './pages/seller/SellerDashboard.jsx';
+import Topbar from './components/seller/TopBar.jsx';
 
 // Homepage
 import ProductsPage from './pages/homepage/ProductsPage.jsx';
@@ -50,6 +51,24 @@ const LayoutWrapper = ({ children }) => {
   );
 };
 
+const SellerLayout = ({ children }) => {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      {/* 1. මෙතනට තමයි Topbar එක එන්නේ */}
+      <Topbar /> 
+
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* 2. Sidebar එක ඊළඟ පියවරේදී හදමු */}
+        {/* <Sidebar /> */}
+        
+        <main style={{ flex: 1, padding: '20px', overflowY: 'auto', background: '#f8f9fa' }}>
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
 // Main application component that sets up routing for admin, user, and seller sections
 
 function App() {
@@ -66,7 +85,15 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
 
           {/* Seller routes */}
-          <Route path="/seller" element={<LayoutWrapper><SellerDashboard /></LayoutWrapper>} />
+          {/* Seller routes - දැන් අපි LayoutWrapper වෙනුවට SellerLayout භාවිතා කරමු */}
+          <Route path="/seller/*" element={
+            <SellerLayout>
+              <Routes>
+                <Route path="/" element={<SellerDashboard />} />
+                {/* ඉදිරියේදී මෙහි තවත් seller පිටු එකතු කළ හැක */}
+              </Routes>
+            </SellerLayout>
+          } />
 
           {/* Admin routes using AdminLayout for sidebar and styling */}
           <Route path="/admin/*" element={
