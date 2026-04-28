@@ -20,8 +20,13 @@ import Dashboard from './pages/admin/Dashboard.jsx';
 import Settings from './pages/admin/Settings.jsx';
 import StaffManagement from './pages/admin/StaffManagement.jsx';
 
-// Seller pages
+// Seller components and pages
 import SellerDashboard from './pages/seller/SellerDashboard.jsx';
+import SellerLayout from './layouts/SellerLayout.jsx';
+import MyItems from './pages/seller/MyItems.jsx';
+import AddItems from './pages/seller/AddItems.jsx';
+import Orders from './pages/seller/Orders.jsx';
+import SellerSettings from './pages/seller/Settings.jsx';
 
 // Homepage
 import ProductsPage from './pages/homepage/ProductsPage.jsx';
@@ -67,7 +72,17 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
 
           {/* Seller routes */}
-          <Route path="/seller" element={<LayoutWrapper><SellerDashboard /></LayoutWrapper>} />
+          <Route path="/seller/*" element={
+            <SellerLayout>
+              <Routes>
+                <Route path="/" element={<SellerDashboard />} />
+                <Route path="my-items" element={<MyItems />} />
+                <Route path="add-items" element={<AddItems />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="settings" element={<SellerSettings />} />
+              </Routes>
+            </SellerLayout>
+          } />
 
           {/* Admin routes using AdminLayout for sidebar and styling */}
           <Route path="/admin/*" element={
