@@ -118,19 +118,6 @@ const Partners = () => {
             </div>
           </div>
         </div>
-        
-        <div className="stat-card total-card">
-          <div className="stat-icon total">
-            <FaStore size={24} />
-          </div>
-          <div className="stat-content">
-            <h3 className="stat-number">{activeSellers.length + pendingCount}</h3>
-            <p className="stat-label">Total Partners</p>
-            <div className="stat-trend neutral">
-              <span>●</span> Overall count
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Section header with filter actions */}
