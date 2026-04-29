@@ -7,6 +7,9 @@ import HomePage from './pages/homepage/HomePage.jsx';
 import CustomerHome from './pages/user/CustomerHome.jsx';
 import Verify from './pages/user/Verify.jsx';
 
+//Customer
+import GiftCustomizer from './pages/user/GiftCustomizer.jsx';
+
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
 
@@ -70,6 +73,9 @@ function App() {
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
           <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
           <Route path="/cart" element={<CartPage />} />
+
+          {/* Customer routes */}
+          <Route path="/customize" element={<LayoutWrapper><GiftCustomizer /></LayoutWrapper>} />
 
           {/* Seller routes */}
           <Route path="/seller/*" element={
