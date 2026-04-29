@@ -9,8 +9,9 @@ INSERT INTO users (name, username, email, password, role, is_verified) VALUES
 ('Nuwan Perera', 'craftyhands', 'nuwan@crafty.lk', '$2a$12$rpcYy8XmMneWhx5XwIZ1.uySIUpf1uOhCOr4az3L3YJ47mVcm25TW', 'PARTNER', 1);
 
 -- 5.3 Partner Details Update
-UPDATE partners SET shop_name='Gift World', categories='Handmade, Corporate', shop_address='No. 45, Galle Road, Colombo 03', verification_id='BR-99210', status='PENDING' WHERE partner_id=2;
-UPDATE partners SET shop_name='Lucky Gifts', categories='Toys, Kids', shop_address='No. 12, Main Street, Kandy', verification_id='BR-88452', status='ACTIVE' WHERE partner_id=3;
+INSERT INTO partners (partner_id, shop_name, categories, shop_address, verification_id, full_name, phone_number, status) VALUES 
+(2, 'Gift World', 'Handmade, Corporate', 'No. 45, Galle Road, Colombo 03', 'BR-99210', 'Partner Name', '0771234567', 'PENDING'),
+(3, 'Lucky Gifts', 'Toys, Kids', 'No. 12, Main Street, Kandy', 'BR-88452', 'Partner Name', '0779876543', 'ACTIVE');
 
 -- 5.4 Customers
 INSERT INTO users (name, username, email, password, role, is_verified) VALUES 
