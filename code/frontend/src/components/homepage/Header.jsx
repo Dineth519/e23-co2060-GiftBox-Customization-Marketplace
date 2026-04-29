@@ -25,7 +25,6 @@ const Header = () => {
           {[
             { label: 'Products',    route: '/products' },
             { label: 'How It Works', route: '/how-it-works'    },
-            { label: 'Vendors',     route: '/vendors'  },
             { label: 'About Us',       route: '/about-us'    },
           ].map(item => (
             <button
