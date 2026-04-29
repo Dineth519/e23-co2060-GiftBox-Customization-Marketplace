@@ -24,9 +24,9 @@ const Header = () => {
         <nav className="header-nav">
           {[
             { label: 'Products',    route: '/products' },
-            { label: 'Build a Box', route: '/build'    },
+            { label: 'How It Works', route: '/how-it-works'    },
             { label: 'Vendors',     route: '/vendors'  },
-            { label: 'About',       route: '/about'    },
+            { label: 'About Us',       route: '/about-us'    },
           ].map(item => (
             <button
               key={item.label}

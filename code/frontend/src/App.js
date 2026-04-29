@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 
 // Public and user pages
 import HomePage from './pages/homepage/HomePage.jsx';
+import HowItWorksPage from './pages/homepage/HowItWorksPage.jsx';
 import CustomerHome from './pages/user/CustomerHome.jsx';
 import Verify from './pages/user/Verify.jsx';
 
@@ -66,6 +67,7 @@ function App() {
           {/* Public and user routes */}
           <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/how-it-works" element={<LayoutWrapper><HowItWorksPage /></LayoutWrapper>} />
           <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
           <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
