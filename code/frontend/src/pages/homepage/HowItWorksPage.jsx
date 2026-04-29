@@ -112,11 +112,6 @@ const HowItWorksPage = () => {
         <div className="hiw-hero__grid" />
 
         <div className="hiw-hero__inner" ref={heroRef}>
-          <div className="hiw-breadcrumb">
-            <span onClick={() => navigate('/')}>Home</span>
-            <span className="hiw-crumb-sep">›</span>
-            <span className="hiw-crumb-active">How It Works</span>
-          </div>
           <div className="hiw-hero__label">Simple & Seamless</div>
           <h1 className="hiw-hero__title">
             Gifting Made<br />
@@ -125,19 +120,11 @@ const HowItWorksPage = () => {
           <p className="hiw-hero__sub">
             From browsing to doorstep — discover how Giftora turns every occasion into an unforgettable moment.
           </p>
-          <div className="hiw-hero__actions">
-            <button className="hiw-hero__cta" onClick={() => navigate('/products')}>
-              Shop Now →
-            </button>
-            <button className="hiw-hero__ghost" onClick={() => navigate('/build')}>
-              Build a Box 🎁
-            </button>
-          </div>
         </div>
 
         {/* floating pill strip */}
         <div className="hiw-hero__pills">
-          {['100% Secure', 'Islandwide Delivery', 'Premium Packaging', 'Same-Day Available', 'Easy Returns'].map((p) => (
+          {['100% Secure', 'Trusted Multiple Sellers', 'Premium Packaging', 'Same-Day Available', 'Easy Returns'].map((p) => (
             <span key={p} className="hiw-hero-pill">{p}</span>
           ))}
         </div>

@@ -101,11 +101,6 @@ const AboutUsPage = () => {
         <div className="about-hero__grid" />
 
         <div className="about-hero__inner" ref={heroRef}>
-          <div className="about-breadcrumb">
-            <span onClick={() => navigate('/')}>Home</span>
-            <span className="about-crumb-sep">›</span>
-            <span className="about-crumb-active">About Us</span>
-          </div>
           <div className="about-hero__label">Our Story</div>
           <h1 className="about-hero__title">
             Meet the Minds<br />
@@ -114,14 +109,6 @@ const AboutUsPage = () => {
           <p className="about-hero__sub">
             We are Team Nexus. A group of passionate engineering undergraduates dedicated to revolutionizing the art of gifting through technology.
           </p>
-          <div className="about-hero__actions">
-            <button className="about-hero__cta" onClick={() => navigate('/products')}>
-              Explore the Marketplace →
-            </button>
-            <button className="about-hero__ghost" onClick={() => navigate('/contact')}>
-              Get in Touch ✉️
-            </button>
-          </div>
         </div>
 
         {/* Floating pill strip showcasing project highlights */}
@@ -205,24 +192,6 @@ const AboutUsPage = () => {
                 <div className="about-faq-a">{item.a}</div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── BOTTOM CTA ── */}
-      <section className="about-bottom-cta">
-        <div className="about-bottom-cta__orb" />
-        <div className="about-bottom-cta__inner">
-          <div className="about-bottom-cta__icon">🚀</div>
-          <h2 className="about-bottom-cta__title">Ready to Experience Giftora?</h2>
-          <p className="about-bottom-cta__sub">Join our community and start creating the perfect gift boxes today.</p>
-          <div className="about-bottom-cta__btns">
-            <button className="about-hero__cta" onClick={() => navigate('/products')}>
-              Shop the Collection
-            </button>
-            <button className="about-hero__ghost" onClick={() => navigate('/build')}>
-              Build a Custom Box
-            </button>
           </div>
         </div>
       </section>
