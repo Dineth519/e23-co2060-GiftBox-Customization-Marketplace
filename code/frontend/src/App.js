@@ -24,7 +24,7 @@ import SellerDashboard from './pages/seller/SellerDashboard.jsx';
 
 // Homepage
 import ProductsPage from './pages/homepage/ProductsPage.jsx';
-
+import AddressForm from './components/user/AddressForm.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import CartPage from './pages/homepage/CartPage.jsx';
 
@@ -64,6 +64,7 @@ function App() {
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
           <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/test-address" element={<LayoutWrapper><AddressForm /></LayoutWrapper>} />
 
           {/* Seller routes */}
           <Route path="/seller" element={<LayoutWrapper><SellerDashboard /></LayoutWrapper>} />

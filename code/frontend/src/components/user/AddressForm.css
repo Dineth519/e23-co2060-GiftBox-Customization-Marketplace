@@ -1,0 +1,161 @@
+/* ============================================================
+   ADDRESS FORM STYLES
+   ============================================================ */
+
+.address-form-container {
+  background: #1a1a2e;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 600px;
+  margin: 0 auto;
+  color: #fff;
+}
+
+/* Compact mode for cart page */
+.address-form-container.compact {
+  background: transparent;
+  padding: 0;
+  max-width: 100%;
+}
+
+.address-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #fff;
+}
+
+.address-sub {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 24px;
+}
+
+.address-loading {
+  text-align: center;
+  color: #aaa;
+  padding: 20px;
+}
+
+/* ── Form layout ── */
+.address-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.address-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.address-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.address-field .optional {
+  font-weight: 400;
+  color: #888;
+  font-size: 12px;
+}
+
+.address-field input,
+.address-field select {
+  background: #2a2a3e;
+  border: 1.5px solid #3a3a5e;
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.address-field input::placeholder {
+  color: #666;
+}
+
+.address-field input:focus,
+.address-field select:focus {
+  border-color: #f59e0b;
+}
+
+.address-field select option {
+  background: #2a2a3e;
+  color: #fff;
+}
+
+/* ── Side by side row ── */
+.address-row {
+  display: flex;
+  gap: 16px;
+}
+
+.address-row .address-field {
+  flex: 1;
+}
+
+/* ── Errors and success ── */
+.address-error {
+  color: #e74c3c;
+  font-size: 11px;
+  margin: 0;
+}
+
+.address-general-error {
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid #e74c3c;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 13px;
+}
+
+.address-success {
+  background: rgba(46, 204, 113, 0.1);
+  border: 1px solid #2ecc71;
+  border-radius: 8px;
+  padding: 10px;
+  color: #2ecc71;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ── Save button ── */
+.address-save-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 8px;
+}
+
+.address-save-btn:hover {
+  opacity: 0.9;
+}
+
+.address-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .address-row {
+    flex-direction: column;
+  }
+
+  .address-form-container {
+    padding: 20px;
+  }
+}

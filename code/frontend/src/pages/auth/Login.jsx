@@ -8,7 +8,6 @@ import { assets } from '../../assets/login/assets';
 // Stylesheet
 import './Login.css';
 
-// ============================================================================
 // PASSWORD STRENGTH CHECKER
 // ============================================================================
 const getPasswordStrength = (password) => {
