@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaThLarge, FaList, FaSearch, FaEdit, FaTrash, FaStar, FaBoxOpen, FaPlus } from 'react-icons/fa';
 
 // ── Design tokens ──────────────────────────────────────────────
@@ -99,6 +100,7 @@ const ProductCard = ({ p, onDelete }) => {
 
 // ── Main Component ─────────────────────────────────────────────
 const MyItems = () => {
+  const navigate = useNavigate();
   const [view, setView]         = useState('grid');
   const [search, setSearch]     = useState('');
   const [category, setCategory] = useState('All');
@@ -132,7 +134,7 @@ const MyItems = () => {
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: navy }}>My Items</h1>
           <p style={{ margin: '6px 0 0', color: '#7A869A', fontSize: 14 }}>Manage your product listings</p>
         </div>
-        <button style={{
+        <button onClick={() => navigate('/seller/add-items')} style={{
           display: 'flex', alignItems: 'center', gap: 8,
           background: gold, color: navy, border: 'none',
           padding: '11px 22px', borderRadius: 11, fontSize: 14, fontWeight: 700,
