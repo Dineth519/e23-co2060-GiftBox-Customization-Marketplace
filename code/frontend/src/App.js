@@ -10,6 +10,7 @@ import Verify from './pages/user/Verify.jsx';
 //Customer
 import GiftCustomizer from './pages/user/GiftCustomizer.jsx';
 import CustomerOrders from './pages/user/Orders.jsx';
+import OrderDetail from './pages/user/OrderDetail.jsx';
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
@@ -78,6 +79,7 @@ function App() {
           {/* Customer routes */}
           <Route path="/customize" element={<LayoutWrapper><GiftCustomizer /></LayoutWrapper>} />
           <Route path="/orders" element={<LayoutWrapper><Orders /></LayoutWrapper>} />
+          <Route path="/orders/:orderId" element={<LayoutWrapper><OrderDetail /></LayoutWrapper>} />
 
           {/* Seller routes */}
           <Route path="/seller/*" element={
