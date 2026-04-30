@@ -1,0 +1,513 @@
+/* Profile.css
+   Light warm theme — cream/warm white background with gold accents.
+   Design inspired by Daraz and Temu profile pages:
+   - Clean white cards like Daraz
+   - Clear section separation like Temu
+   - Giftora's gold accent colour throughout
+   All classes use "pf-" prefix to avoid conflicts. */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── Colour Tokens ────────────────────────────────────────────────────────── */
+:root {
+  --pf-bg:         #FAF7F2;   /* warm cream — main page background         */
+  --pf-surface:    #FFFFFF;   /* pure white — card backgrounds             */
+  --pf-surface2:   #F5F0E8;   /* light warm — hover / input fill           */
+  --pf-border:     #E8E0D0;   /* soft warm border                          */
+  --pf-gold:       #D4A843;   /* Giftora primary gold                      */
+  --pf-gold-dark:  #B8922E;   /* darker gold for hover states              */
+  --pf-gold-bg:    #FDF4E0;   /* very light gold — stat box background     */
+  --pf-text:       #2C2415;   /* dark warm brown — primary text            */
+  --pf-muted:      #8A7A60;   /* muted warm — secondary text               */
+  --pf-green:      #1D9E75;   /* success green                             */
+  --pf-green-bg:   #E8F7F2;   /* light green background                    */
+  --pf-blue:       #378ADD;   /* blue for in-progress stat                 */
+  --pf-blue-bg:    #EAF3FC;   /* light blue background                     */
+  --pf-red:        #E24B4A;   /* danger — remove button                    */
+  --pf-red-bg:     #FEF0EF;   /* light red background                      */
+  --pf-shadow:     0 2px 12px rgba(44, 36, 21, 0.07);
+  --pf-radius:     14px;
+  --pf-radius-sm:  8px;
+}
+
+/* ── Page Wrapper ─────────────────────────────────────────────────────────── */
+.pf-page {
+  min-height: 100vh;
+  background: var(--pf-bg);
+  color: var(--pf-text);
+  font-family: 'DM Sans', sans-serif;
+  padding: 2rem 1.5rem 4rem;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* ── Loading State ────────────────────────────────────────────────────────── */
+.pf-loading {
+  min-height: 100vh;
+  background: var(--pf-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--pf-muted);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.pf-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--pf-border);
+  border-top-color: var(--pf-gold);
+  border-radius: 50%;
+  animation: pf-spin 0.8s linear infinite;
+}
+
+@keyframes pf-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ══ PROFILE HEADER ══════════════════════════════════════════════════════════ */
+/* Like Daraz — avatar on left, name + info on right, clean white card */
+.pf-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--pf-surface);
+  border: 1px solid var(--pf-border);
+  border-radius: var(--pf-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--pf-shadow);
+}
+
+/* Gold circle with customer initials — like Daraz avatar */
+.pf-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pf-gold), #B8922E);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(212, 168, 67, 0.3);
+}
+
+.pf-header-info { flex: 1; }
+
+/* Customer name */
+.pf-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--pf-text);
+  margin-bottom: 4px;
+}
+
+/* Email / member since */
+.pf-meta {
+  font-size: 13px;
+  color: var(--pf-muted);
+  margin-bottom: 2px;
+}
+
+/* ══ STATS ROW ═══════════════════════════════════════════════════════════════ */
+/* Like Temu — 4 stats in a row, each with coloured number + label below */
+.pf-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.pf-stat-box {
+  background: var(--pf-surface);
+  border: 1px solid var(--pf-border);
+  border-radius: var(--pf-radius-sm);
+  padding: 1rem 0.75rem;
+  text-align: center;
+  box-shadow: var(--pf-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: transform 0.15s;
+}
+
+.pf-stat-box:hover {
+  transform: translateY(-2px);
+}
+
+/* Big number */
+.pf-stat-num {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--pf-text);
+}
+
+.pf-stat-num.green { color: var(--pf-green); }
+.pf-stat-num.blue  { color: var(--pf-blue);  }
+.pf-stat-num.gold  { color: var(--pf-gold);  font-size: 15px; }
+
+/* Label below number */
+.pf-stat-label {
+  font-size: 11px;
+  color: var(--pf-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ══ TAB NAVIGATION ══════════════════════════════════════════════════════════ */
+/* Like Daraz profile tabs — underline style, gold active indicator */
+.pf-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid var(--pf-border);
+  background: var(--pf-surface);
+  border-radius: var(--pf-radius) var(--pf-radius) 0 0;
+  padding: 0 1rem;
+  box-shadow: var(--pf-shadow);
+  overflow-x: auto;
+}
+
+.pf-tab {
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: var(--pf-muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.pf-tab:hover {
+  color: var(--pf-text);
+}
+
+/* Gold underline on active tab */
+.pf-tab.active {
+  color: var(--pf-gold-dark);
+  border-bottom-color: var(--pf-gold);
+}
+
+/* ── Tab Content ──────────────────────────────────────────────────────────── */
+.pf-tab-content {
+  animation: pf-fade 0.2s ease;
+}
+
+@keyframes pf-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══ WHITE CARD ══════════════════════════════════════════════════════════════ */
+/* Every section content sits inside one of these clean white cards */
+.pf-card {
+  background: var(--pf-surface);
+  border: 1px solid var(--pf-border);
+  border-radius: 0 0 var(--pf-radius) var(--pf-radius);
+  padding: 1.75rem;
+  box-shadow: var(--pf-shadow);
+  margin-bottom: 1rem;
+}
+
+.pf-card-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--pf-text);
+  margin-bottom: 4px;
+}
+
+.pf-card-desc {
+  font-size: 13px;
+  color: var(--pf-muted);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--pf-border);
+}
+
+/* ══ FORM ELEMENTS ═══════════════════════════════════════════════════════════ */
+/* Like Daraz — clean inputs with light border, gold focus ring */
+
+/* Two column form row */
+.pf-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* Single form field group: label on top, input below */
+.pf-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+/* When inside form-row, group has no bottom margin (row handles it) */
+.pf-form-row .pf-form-group {
+  margin-bottom: 0;
+}
+
+/* Label text */
+.pf-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--pf-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Input field */
+.pf-input {
+  background: var(--pf-surface2);
+  border: 1.5px solid var(--pf-border);
+  border-radius: var(--pf-radius-sm);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--pf-text);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+}
+
+.pf-input:focus {
+  border-color: var(--pf-gold);
+  background: #FFFDF5;
+}
+
+.pf-input::placeholder {
+  color: #C4B89A;
+}
+
+/* ── Error message ────────────────────────────────────────────────────────── */
+.pf-error {
+  font-size: 13px;
+  color: var(--pf-red);
+  background: var(--pf-red-bg);
+  padding: 8px 12px;
+  border-radius: var(--pf-radius-sm);
+  margin-bottom: 14px;
+}
+
+/* ══ BUTTONS ═════════════════════════════════════════════════════════════════ */
+
+/* Primary gold button — Save / Update */
+.pf-btn-primary {
+  padding: 11px 28px;
+  background: var(--pf-gold);
+  color: #12122A;
+  border: none;
+  border-radius: var(--pf-radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+}
+
+.pf-btn-primary:hover {
+  background: var(--pf-gold-dark);
+  color: #fff;
+}
+
+/* Green state when saved successfully */
+.pf-btn-primary.saved {
+  background: var(--pf-green);
+  color: #fff;
+  cursor: default;
+}
+
+/* Outline button — Cancel */
+.pf-btn-outline {
+  padding: 11px 28px;
+  background: transparent;
+  color: var(--pf-muted);
+  border: 1.5px solid var(--pf-border);
+  border-radius: var(--pf-radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+
+.pf-btn-outline:hover {
+  border-color: var(--pf-gold);
+  color: var(--pf-gold-dark);
+}
+
+/* ══ ADDRESSES ═══════════════════════════════════════════════════════════════ */
+/* Like Daraz saved addresses — each address is a card with label + actions */
+
+.pf-addresses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+/* Each saved address card */
+.pf-addr-card {
+  background: var(--pf-surface);
+  border: 1.5px solid var(--pf-border);
+  border-radius: var(--pf-radius-sm);
+  padding: 1rem 1.25rem;
+  transition: border-color 0.15s;
+}
+
+/* Default address gets a gold left border — like Daraz */
+.pf-addr-card.default {
+  border-left: 4px solid var(--pf-gold);
+  background: var(--pf-gold-bg);
+}
+
+/* Top row: label + badges on left, action buttons on right */
+.pf-addr-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pf-addr-label-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Address label e.g. "Home", "Office" */
+.pf-addr-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--pf-text);
+}
+
+/* Green "Default" badge */
+.pf-addr-default-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pf-green);
+  background: var(--pf-green-bg);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Action buttons: "Set Default" and "Remove" */
+.pf-addr-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pf-addr-btn {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  border: 1.5px solid var(--pf-border);
+  background: var(--pf-surface);
+  color: var(--pf-muted);
+  transition: all 0.15s;
+}
+
+.pf-addr-btn:hover {
+  border-color: var(--pf-gold);
+  color: var(--pf-gold-dark);
+}
+
+/* Red "Remove" button */
+.pf-addr-btn.danger {
+  color: var(--pf-red);
+  border-color: var(--pf-border);
+}
+
+.pf-addr-btn.danger:hover {
+  background: var(--pf-red-bg);
+  border-color: var(--pf-red);
+}
+
+/* Address text lines */
+.pf-addr-text {
+  font-size: 13px;
+  color: var(--pf-text);
+  margin-bottom: 2px;
+}
+
+.pf-addr-text.muted {
+  color: var(--pf-muted);
+}
+
+/* "+ Add New Address" dashed button — like Daraz */
+.pf-add-addr-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--pf-surface);
+  border: 1.5px dashed var(--pf-gold);
+  border-radius: var(--pf-radius-sm);
+  color: var(--pf-gold-dark);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  margin-top: 4px;
+}
+
+.pf-add-addr-btn:hover {
+  background: var(--pf-gold-bg);
+}
+
+/* ── Address form card ────────────────────────────────────────────────────── */
+/* Reuse pf-card but without the tab border-radius */
+.pf-addresses-list + .pf-card,
+.pf-add-addr-btn + .pf-card {
+  border-radius: var(--pf-radius);
+}
+
+/* ══ RESPONSIVE ══════════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  /* Stack form rows on mobile */
+  .pf-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stack stats 2x2 on mobile */
+  .pf-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Stack header vertically */
+  .pf-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .pf-addr-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Smaller avatar on mobile */
+  .pf-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 18px;
+  }
+}
