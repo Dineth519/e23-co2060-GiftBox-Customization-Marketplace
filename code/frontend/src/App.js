@@ -6,10 +6,11 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 import HomePage from './pages/homepage/HomePage.jsx';
 import CustomerHome from './pages/user/CustomerHome.jsx';
 import Verify from './pages/user/Verify.jsx';
+import VendorLanding from './pages/homepage/VendorLanding.jsx';
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
-
+import VendorRegistration from './pages/auth/VendorRegistration.jsx';
 // Admin components and pages
 import Sidebar from './components/admin/Sidebar.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
@@ -68,6 +69,8 @@ function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
+          <Route path="/vendor-landing" element={<VendorLanding />} />
+          <Route path="/vendor-register" element={<VendorRegistration />} />
           <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/test-address" element={<LayoutWrapper><AddressForm /></LayoutWrapper>} />
