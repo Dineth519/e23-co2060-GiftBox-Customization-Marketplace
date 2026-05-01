@@ -1,95 +1,78 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaThLarge, FaList, FaSearch, FaEdit, FaTrash, FaStar, FaBoxOpen, FaPlus } from 'react-icons/fa';
+import { FaThLarge, FaList, FaSearch, FaEdit, FaTrash, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
+import './MyItems.css'; // ඔයාගේ පරණ CSS එකමයි, කිසිම වෙනසක් නෑ
 
-// ── Design tokens ──────────────────────────────────────────────
-const gold     = '#C9A84C';
-const goldLight = '#E8C96A';
-const navy     = '#1A2340';
-const cream    = '#F5F0E8';
-const white    = '#FFFFFF';
-
-// ── Mock products data ─────────────────────────────────────────
-const PRODUCTS = [
-  { id: 1, name: 'Premium Gift Box',      category: 'Gift Boxes',  price: 2000,  stock: 45, sold: 142, rating: 4.9, status: 'Active',      image: '🎁' },
-  { id: 2, name: 'Luxury Hamper Set',     category: 'Hampers',     price: 3500,  stock: 28, sold: 98,  rating: 4.7, status: 'Active',      image: '🧺' },
-  { id: 3, name: 'Birthday Bouquet',      category: 'Floral',      price: 1500,  stock: 0,  sold: 87,  rating: 4.8, status: 'Out of Stock', image: '💐' },
-  { id: 4, name: 'Wedding Gift Bundle',   category: 'Gift Boxes',  price: 4200,  stock: 12, sold: 64,  rating: 4.6, status: 'Active',      image: '💍' },
-  { id: 5, name: 'Anniversary Box',       category: 'Gift Boxes',  price: 3000,  stock: 8,  sold: 51,  rating: 4.5, status: 'Low Stock',   image: '❤️' },
-  { id: 6, name: 'Chocolate Hamper',      category: 'Hampers',     price: 2800,  stock: 33, sold: 76,  rating: 4.8, status: 'Active',      image: '🍫' },
-  { id: 7, name: 'Rose Bouquet Deluxe',   category: 'Floral',      price: 1800,  stock: 22, sold: 93,  rating: 4.7, status: 'Active',      image: '🌹' },
-  { id: 8, name: 'Baby Shower Gift Set',  category: 'Special',     price: 3200,  stock: 0,  sold: 38,  rating: 4.6, status: 'Out of Stock', image: '🍼' },
-  { id: 9, name: 'Corporate Gift Pack',   category: 'Special',     price: 5000,  stock: 5,  sold: 29,  rating: 4.4, status: 'Low Stock',   image: '💼' },
-  { id: 10, name: 'Fruit Basket',         category: 'Hampers',     price: 1200,  stock: 60, sold: 112, rating: 4.5, status: 'Active',      image: '🍎' },
-];
-
+// ── Constants ──────────────────────────────────────────────────
 const CATEGORIES = ['All', 'Gift Boxes', 'Hampers', 'Floral', 'Special'];
 
-// ── Status badge style ─────────────────────────────────────────
-const statusStyle = (s) => ({
-  Active:        { bg: '#EAF3DE', color: '#2E7D52', border: '#A8D87A' },
-  'Low Stock':   { bg: '#FEF9ED', color: '#854F0B', border: '#FAC775' },
-  'Out of Stock':{ bg: '#FCEBEB', color: '#A32D2D', border: '#F09595' },
-}[s] || {});
+const getBadgeClass = (status) => ({
+  'Active':        'badge-active',
+  'Low Stock':     'badge-low-stock',
+  'Out of Stock':  'badge-out-of-stock',
+}[status] || '');
 
-// ── Product Card (Grid view) ───────────────────────────────────
-const ProductCard = ({ p, onDelete }) => {
-  const ss = statusStyle(p.status);
-  return (
-    <div style={{
-      background: white, borderRadius: 16, border: '1px solid #EDE8DE',
-      overflow: 'hidden', boxShadow: '0 2px 12px rgba(26,35,64,0.06)',
-      transition: 'transform 0.15s, box-shadow 0.15s',
-      display: 'flex', flexDirection: 'column',
-    }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(26,35,64,0.12)'; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(26,35,64,0.06)'; }}
-    >
-      {/* Image area */}
-      <div style={{
-        height: 130, background: `linear-gradient(135deg, #F8F4EC, #EDE8DE)`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 52, position: 'relative',
-      }}>
-        {p.image}
-        <span style={{
-          position: 'absolute', top: 10, right: 10,
-          background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`,
-          fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
-        }}>{p.status}</span>
+const stockColor = (stock) => {
+  if (stock === 0)   return '#A32D2D';
+  if (stock <= 10)   return '#854F0B';
+  return '#1A2340';
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ProductCard — Grid view
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const ProductCard = ({ product, isEditing, editForm, onEditChange, onStartEdit, onSaveEdit, onCancelEdit, onDelete }) => {
+  
+  // Edit කරන අවස්ථාවේ පෙනෙන කොටස (CSS වෙනස් නොකර Inline Styles භාවිතා කර ඇත)
+  if (isEditing) {
+    return (
+      <div className="product-card" style={{ padding: '15px', background: '#FDFBF7', border: '1px solid #E0D8C8', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <h4 style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#1A2340' }}>Edit Item</h4>
+        
+        <input name="name" value={editForm.name} onChange={onEditChange} placeholder="Product Name" style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }} />
+        <input name="price" type="number" value={editForm.price} onChange={onEditChange} placeholder="Price" style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }} />
+        <input name="stock" type="number" value={editForm.stock} onChange={onEditChange} placeholder="Stock" style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }} />
+        
+        <select name="status" value={editForm.status} onChange={onEditChange} style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+          <option value="Active">Active</option>
+          <option value="Out of Stock">Out of Stock</option>
+        </select>
+
+        <div style={{ display: 'flex', gap: '8px', marginTop: '5px' }}>
+          <button onClick={() => onSaveEdit(product.id)} style={{ flex: 1, padding: '8px', background: '#1A2340', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+            <FaSave /> Save
+          </button>
+          <button onClick={onCancelEdit} style={{ flex: 1, padding: '8px', background: '#fff', color: '#1A2340', border: '1px solid #1A2340', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+            <FaTimes /> Cancel
+          </button>
+        </div>
       </div>
+    );
+  }
 
-      {/* Content */}
-      <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <span style={{ fontSize: 11, color: gold, fontWeight: 600, letterSpacing: 0.5 }}>{p.category}</span>
-        <p style={{ margin: '4px 0 8px', fontSize: 14, fontWeight: 700, color: navy, lineHeight: 1.3 }}>{p.name}</p>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <span style={{ fontSize: 16, fontWeight: 800, color: navy }}>LKR {p.price.toLocaleString()}</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, fontWeight: 600, color: '#5A6478' }}>
-            ⭐ {p.rating}
-          </span>
+  // සාමාන්‍ය අවස්ථාව (ඔයාගේ මුල් Design එක කිසිම වෙනසක් නොකර)
+  return (
+    <div className="product-card">
+      <div className="card-image-area">
+        <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e)=>{e.target.src="https://via.placeholder.com/220x150?text=No+Image"}} />
+        <span className={`card-status-badge ${getBadgeClass(product.status)}`}>{product.status}</span>
+      </div>
+      <div className="card-body">
+        <span className="card-category">{product.category}</span>
+        <p className="card-name">{product.name}</p>
+        <div className="card-price-row">
+          <span className="card-price">LKR {Number(product.price).toLocaleString()}</span>
+          <span className="card-rating">⭐ {product.rating}</span>
         </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#7A869A', marginBottom: 14 }}>
-          <span>Stock: <strong style={{ color: p.stock === 0 ? '#A32D2D' : p.stock <= 10 ? '#854F0B' : navy }}>{p.stock}</strong></span>
-          <span>Sold: <strong style={{ color: navy }}>{p.sold}</strong></span>
+        <div className="card-meta">
+          <span>Stock: <strong style={{ color: stockColor(product.stock) }}>{product.stock}</strong></span>
+          <span>Sold: <strong style={{ color: '#1A2340' }}>{product.sold}</strong></span>
         </div>
-
-        {/* Actions */}
-        <div style={{ display: 'flex', gap: 8, marginTop: 'auto' }}>
-          <button style={{
-            flex: 1, padding: '8px 0', borderRadius: 9, border: `1.5px solid ${gold}`,
-            background: 'transparent', color: gold, fontSize: 12, fontWeight: 600,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontFamily: 'inherit',
-          }}>
+        <div className="card-actions">
+          <button className="btn-edit" onClick={() => onStartEdit(product)}>
             <FaEdit size={11} /> Edit
           </button>
-          <button onClick={() => onDelete(p.id)} style={{
-            flex: 1, padding: '8px 0', borderRadius: 9, border: '1.5px solid #F09595',
-            background: 'transparent', color: '#A32D2D', fontSize: 12, fontWeight: 600,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontFamily: 'inherit',
-          }}>
+          <button className="btn-delete" onClick={() => onDelete(product.id)}>
             <FaTrash size={11} /> Delete
           </button>
         </div>
@@ -98,202 +81,281 @@ const ProductCard = ({ p, onDelete }) => {
   );
 };
 
-// ── Main Component ─────────────────────────────────────────────
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TableRow — List view
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const TableRow = ({ product, index, isEditing, editForm, onEditChange, onStartEdit, onSaveEdit, onCancelEdit, onDelete }) => {
+  
+  if (isEditing) {
+    return (
+      <tr style={{ background: '#FDFBF7' }}>
+        <td colSpan="8" style={{ padding: '15px' }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <input name="name" value={editForm.name} onChange={onEditChange} placeholder="Name" style={{ flex: 2, padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }} />
+            <input name="price" type="number" value={editForm.price} onChange={onEditChange} placeholder="Price" style={{ flex: 1, padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }} />
+            <input name="stock" type="number" value={editForm.stock} onChange={onEditChange} placeholder="Stock" style={{ flex: 1, padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }} />
+            <select name="status" value={editForm.status} onChange={onEditChange} style={{ flex: 1, padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }}>
+              <option value="Active">Active</option>
+              <option value="Out of Stock">Out of Stock</option>
+            </select>
+            <button onClick={() => onSaveEdit(product.id)} style={{ padding: '6px 12px', background: '#1A2340', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><FaSave /></button>
+            <button onClick={onCancelEdit} style={{ padding: '6px 12px', background: '#fff', color: '#1A2340', border: '1px solid #1A2340', borderRadius: '4px', cursor: 'pointer' }}><FaTimes /></button>
+          </div>
+        </td>
+      </tr>
+    );
+  }
+
+  return (
+    <tr style={{ background: index % 2 === 0 ? '#FFFFFF' : '#FDFAF5' }}>
+      <td>
+        <div className="table-product-cell">
+          <img src={product.image} alt={product.name} className="table-product-img" onError={(e)=>{e.target.src="https://via.placeholder.com/50?text=No+Image"}} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', marginRight: '10px' }} />
+          <span className="table-product-name">{product.name}</span>
+        </div>
+      </td>
+      <td className="table-category">{product.category}</td>
+      <td className="table-price">{Number(product.price).toLocaleString()}</td>
+      <td style={{ fontWeight: 600, color: stockColor(product.stock) }}>{product.stock}</td>
+      <td style={{ color: '#5A6478' }}>{product.sold}</td>
+      <td><span className="table-rating">⭐ {product.rating}</span></td>
+      <td>
+        <span className={`card-status-badge ${getBadgeClass(product.status)}`} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+          {product.status}
+        </span>
+      </td>
+      <td>
+        <div className="table-actions">
+          <button className="btn-table-edit" onClick={() => onStartEdit(product)}><FaEdit size={10} /> Edit</button>
+          <button className="btn-table-delete" onClick={() => onDelete(product.id)}><FaTrash size={10} /> Delete</button>
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// EmptyState
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const EmptyState = () => (
+  <div className="state-box">
+    <div className="state-icon">📦</div>
+    <h3 className="state-title">No products found</h3>
+    <p className="state-desc">Try adjusting your search or filter</p>
+  </div>
+);
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// MyItems — Main Component
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const MyItems = () => {
   const navigate = useNavigate();
-  const [view, setView]         = useState('grid');
-  const [search, setSearch]     = useState('');
-  const [category, setCategory] = useState('All');
-  const [products, setProducts] = useState(PRODUCTS);
 
-  const filtered = useMemo(() => products.filter(p => {
-    const matchCat    = category === 'All' || p.category === category;
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
-  }), [products, search, category]);
+  const [products, setProducts]   = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
+  const [view, setView]           = useState('grid');
+  const [search, setSearch]       = useState('');
+  const [category, setCategory]   = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
 
-  const handleDelete = (id) => {
-    if (window.confirm('Delete this product?')) {
-      setProducts(prev => prev.filter(p => p.id !== id));
+  // ── Inline Edit State ──
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({ name: '', price: '', stock: '', status: '' });
+
+  const SELLER_ID = 2; 
+  const API_BASE  = 'http://localhost:8080/api';          
+
+  useEffect(() => {
+    fetchProducts();
+  }, [SELLER_ID]);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/sellers/${SELLER_ID}/products`);
+      if (!res.ok) throw new Error('Failed to load products');
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const stats = [
-    { label: 'Total Products', value: products.length, icon: '📦' },
-    { label: 'Active',         value: products.filter(p => p.status === 'Active').length, icon: '✅' },
-    { label: 'Low Stock',      value: products.filter(p => p.status === 'Low Stock').length, icon: '⚠️' },
-    { label: 'Out of Stock',   value: products.filter(p => p.status === 'Out of Stock').length, icon: '❌' },
-  ];
+  // ── Delete Handler ──
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this product?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/sellers/products/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Delete failed');
+      setProducts(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      alert(`Error deleting product: ${err.message}`);
+    }
+  };
+
+  // ── Inline Edit Handlers ──
+  const handleStartEdit = (product) => {
+    setEditingId(product.id);
+    setEditForm({ name: product.name, price: product.price, stock: product.stock, status: product.status });
+  };
+
+  const handleEditChange = (e) => {
+    setEditForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+  };
+
+// ── Save Edit to Backend ──
+  const handleSaveEdit = async (id) => {
+    try {
+      // 1. අලුත් තොග ප්‍රමාණය (Stock) අංකයක් බවට පත් කරගැනීම
+      const newStock = parseInt(editForm.stock, 10);
+      const isActiveSelected = editForm.status === 'Active';
+
+      // 2. තොගය අනුව නිවැරදි Status එක ස්වයංක්‍රීයව තීරණය කිරීම (Backend Logic එකමයි)
+      let newCalculatedStatus = 'Active';
+      
+      if (!isActiveSelected || newStock <= 0) {
+        newCalculatedStatus = 'Out of Stock'; // Active නැත්නම් හෝ බඩු 0 නම්
+      } else if (newStock <= 10) {
+        newCalculatedStatus = 'Low Stock';    // බඩු 10ට අඩු නම්
+      }
+
+      // Backend එකට යවන Payload එක
+      const payload = {
+        name: editForm.name,
+        price: parseFloat(editForm.price),
+        stockQuantity: newStock,
+        isActive: isActiveSelected ? 1 : 0
+      };
+
+      const res = await fetch(`${API_BASE}/sellers/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Update failed');
+      
+      // 3. React State එක අලුත් Status එකත් එක්කම එසැණින් Update කිරීම
+      setProducts(prev => prev.map(p => 
+        p.id === id ? { 
+          ...p, 
+          name: editForm.name, 
+          price: editForm.price, 
+          stock: newStock, 
+          status: newCalculatedStatus // ගණනය කළ අලුත් status එක (Low Stock/Out of Stock)
+        } : p
+      ));
+      
+      setEditingId(null); // Edit Mode එකෙන් ඉවත් වීම
+    } catch (err) {
+      alert(`Error saving: ${err.message}`);
+    }
+  };
+
+  const stats = useMemo(() => [
+    { key: 'All',           label: 'Total Products', icon: '📦', value: products.length },
+    { key: 'Active',        label: 'Active',         icon: '✅', value: products.filter(p => p.status === 'Active').length },
+    { key: 'Low Stock',     label: 'Low Stock',      icon: '⚠️', value: products.filter(p => p.status === 'Low Stock').length },
+    { key: 'Out of Stock',  label: 'Out of Stock',   icon: '❌', value: products.filter(p => p.status === 'Out of Stock').length },
+  ], [products]);
+
+  const filtered = useMemo(() => products.filter(p => {
+    const matchCategory = category === 'All' || p.category === category;
+    const matchStatus   = statusFilter === 'All' || p.status === statusFilter;
+    const matchSearch   = p.name.toLowerCase().includes(search.toLowerCase());
+    return matchCategory && matchStatus && matchSearch;
+  }), [products, search, category, statusFilter]);
 
   return (
-    <div style={{ padding: '32px 36px', minHeight: '100vh', background: cream, fontFamily: "'Inter', sans-serif" }}>
-
-      {/* ── Page Header ── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+    <div className="my-items-page">
+      <div className="page-header">
         <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: navy }}>My Items</h1>
-          <p style={{ margin: '6px 0 0', color: '#7A869A', fontSize: 14 }}>Manage your product listings</p>
+          <h1 className="page-title">My Items</h1>
+          <p className="page-subtitle">Manage your product listings</p>
         </div>
-        <button onClick={() => navigate('/seller/add-items')} style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          background: gold, color: navy, border: 'none',
-          padding: '11px 22px', borderRadius: 11, fontSize: 14, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit',
-        }}>
+        <button className="btn-add" onClick={() => navigate('/seller/add-items')}>
           <FaPlus size={12} /> Add New Item
         </button>
       </div>
 
-      {/* ── Summary Stats ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+      <div className="stats-grid">
         {stats.map(s => (
-          <div key={s.label} style={{
-            background: white, borderRadius: 14, border: '1px solid #EDE8DE',
-            padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14,
-            boxShadow: '0 2px 8px rgba(26,35,64,0.05)',
-          }}>
-            <span style={{ fontSize: 26 }}>{s.icon}</span>
-            <div>
-              <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: navy }}>{s.value}</p>
-              <p style={{ margin: 0, fontSize: 11, color: '#7A869A', fontWeight: 600 }}>{s.label}</p>
-            </div>
-          </div>
+          <button key={s.key} className={`stat-card${statusFilter === s.key ? ' active-filter' : ''}`} onClick={() => setStatusFilter(s.key)}>
+            <span className="stat-icon">{s.icon}</span>
+            <div><p className="stat-value">{loading ? '—' : s.value}</p><p className="stat-label">{s.label}</p></div>
+          </button>
         ))}
       </div>
 
-      {/* ── Toolbar: Search + Filter + Toggle ── */}
-      <div style={{
-        background: white, borderRadius: 14, border: '1px solid #EDE8DE',
-        padding: '14px 20px', marginBottom: 20,
-        display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
-        boxShadow: '0 2px 8px rgba(26,35,64,0.05)',
-      }}>
-        {/* Search */}
-        <div style={{ flex: 1, minWidth: 200, position: 'relative' }}>
-          <FaSearch style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#AAA', fontSize: 13 }} />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search products..."
-            style={{
-              width: '100%', padding: '9px 14px 9px 36px', borderRadius: 10,
-              border: '1.5px solid #E0D8C8', fontSize: 13, color: navy,
-              background: '#FAFAF8', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
-            }}
-          />
+      <div className="toolbar">
+        <div className="search-wrapper">
+          <FaSearch className="search-icon" />
+          <input className="search-input" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." />
         </div>
-
-        {/* Category Filter */}
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {CATEGORIES.map(c => (
-            <button key={c} onClick={() => setCategory(c)} style={{
-              padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-              cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
-              background: category === c ? gold : 'transparent',
-              color: category === c ? navy : '#7A869A',
-              border: category === c ? `1.5px solid ${gold}` : '1.5px solid #E0D8C8',
-            }}>{c}</button>
-          ))}
+        <div className="category-filters">
+          {CATEGORIES.map(c => <button key={c} className={`btn-category${category === c ? ' selected' : ''}`} onClick={() => setCategory(c)}>{c}</button>)}
         </div>
-
-        {/* View Toggle */}
-        <div style={{ display: 'flex', background: '#F0EAD8', borderRadius: 10, padding: 3 }}>
-          {[['grid', <FaThLarge size={13} />], ['list', <FaList size={13} />]].map(([v, icon]) => (
-            <button key={v} onClick={() => setView(v)} style={{
-              padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer',
-              background: view === v ? white : 'transparent',
-              color: view === v ? navy : '#7A869A',
-              boxShadow: view === v ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-              display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit',
-              fontSize: 12, fontWeight: 600, transition: 'all 0.15s',
-            }}>{icon} {v === 'grid' ? 'Grid' : 'List'}</button>
+        <div className="view-toggle">
+          {[['grid', <FaThLarge size={13} />, 'Grid'], ['list', <FaList size={13} />, 'List']].map(([v, icon, label]) => (
+            <button key={v} className={`btn-view${view === v ? ' active' : ''}`} onClick={() => setView(v)}>{icon} {label}</button>
           ))}
         </div>
       </div>
 
-      {/* ── Results count ── */}
-      <p style={{ fontSize: 13, color: '#7A869A', marginBottom: 16 }}>
-        Showing <strong style={{ color: navy }}>{filtered.length}</strong> of <strong style={{ color: navy }}>{products.length}</strong> products
-        {category !== 'All' && <span> in <strong style={{ color: gold }}>{category}</strong></span>}
-      </p>
-
-      {/* ── Grid View ── */}
-      {view === 'grid' && (
-        filtered.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 18 }}>
-            {filtered.map(p => <ProductCard key={p.id} p={p} onDelete={handleDelete} />)}
-          </div>
-        ) : (
-          <EmptyState />
-        )
+      {!loading && !error && (
+        <p className="results-count">
+          Showing <strong>{filtered.length}</strong> of <strong>{products.length}</strong> products
+        </p>
       )}
 
-      {/* ── List / Table View ── */}
-      {view === 'list' && (
+      {loading && <div className="state-box"><div className="spinner" /><p className="state-desc">Loading your products…</p></div>}
+      {!loading && error && <div className="state-box"><div className="state-icon">⚠️</div><h3 className="state-title">Failed to load products</h3><p className="state-desc">{error}</p></div>}
+
+      {!loading && !error && view === 'grid' && (
         filtered.length > 0 ? (
-          <div style={{ background: white, borderRadius: 16, border: '1px solid #EDE8DE', overflow: 'hidden', boxShadow: '0 2px 12px rgba(26,35,64,0.06)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <div className="products-grid">
+            {filtered.map(p => (
+              <ProductCard 
+                key={p.id} product={p} 
+                isEditing={editingId === p.id} editForm={editForm}
+                onEditChange={handleEditChange} onStartEdit={handleStartEdit} onSaveEdit={handleSaveEdit} onCancelEdit={handleCancelEdit} onDelete={handleDelete} 
+              />
+            ))}
+          </div>
+        ) : <EmptyState />
+      )}
+
+      {!loading && !error && view === 'list' && (
+        filtered.length > 0 ? (
+          <div className="table-wrapper">
+            <table className="products-table">
               <thead>
-                <tr style={{ background: '#F8F4EC' }}>
-                  {['Product', 'Category', 'Price (LKR)', 'Stock', 'Sold', 'Rating', 'Status', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '13px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#5A6478', letterSpacing: 0.5, textTransform: 'uppercase' }}>{h}</th>
-                  ))}
+                <tr>
+                  {['Product', 'Category', 'Price (LKR)', 'Stock', 'Sold', 'Rating', 'Status', 'Actions'].map(h => <th key={h}>{h}</th>)}
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((p, i) => {
-                  const ss = statusStyle(p.status);
-                  return (
-                    <tr key={p.id} style={{ borderTop: '1px solid #F0EAD8', background: i % 2 === 0 ? white : '#FDFAF5' }}>
-                      <td style={{ padding: '13px 16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <span style={{ fontSize: 24 }}>{p.image}</span>
-                          <span style={{ fontWeight: 600, color: navy }}>{p.name}</span>
-                        </div>
-                      </td>
-                      <td style={{ padding: '13px 16px', color: gold, fontWeight: 600 }}>{p.category}</td>
-                      <td style={{ padding: '13px 16px', fontWeight: 700, color: navy }}>{p.price.toLocaleString()}</td>
-                      <td style={{ padding: '13px 16px', fontWeight: 600, color: p.stock === 0 ? '#A32D2D' : p.stock <= 10 ? '#854F0B' : navy }}>{p.stock}</td>
-                      <td style={{ padding: '13px 16px', color: '#5A6478' }}>{p.sold}</td>
-                      <td style={{ padding: '13px 16px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: navy, fontWeight: 600 }}>⭐ {p.rating}</span>
-                      </td>
-                      <td style={{ padding: '13px 16px' }}>
-                        <span style={{ background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                          {p.status}
-                        </span>
-                      </td>
-                      <td style={{ padding: '13px 16px' }}>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <button style={{ background: 'transparent', border: `1.5px solid ${gold}`, color: gold, padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <FaEdit size={10} /> Edit
-                          </button>
-                          <button onClick={() => handleDelete(p.id)} style={{ background: 'transparent', border: '1.5px solid #F09595', color: '#A32D2D', padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <FaTrash size={10} /> Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {filtered.map((p, i) => (
+                  <TableRow 
+                    key={p.id} product={p} index={i}
+                    isEditing={editingId === p.id} editForm={editForm}
+                    onEditChange={handleEditChange} onStartEdit={handleStartEdit} onSaveEdit={handleSaveEdit} onCancelEdit={handleCancelEdit} onDelete={handleDelete} 
+                  />
+                ))}
               </tbody>
             </table>
           </div>
-        ) : (
-          <EmptyState />
-        )
+        ) : <EmptyState />
       )}
     </div>
   );
 };
-
-// ── Empty State ────────────────────────────────────────────────
-const EmptyState = () => (
-  <div style={{ textAlign: 'center', padding: '60px 20px', background: white, borderRadius: 16, border: '1px solid #EDE8DE' }}>
-    <div style={{ fontSize: 52, marginBottom: 16 }}>📦</div>
-    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: navy }}>No products found</h3>
-    <p style={{ margin: '8px 0 0', color: '#7A869A', fontSize: 14 }}>Try adjusting your search or filter</p>
-  </div>
-);
 
 export default MyItems;

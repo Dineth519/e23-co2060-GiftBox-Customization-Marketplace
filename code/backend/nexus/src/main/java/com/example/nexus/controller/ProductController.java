@@ -1,25 +1,84 @@
 package com.example.nexus.controller;
 
+import com.example.nexus.dto.ProductDTO;
 import com.example.nexus.model.Product;
 import com.example.nexus.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-// REST Controller to handle API requests from the React frontend
-// CORS is now handled globally by CorsConfig.java — no @CrossOrigin needed here
+
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/sellers")
 public class ProductController {
 
     @Autowired
     private ProductRepository productRepository;
 
-    // Fetch all products from the database and return them as a JSON list
-    @GetMapping
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    @GetMapping("/{sellerId}/products")
+    public List<ProductDTO> getProductsBySeller(@PathVariable Integer sellerId) {
+        
+        return productRepository.findByPartnerId(sellerId)
+            .stream()
+            .map(product -> {
+                ProductDTO dto = new ProductDTO();
+                dto.setId(product.getId());
+                dto.setName(product.getName());
+                
+                dto.setCategory(product.getCategoryId() == null ? "Uncategorized" : "Category ID: " + product.getCategoryId());
+                
+                dto.setPrice(product.getPrice());
+                dto.setStock(product.getStockQuantity() != null ? product.getStockQuantity() : 0);
+                dto.setSold(0);
+                dto.setRating(product.getRating() != null ? product.getRating().doubleValue() : 0.0);
+                dto.setImage(product.getImageUrl());
+                
+                int stock = dto.getStock();
+                int isActive = product.getIsActive() != null ? product.getIsActive() : 1;
+
+                if (isActive == 0 || stock <= 0) {
+                    dto.setStatus("Out of Stock");
+                } else if (stock <= 10) {
+                    dto.setStatus("Low Stock");
+                } else {
+                    dto.setStatus("Active");
+                }
+                
+                return dto;
+            }).collect(Collectors.toList());
     }
 
+    @PostMapping("/{sellerId}/products")
+    public Product addProduct(@PathVariable Integer sellerId, @RequestBody Product product) {
+        
+        product.setPartnerId(sellerId);
+        
+        return productRepository.save(product);
+    } 
+
+    @PutMapping("/products/{id}")
+    public org.springframework.http.ResponseEntity<?> updateProduct(@PathVariable Integer id, @RequestBody Product updatedProduct) {
+        return productRepository.findById(id).map(product -> {
+            
+            if(updatedProduct.getName() != null) product.setName(updatedProduct.getName());
+            if(updatedProduct.getPrice() != null) product.setPrice(updatedProduct.getPrice());
+            if(updatedProduct.getStockQuantity() != null) product.setStockQuantity(updatedProduct.getStockQuantity());
+            if(updatedProduct.getIsActive() != null) product.setIsActive(updatedProduct.getIsActive());
+            
+            productRepository.save(product);
+            return org.springframework.http.ResponseEntity.ok().body("Product updated successfully");
+            
+        }).orElse(org.springframework.http.ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/products/{id}")
+    public org.springframework.http.ResponseEntity<?> deleteProduct(@PathVariable Integer id) {
+        if (!productRepository.existsById(id)) {
+            return org.springframework.http.ResponseEntity.notFound().build();
+        }
+        productRepository.deleteById(id);
+        return org.springframework.http.ResponseEntity.ok().body("Product deleted successfully");
+    }
 }
