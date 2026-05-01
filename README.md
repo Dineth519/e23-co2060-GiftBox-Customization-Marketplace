@@ -3,7 +3,20 @@
 > A centralized multi-vendor platform where customers can browse items from multiple vendors, assemble customized gift boxes, and have them quality-checked, professionally packaged, and delivered — all through one seamless experience.
 
 ---
-
+## 📌 Table of Contents
+- [The Problem](#-the-problem)
+- [Our Solution](#-our-solution)
+- [Key Features](#-key-features)
+- [Tech Stack](#-technology-stack)
+- [System Architecture](#-system-architecture)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [API Endpoints](#-api-endpoints)
+- [Git Workflow](#-git-workflow)
+- [Project Timeline](#-project-timeline)
+- [Team](#-team)
+- [Links](#-links)
+  
 ## 👥 Team Nexus
 
 | Student ID | Name | Email |
@@ -80,6 +93,108 @@ The platform follows a clean three-tier architecture:
 
 A single customer order flows through:
 `Order Placed → Sub-orders Created → Vendor Dispatch → Hub Receipt → Quality Check → Assembly → Delivery`
+
+---
+
+## 📁 Project Structure
+
+e23-co2060-GiftBox-Customization-Marketplace/
+├── code/
+│   ├── backend/
+│   │   └── nexus/
+│   │       ├── src/
+│   │       │   ├── main/
+│   │       │   │   ├── java/com/example/nexus/
+│   │       │   │   │   ├── config/
+│   │       │   │   │   │   └── SecurityConfig.java
+│   │       │   │   │   ├── controller/
+│   │       │   │   │   │   ├── AuthController.java
+│   │       │   │   │   │   ├── CartController.java
+│   │       │   │   │   │   ├── OrderController.java
+│   │       │   │   │   │   ├── PartnerController.java
+│   │       │   │   │   │   ├── ProductController.java
+│   │       │   │   │   │   ├── SellerDashboardController.java
+│   │       │   │   │   │   └── UserController.java
+│   │       │   │   │   ├── dto/
+│   │       │   │   │   ├── model/
+│   │       │   │   │   │   ├── CartItem.java
+│   │       │   │   │   │   ├── Order.java
+│   │       │   │   │   │   ├── Partner.java
+│   │       │   │   │   │   ├── Product.java
+│   │       │   │   │   │   ├── Role.java
+│   │       │   │   │   │   ├── SessionCartManager.java
+│   │       │   │   │   │   └── User.java
+│   │       │   │   │   ├── repository/
+│   │       │   │   │   │   ├── OrderRepository.java
+│   │       │   │   │   │   ├── PartnerRepository.java
+│   │       │   │   │   │   ├── ProductRepository.java
+│   │       │   │   │   │   └── UserRepository.java
+│   │       │   │   │   ├── service/
+│   │       │   │   │   └── NexusApplication.java
+│   │       │   │   └── resources/
+│   │       │   │       ├── application.properties
+│   │       │   │       ├── application-arch.properties
+│   │       │   │       └── application-windows.properties
+│   │       │   └── test/
+│   │       └── pom.xml
+│   ├── database/
+│   │   ├── data.sql
+│   │   ├── items.sql
+│   │   ├── schema.sql
+│   │   └── triggers.sql
+│   └── frontend/
+│       ├── public/
+│       │   ├── index.html
+│       │   └── logo.jpeg
+│       └── src/
+│           ├── assets/
+│           │   └── login/
+│           ├── components/
+│           │   ├── admin/
+│           │   ├── homepage/
+│           │   │   ├── CartBadge.jsx
+│           │   │   ├── Footer.jsx
+│           │   │   └── Header.jsx
+│           │   ├── seller/
+│           │   └── user/
+│           ├── context/
+│           ├── layouts/
+│           │   ├── AdminLayout.jsx
+│           │   ├── CustomerLayout.jsx
+│           │   └── SellerLayout.jsx
+│           └── pages/
+│               ├── admin/
+│               │   ├── Customers.jsx
+│               │   ├── Dashboard.jsx
+│               │   ├── Partners.jsx
+│               │   ├── PendingPartners.jsx
+│               │   ├── Settings.jsx
+│               │   └── StaffManagement.jsx
+│               ├── auth/
+│               │   ├── Login.jsx
+│               │   └── VendorRegistration.jsx
+│               ├── homepage/
+│               │   ├── AboutUsPage.jsx
+│               │   ├── CartPage.jsx
+│               │   ├── HomePage.jsx
+│               │   ├── HowItWorksPage.jsx
+│               │   ├── Products.jsx
+│               │   ├── ProductsPage.jsx
+│               │   └── VendorLanding.jsx
+│               ├── seller/
+│               │   ├── AddItems.jsx
+│               │   ├── MyItems.jsx
+│               │   ├── SellerDashboard.jsx
+│               │   └── Settings.jsx
+│               └── user/
+│                   ├── CustomerHome.jsx
+│                   ├── GiftCustomizer.jsx
+│                   ├── OrderDetail.jsx
+│                   ├── Orders.jsx
+│                   ├── Profile.jsx
+│                   └── Verify.jsx
+└── docs/
+    └── data/
 
 ---
 
