@@ -1,10 +1,9 @@
 package com.example.nexus.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
-// Entity class representing the 'products' table in the MySQL database
 @Entity
 @Table(name = "products")
 public class Product {
@@ -13,64 +12,65 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "partner_id", nullable = false)
+    private Integer partnerId;
+
+    @Column(name = "category_id")
+    private Integer categoryId;
+
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private Double price;
+    private String description;
 
-    // Maps to the 'image_url' column in the database
+    @Column(nullable = false)
+    private BigDecimal price;
+
+    @Column(name = "discount_price")
+    private BigDecimal discountPrice;
+
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity;
+
+    @Column(unique = true)
+    private String sku;
+
     @JsonProperty("imageUrl")
     @Column(name = "image_url", nullable = false, length = 500)
     private String imageUrl;
 
-    // Maps to the 'category_id' column in the database
-    @Column(name = "category_id")
-    private Integer categoryId;
+    @Column(name = "is_active")
+    private Integer isActive; // 1 = Active, 0 = Inactive
 
-    // Default constructor required by JPA
-    public Product() {
-    }
+    private BigDecimal rating;
 
-    // Getters and Setters
+    public Product() {}
 
-    public Integer getId() {
-        return id;
-    }
+    // ─── Getters and Setters  ───
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    
+    public Integer getPartnerId() { return partnerId; }
+    public void setPartnerId(Integer partnerId) { this.partnerId = partnerId; }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    public Integer getCategoryId() { return categoryId; }
+    public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
 
-    public Double getPrice() {
-        return price;
-    }
+    public Integer getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(Integer stockQuantity) { this.stockQuantity = stockQuantity; }
 
-    public void setPrice(Double price) {
-        this.price = price;
-    }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
+    public Integer getIsActive() { return isActive; }
+    public void setIsActive(Integer isActive) { this.isActive = isActive; }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
+    public BigDecimal getRating() { return rating; }
+    public void setRating(BigDecimal rating) { this.rating = rating; }
 }
