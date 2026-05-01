@@ -19,6 +19,7 @@ import Profile from './pages/user/Profile.jsx';
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
 import VendorRegistration from './pages/auth/VendorRegistration.jsx';
+
 // Admin components and pages
 import Sidebar from './components/admin/Sidebar.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
@@ -42,6 +43,9 @@ import ProductsPage from './pages/homepage/ProductsPage.jsx';
 import AddressForm from './components/user/AddressForm.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import CartPage from './pages/homepage/CartPage.jsx';
+
+// Box Builder
+import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
 
 // Layout wrapper component for general and user routes
 const LayoutWrapper = ({ children }) => {
@@ -90,6 +94,7 @@ function App() {
           <Route path="/orders" element={<LayoutWrapper><Orders /></LayoutWrapper>} />
           <Route path="/orders/:orderId" element={<LayoutWrapper><OrderDetail /></LayoutWrapper>} />
           <Route path="/profile" element={<LayoutWrapper><Profile /></LayoutWrapper>} />
+          <Route path="/build-box" element={<BoxBuilderPage />} />
 
           {/* Seller routes */}
           <Route path="/seller/*" element={
