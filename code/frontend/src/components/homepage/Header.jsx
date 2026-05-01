@@ -1,10 +1,7 @@
 // Header.jsx
-// Updated to add a profile dropdown menu for logged-in customers.
-// When customer clicks "👤 My Account" → dropdown shows:
-//   - My Profile
-//   - My Orders
-//   - Build a Box
-//   - Logout
+// Updated with login state check:
+// - NOT logged in → shows "Sign In / Sign Up" button
+// - Logged in     → shows "My Account" dropdown with profile, orders, logout
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,12 +10,28 @@ import CartBadge from './CartBadge.jsx';
 
 const Header = () => {
   const navigate = useNavigate();
-  const [scrolled, setScrolled]           = useState(false);
 
-  // Controls whether the profile dropdown is open or closed
-  const [dropdownOpen, setDropdownOpen]   = useState(false);
+  // Scroll state — makes header background appear when scrolling down
+  const [scrolled, setScrolled] = useState(false);
 
-  // Scroll effect for header background
+  // Dropdown open/close state
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // ✅ Login check
+  // Reads the token from localStorage.
+  // If token exists → customer is logged in → show "My Account"
+  // If no token    → customer is not logged in → show "Sign In / Sign Up"
+  // Also checks that the value is not the string "undefined"
+  // useState so header re-renders when login status changes
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check userRole since backend doesn't send token yet
+    const role = localStorage.getItem('userRole');
+    setIsLoggedIn(!!role && role !== 'undefined' && role !== 'null');
+  }, []); // runs once when header loads
+
+  // Scroll listener — adds dark background to header on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll);
@@ -42,9 +55,13 @@ const Header = () => {
     navigate(route);
   }
 
-  // Logout — clears token and goes back to login page
+  // Logout — removes token from localStorage and goes to login page
   function handleLogout() {
-    localStorage.removeItem('token');  // remove JWT token
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');  
+    localStorage.removeItem('username');   
+    localStorage.removeItem('userId');  
+    setIsLoggedIn(false); // ← update state immediately   
     setDropdownOpen(false);
     navigate('/login');
   }
@@ -53,19 +70,19 @@ const Header = () => {
     <header className={`giftora-header ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-inner">
 
-        {/* Logo */}
+        {/* ── Logo ── */}
         <div className="header-logo" onClick={() => navigate('/')}>
           <span className="logo-icon">🎁</span>
           <span className="logo-text">Giftora</span>
         </div>
 
-        {/* Nav links */}
+        {/* ── Nav Links ── */}
         <nav className="header-nav">
           {[
-            { label: 'Products',    route: '/products' },
+            { label: 'Products',    route: '/products'  },
             { label: 'Build a Box', route: '/customize' },
-            { label: 'Vendors',     route: '/vendors'  },
-            { label: 'About',       route: '/about'    },
+            { label: 'Vendors',     route: '/vendors'   },
+            { label: 'About',       route: '/about'     },
           ].map(item => (
             <button
               key={item.label}
@@ -80,70 +97,69 @@ const Header = () => {
           <CartBadge />
         </nav>
 
-        {/* Header right side actions */}
+        {/* ── Right Side Actions ── */}
         <div className="header-actions">
 
-          {/* ✅ PROFILE DROPDOWN
-              Replaces the old "Sign In / Sign Up" button for logged-in users.
-              Shows a dropdown with profile, orders, and logout links. */}
-          <div className="header-profile">
+          {isLoggedIn ? (
 
-            {/* Trigger button — click to open/close dropdown */}
+            // ════ LOGGED IN — show My Account dropdown ════
+            // This only appears after the customer has logged in
+            // and a token is saved in localStorage
+            <div className="header-profile">
+
+              {/* Trigger button */}
+              <button
+                className="header-profile-btn"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                {/* Gold avatar circle with first letter of name */}
+                <span className="header-avatar">N</span>
+                <span className="header-profile-name">My Account</span>
+                {/* Arrow rotates when dropdown opens */}
+                <span className={`header-arrow ${dropdownOpen ? 'open' : ''}`}>▾</span>
+              </button>
+
+              {/* Dropdown menu — only visible when dropdownOpen is true */}
+              {dropdownOpen && (
+                <div className="header-dropdown">
+
+                  <button className="dropdown-item" onClick={() => goTo('/profile')}>
+                    👤 My Profile
+                  </button>
+
+                  <button className="dropdown-item" onClick={() => goTo('/orders')}>
+                    📦 My Orders
+                  </button>
+
+                  <button className="dropdown-item" onClick={() => goTo('/customize')}>
+                    🎁 Build a Box
+                  </button>
+
+                  {/* Divider line before logout */}
+                  <div className="dropdown-divider" />
+
+                  <button className="dropdown-item danger" onClick={handleLogout}>
+                    🚪 Logout
+                  </button>
+
+                </div>
+              )}
+            </div>
+
+          ) : (
+
+            // ════ NOT LOGGED IN — show Sign In / Sign Up button ════
+            // This is the original button shown to guests
             <button
-              className="header-profile-btn"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="header-btn-ghost"
+              onClick={() => navigate('/login')}
             >
-              {/* Avatar circle with initial — like Daraz */}
-              <span className="header-avatar">N</span>
-              <span className="header-profile-name">My Account</span>
-              {/* Arrow rotates when dropdown is open */}
-              <span className={`header-arrow ${dropdownOpen ? 'open' : ''}`}>▾</span>
+              Sign In / Sign Up
             </button>
 
-            {/* Dropdown menu — only shown when dropdownOpen is true */}
-            {dropdownOpen && (
-              <div className="header-dropdown">
+          )}
 
-                {/* Profile link */}
-                <button
-                  className="dropdown-item"
-                  onClick={() => goTo('/profile')}
-                >
-                  👤 My Profile
-                </button>
-
-                {/* Orders link */}
-                <button
-                  className="dropdown-item"
-                  onClick={() => goTo('/orders')}
-                >
-                  📦 My Orders
-                </button>
-
-                {/* Build a Box link */}
-                <button
-                  className="dropdown-item"
-                  onClick={() => goTo('/customize')}
-                >
-                  🎁 Build a Box
-                </button>
-
-                {/* Divider line */}
-                <div className="dropdown-divider" />
-
-                {/* Logout */}
-                <button
-                  className="dropdown-item danger"
-                  onClick={handleLogout}
-                >
-                  🚪 Logout
-                </button>
-
-              </div>
-            )}
-          </div>
-
-          {/* Start Building gold button */}
+          {/* Gold "Start Building" button — always visible */}
           <button
             className="header-btn-gold"
             onClick={() => navigate('/customize')}

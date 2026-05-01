@@ -136,10 +136,19 @@ const Login = () => {
         if (data.success === true) {
           // Get user role from server response
           const userRole = data.role;
+          // FIXED — only saves token if it actually exists
           localStorage.setItem('userRole', userRole);
           localStorage.setItem('username', username);
-          localStorage.setItem('token', data.token); // Store JWT token if provided
-          localStorage.setItem('userId', data.userId); // Store user ID if provided
+
+          // Only save token if backend actually sends one
+          if (data.token) {
+            localStorage.setItem('token', data.token);
+          }
+
+          // Only save userId if backend actually sends one  
+          if (data.userId) {
+            localStorage.setItem('userId', data.userId);
+          }
 
           // Route user to appropriate dashboard based on role
           if (userRole === 'ADMIN') {
