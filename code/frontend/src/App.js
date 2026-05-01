@@ -8,6 +8,7 @@ import HowItWorksPage from './pages/homepage/HowItWorksPage.jsx';
 import AboutUsPage from './pages/homepage/AboutUsPage.jsx';
 import CustomerHome from './pages/user/CustomerHome.jsx';
 import Verify from './pages/user/Verify.jsx';
+import VendorLanding from './pages/homepage/VendorLanding.jsx';
 
 //Customer
 import GiftCustomizer from './pages/user/GiftCustomizer.jsx';
@@ -16,7 +17,7 @@ import OrderDetail from './pages/user/OrderDetail.jsx';
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
-
+import VendorRegistration from './pages/auth/VendorRegistration.jsx';
 // Admin components and pages
 import Sidebar from './components/admin/Sidebar.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
@@ -37,7 +38,7 @@ import SellerSettings from './pages/seller/Settings.jsx';
 
 // Homepage
 import ProductsPage from './pages/homepage/ProductsPage.jsx';
-
+import AddressForm from './components/user/AddressForm.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import CartPage from './pages/homepage/CartPage.jsx';
 
@@ -77,8 +78,11 @@ function App() {
           <Route path="/about-us" element={<LayoutWrapper><AboutUsPage /></LayoutWrapper>} />
           <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
+          <Route path="/vendor-landing" element={<VendorLanding />} />
+          <Route path="/vendor-register" element={<VendorRegistration />} />
           <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/test-address" element={<LayoutWrapper><AddressForm /></LayoutWrapper>} />
 
           {/* Customer routes */}
           <Route path="/customize" element={<LayoutWrapper><GiftCustomizer /></LayoutWrapper>} />

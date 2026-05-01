@@ -330,7 +330,7 @@ const HeroSection = () => {
             <div className="hero__vendor-desc">
               Join our marketplace and reach thousands of customers island-wide.
             </div>
-            <button className="btn-vendor-join" onClick={() => navigate('/join-us')}>
+            <button className="btn-vendor-join" onClick={() => navigate('/vendor-landing')}>
               Join With Us →
             </button>
           </div>

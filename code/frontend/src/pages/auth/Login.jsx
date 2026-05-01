@@ -8,6 +8,24 @@ import { assets } from '../../assets/login/assets';
 // Stylesheet
 import './Login.css';
 
+// PASSWORD STRENGTH CHECKER
+// ============================================================================
+const getPasswordStrength = (password) => {
+  if (!password) return { score: 0, label: '', color: '' };
+
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  if (score <= 2) return { score, label: 'Weak', color: '#e74c3c' };
+  if (score <= 4) return { score, label: 'Medium', color: '#f39c12' };
+  return { score, label: 'Strong', color: '#2ecc71' };
+};
+
 // ============================================================================
 // LOGIN & SIGNUP COMPONENT (Main Component)
 // ============================================================================
@@ -21,11 +39,16 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Form validation errors
   const [errors, setErrors] = useState({});
+
+  // Password strength
+  const passwordStrength = getPasswordStrength(password);
 
   // ── Toggle between Login and Sign Up ────────────────────────────────────
   const toggleState = () => {
@@ -34,12 +57,14 @@ const Login = () => {
     setUsername('');
     setEmail('');
     setPassword('');
+    setConfirmPassword('');
     setShowPassword(false);
+    setShowConfirmPassword(false);
     setErrors({});
   };
 
-  // ── Form Validation ─────────────────────────────────────────────────────
-  
+  // Form Validation 
+
   // Validate login form
   const validateLoginForm = () => {
     const newErrors = {};
@@ -59,31 +84,29 @@ const Login = () => {
     if (!email.trim()) newErrors.email = 'Email is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = 'Please enter a valid email';
     if (!password) newErrors.password = 'Password is required';
-    if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+    if (passwordStrength.label === 'Weak') newErrors.password = 'Password is too weak. Add uppercase, numbers or symbols.';
+    if (!confirmPassword) newErrors.confirmPassword = 'Please confirm your password';
+    if (confirmPassword && password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // ── Form Submit Handler ─────────────────────────────────────────────────
+  // Form Submit Handler
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
-    // Validate form before submission
     if (state === 'Sign Up') {
-      if (!validateSignupForm()) {
-        return;
-      }
+      if (!validateSignupForm()) return;
     } else {
-      if (!validateLoginForm()) {
-        return;
-      }
+      if (!validateLoginForm()) return;
     }
 
     setLoading(true);
 
     try {
       if (state === 'Sign Up') {
-        // ── REGISTRATION FLOW ───────────────────────────────────────────
+        // REGISTRATION FLOW
         const response = await fetch('http://localhost:8080/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -93,38 +116,22 @@ const Login = () => {
         const data = await response.json();
 
         if (data.success === true) {
-          // Store email in sessionStorage for verification page
           sessionStorage.setItem('verifyEmail', email);
-
-          // Add delay for smooth transition
           setTimeout(() => {
             navigate('/verify', { state: { email: email } });
           }, 500);
         } else {
-          // Handle specific error messages from backend
           const errorMessage = data.message || 'Registration failed. Please try again.';
-
-          // Set field-specific errors if applicable
           if (errorMessage.toLowerCase().includes('email')) {
-            setErrors(prev => ({
-              ...prev,
-              email: errorMessage
-            }));
+            setErrors(prev => ({ ...prev, email: errorMessage }));
           } else if (errorMessage.toLowerCase().includes('username')) {
-            setErrors(prev => ({
-              ...prev,
-              username: errorMessage
-            }));
+            setErrors(prev => ({ ...prev, username: errorMessage }));
           } else {
-            // For other errors, show general error
-            setErrors(prev => ({
-              ...prev,
-              general: errorMessage
-            }));
+            setErrors(prev => ({ ...prev, general: errorMessage }));
           }
         }
       } else {
-        // ── LOGIN FLOW ──────────────────────────────────────────────────
+        // LOGIN FLOW
         const response = await fetch('http://localhost:8080/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -134,32 +141,20 @@ const Login = () => {
         const data = await response.json();
 
         if (data.success === true) {
-          // Get user role from server response
           const userRole = data.role;
           localStorage.setItem('userRole', userRole);
           localStorage.setItem('username', username);
-          localStorage.setItem('token', data.token); // Store JWT token if provided
-          localStorage.setItem('userId', data.userId); // Store user ID if provided
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userId', data.userId);
 
-          // Route user to appropriate dashboard based on role
-          if (userRole === 'ADMIN') {
-            navigate('/admin');
-          } else if (userRole === 'SELLER' || userRole === 'PARTNER') {
-            navigate('/seller');
-          } else if (userRole === 'CUSTOMER') {
-            navigate('/home');
-          } else if (userRole === 'ASSEMBLER') {
-            navigate('/assembler-dashboard');
-          } else {
-            navigate('/');
-          }
+          if (userRole === 'ADMIN') navigate('/admin');
+          else if (userRole === 'SELLER' || userRole === 'PARTNER') navigate('/seller');
+          else if (userRole === 'CUSTOMER') navigate('/home');
+          else if (userRole === 'ASSEMBLER') navigate('/assembler-dashboard');
+          else navigate('/');
         } else {
           const errorMessage = data.message || 'Login failed. Please check your credentials.';
-
-          // Reset password field for security
           setPassword('');
-
-          // Set field-specific errors
           if (errorMessage.toLowerCase().includes('username')) {
             setErrors(prev => ({ ...prev, username: errorMessage }));
           } else if (errorMessage.toLowerCase().includes('password')) {
@@ -174,11 +169,7 @@ const Login = () => {
       const errorMessage = error.message === 'Failed to fetch'
         ? 'Could not connect to server. Please check your internet connection.'
         : 'Something went wrong. Please try again.';
-      
-      setErrors(prev => ({
-        ...prev,
-        general: errorMessage
-      }));
+      setErrors(prev => ({ ...prev, general: errorMessage }));
     } finally {
       setLoading(false);
     }
@@ -201,7 +192,6 @@ const Login = () => {
             <h2>Welcome Back</h2>
             <p className="login-sub">Login to your account</p>
             <form onSubmit={onSubmitHandler}>
-              {/* General Error */}
               {errors.general && <p className="login-error login-general-error">{errors.general}</p>}
 
               {/* Username Input */}
@@ -246,29 +236,18 @@ const Login = () => {
               </div>
               {errors.password && <p className="login-error">{errors.password}</p>}
 
-              {/* Forgot Password Link */}
               <p className="login-forgot" onClick={() => navigate('/email-verify')}>
                 Forgot Password?
               </p>
 
-              {/* Submit Button */}
               <button type="submit" className="login-submit-btn" disabled={loading}>
-                {loading ? (
-                  <>
-                    <FaSpinner className="spinner-icon" /> Logging in...
-                  </>
-                ) : (
-                  'Login'
-                )}
+                {loading ? <><FaSpinner className="spinner-icon" /> Logging in...</> : 'Login'}
               </button>
             </form>
 
-            {/* Toggle to Sign Up */}
             <p className="login-toggle-text">
               Don't have an account?{' '}
-              <span className="login-toggle-link" onClick={toggleState}>
-                Sign Up
-              </span>
+              <span className="login-toggle-link" onClick={toggleState}>Sign Up</span>
             </p>
           </div>
 
@@ -277,7 +256,6 @@ const Login = () => {
             <h2>Create Account</h2>
             <p className="login-sub">Join us to customize your gifts</p>
             <form onSubmit={onSubmitHandler}>
-              {/* General Error */}
               {errors.general && <p className="login-error login-general-error">{errors.general}</p>}
 
               {/* Full Name Input */}
@@ -340,32 +318,80 @@ const Login = () => {
                     if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
                   }}
                   value={password}
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Password"
                   disabled={loading}
                   required
                 />
+                <button
+                  type="button"
+                  className="login-eye-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                >
+                  <img src={showPassword ? assets.Open_Eye : assets.Close_Eye} alt="Toggle Visibility" />
+                </button>
               </div>
+
+              {/* ── PASSWORD STRENGTH INDICATOR ── */}
+              {password && (
+                <div className="password-strength">
+                  <div className="strength-bars">
+                    <div className="strength-bar" style={{ backgroundColor: passwordStrength.score >= 1 ? passwordStrength.color : '#444' }} />
+                    <div className="strength-bar" style={{ backgroundColor: passwordStrength.score >= 3 ? passwordStrength.color : '#444' }} />
+                    <div className="strength-bar" style={{ backgroundColor: passwordStrength.score >= 5 ? passwordStrength.color : '#444' }} />
+                  </div>
+                  <span className="strength-label" style={{ color: passwordStrength.color }}>
+                    {passwordStrength.label}
+                  </span>
+                </div>
+              )}
+
+              {/* ── PASSWORD REQUIREMENTS CHECKLIST ── */}
+              {password && (
+                <ul className="password-requirements">
+                  <li style={{ color: password.length >= 8 ? '#2ecc71' : '#aaa' }}>✓ At least 8 characters</li>
+                  <li style={{ color: /[A-Z]/.test(password) ? '#2ecc71' : '#aaa' }}>✓ One uppercase letter (A-Z)</li>
+                  <li style={{ color: /[0-9]/.test(password) ? '#2ecc71' : '#aaa' }}>✓ One number (0-9)</li>
+                  <li style={{ color: /[^A-Za-z0-9]/.test(password) ? '#2ecc71' : '#aaa' }}>✓ One special character (!@#$...)</li>
+                </ul>
+              )}
+
               {errors.password && <p className="login-error">{errors.password}</p>}
 
-              {/* Submit Button */}
+              {/* Confirm Password Input */}
+              <div className="login-input-row">
+                <img src={assets.lock_icon} alt="" />
+                <input
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }));
+                  }}
+                  value={confirmPassword}
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirm Password"
+                  disabled={loading}
+                  required
+                />
+                <button
+                  type="button"
+                  className="login-eye-btn"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={loading}
+                >
+                  <img src={showConfirmPassword ? assets.Open_Eye : assets.Close_Eye} alt="Toggle Visibility" />
+                </button>
+              </div>
+              {errors.confirmPassword && <p className="login-error">{errors.confirmPassword}</p>}
+
               <button type="submit" className="login-submit-btn" disabled={loading}>
-                {loading ? (
-                  <>
-                    <FaSpinner className="spinner-icon" /> Creating Account...
-                  </>
-                ) : (
-                  'Sign Up'
-                )}
+                {loading ? <><FaSpinner className="spinner-icon" /> Creating Account...</> : 'Sign Up'}
               </button>
             </form>
 
-            {/* Toggle to Login */}
             <p className="login-toggle-text">
               Already have an account?{' '}
-              <span className="login-toggle-link" onClick={toggleState}>
-                Login
-              </span>
+              <span className="login-toggle-link" onClick={toggleState}>Login</span>
             </p>
           </div>
 
