@@ -1,0 +1,319 @@
+/* Orders.css
+   Styles for the customer Orders page.
+   Matches Giftora dark theme — same navy, gold, and fonts as GiftCustomizer.css
+   All classes use "orders-" and "order-" prefix to avoid conflicts. */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── CSS Variables — same tokens as GiftCustomizer.css ───────────────────── */
+:root {
+  --gc-bg:         #12122A;
+  --gc-surface:    #1C1C38;
+  --gc-surface2:   #23234A;
+  --gc-border:     #2E2E5A;
+  --gc-gold:       #D4A843;
+  --gc-gold-light: #F0C96A;
+  --gc-text:       #E8E8F0;
+  --gc-text-muted: #8888AA;
+  --gc-green:      #1D9E75;
+  --gc-radius:     12px;
+  --gc-radius-sm:  8px;
+}
+
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+.orders-page {
+  min-height: 100vh;
+  background: var(--gc-bg);
+  color: var(--gc-text);
+  font-family: 'DM Sans', sans-serif;
+  padding: 2rem 1.5rem 4rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ── Page Header ──────────────────────────────────────────────────────────── */
+/* Flex row: title on left, "Build New Box" button on right */
+.orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.orders-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 600;
+  color: var(--gc-text);
+  margin-bottom: 4px;
+}
+
+.orders-subtitle {
+  color: var(--gc-text-muted);
+  font-size: 14px;
+}
+
+/* "Build New Box" button — gold, matches GiftCustomizer style */
+.orders-new-btn {
+  padding: 10px 20px;
+  background: var(--gc-gold);
+  color: #12122A;
+  border: none;
+  border-radius: var(--gc-radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.orders-new-btn:hover {
+  background: var(--gc-gold-light);
+}
+
+/* ── Filter Tabs ──────────────────────────────────────────────────────────── */
+/* Horizontal row of status filter buttons */
+.orders-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--gc-border);
+  padding-bottom: 1rem;
+}
+
+.orders-tab {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--gc-border);
+  border-radius: 20px;
+  color: var(--gc-text-muted);
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.orders-tab:hover {
+  border-color: var(--gc-gold);
+  color: var(--gc-text);
+}
+
+/* Active/selected tab — gold background */
+.orders-tab.active {
+  background: var(--gc-gold);
+  border-color: var(--gc-gold);
+  color: #12122A;
+  font-weight: 500;
+}
+
+/* Small number badge inside the "All" tab */
+.orders-tab-count {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+}
+
+.orders-tab.active .orders-tab-count {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* ── Loading State ────────────────────────────────────────────────────────── */
+.orders-loading {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--gc-text-muted);
+}
+
+/* Spinning circle animation */
+.orders-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--gc-border);
+  border-top-color: var(--gc-gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Empty State ──────────────────────────────────────────────────────────── */
+.orders-empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--gc-text-muted);
+}
+
+.orders-empty-emoji {
+  font-size: 52px;
+  margin-bottom: 1rem;
+}
+
+.orders-empty h3 {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--gc-text);
+  margin-bottom: 8px;
+}
+
+.orders-empty p {
+  font-size: 14px;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Orders List ──────────────────────────────────────────────────────────── */
+/* Vertical stack of order cards */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Order Card ───────────────────────────────────────────────────────────── */
+/* Each order is a clickable card */
+.order-card {
+  background: var(--gc-surface);
+  border: 1px solid var(--gc-border);
+  border-radius: var(--gc-radius);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order-card:hover {
+  border-color: rgba(212, 168, 67, 0.4);
+  background: var(--gc-surface2);
+  transform: translateY(-1px);
+}
+
+/* ── Card Top Row ─────────────────────────────────────────────────────────── */
+/* Order ID + date on left, status badge on right */
+.order-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.order-id-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Order ID — e.g. ORD-1001 */
+.order-id {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--gc-text);
+}
+
+/* Order date in muted text below the ID */
+.order-date {
+  font-size: 12px;
+  color: var(--gc-text-muted);
+}
+
+/* Status badge — colour set dynamically via inline style in JSX */
+.order-status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── Items Row ────────────────────────────────────────────────────────────── */
+/* Horizontal list of item pills */
+.order-items-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Each item shown as a small pill with emoji + name */
+.order-item-pill {
+  background: var(--gc-surface2);
+  border: 1px solid var(--gc-border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: var(--gc-text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Quantity shown in muted text: ×2 */
+.order-item-qty {
+  color: var(--gc-text-muted);
+  font-size: 11px;
+}
+
+/* ── Card Bottom Row ──────────────────────────────────────────────────────── */
+/* Box details on left, total price on right */
+.order-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Small metadata items: box size, ribbon, message */
+.order-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.order-meta-item {
+  font-size: 12px;
+  color: var(--gc-text-muted);
+}
+
+/* Total price — gold, right-aligned */
+.order-total {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--gc-gold);
+  white-space: nowrap;
+}
+
+/* ── Responsive: Mobile ───────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .orders-header {
+    flex-direction: column;
+  }
+
+  .order-card-top {
+    flex-direction: column;
+  }
+
+  .order-card-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .orders-tabs {
+    gap: 6px;
+  }
+
+  .orders-tab {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+}
