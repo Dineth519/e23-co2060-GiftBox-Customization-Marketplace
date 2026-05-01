@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaBoxes, FaThLarge, FaClipboardList, FaCog, FaPlusCircle } from 'react-icons/fa';
+import { FaBoxes, FaThLarge, FaClipboardList, FaCog, FaGift } from 'react-icons/fa';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -19,14 +19,6 @@ const Sidebar = () => {
           <FaThLarge size={18} /> 
           <span>Dashboard</span>
         </NavLink>
-        
-        <NavLink 
-          to="/seller/my-items" 
-          className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-        >
-          <FaBoxes size={18} /> 
-          <span>My items</span>
-        </NavLink>
 
         <NavLink 
           to="/seller/orders" 
@@ -37,11 +29,19 @@ const Sidebar = () => {
         </NavLink>
         
         <NavLink 
+          to="/seller/my-items" 
+          className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+        >
+          <FaBoxes size={18} /> 
+          <span>My items</span>
+        </NavLink>
+      
+        <NavLink 
           to="/seller/add-items" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
-          <FaPlusCircle size={18} /> 
-          <span>Add Items</span>
+          <FaGift size={18} /> 
+          <span>Gift Sets</span>
         </NavLink>
 
         <NavLink 

@@ -1,3 +1,6 @@
+-- Drop the trigger if it already exists to prevent Error 1359
+DROP TRIGGER IF EXISTS after_user_register;
+
 DELIMITER $$
 CREATE TRIGGER after_user_register
 AFTER INSERT ON users

@@ -79,6 +79,9 @@ const Header = () => {
         {/* ── Nav Links ── */}
         <nav className="header-nav">
           {[
+            { label: 'Products',    route: '/products' },
+            { label: 'How It Works', route: '/how-it-works'    },
+            { label: 'About Us',       route: '/about-us'    },
             { label: 'Products',    route: '/products'  },
             { label: 'Build a Box', route: '/customize' },
             { label: 'Vendors',     route: '/vendors'   },

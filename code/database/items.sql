@@ -1,21 +1,8 @@
--- 1. Create the categories table if it doesn't exist
-CREATE TABLE IF NOT EXISTS categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE
-);
+-- ============================================================
+-- items.sql : CATEGORIES & PRODUCTS (Fixed for new schema)
+-- ============================================================
 
--- 2. Create the products table if it doesn't exist
-CREATE TABLE IF NOT EXISTS products (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    image_url VARCHAR(500) NOT NULL,
-    category_id INT,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
-);
-
--- 3. Insert Categories
--- Adding the categories based on the image groups you provided.
+-- 1. Insert Categories
 INSERT INTO categories (name) VALUES 
 ('Wine'),
 ('Watches'),
@@ -23,55 +10,50 @@ INSERT INTO categories (name) VALUES
 ('Teddy Bears'),
 ('Bangles'),
 ('Chocolates')
-ON DUPLICATE KEY UPDATE name=name; -- Prevents errors if categories already exist
+ON DUPLICATE KEY UPDATE name=name;
 
--- 4. Insert Products
--- Using subqueries to automatically get the correct category_id based on the category name.
+-- 2. Insert Products (Items)
+-- මෙහි status වෙනුවට අලුත් schema එකේ ඇති is_active (1 = Active, 0 = Inactive) භාවිතා කර ඇත.
 
--- Wine Category
-INSERT INTO products (name, price, image_url, category_id) VALUES
-('Classic Red Wine', 4500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869078/aesop-wines-X-Ga6EUFmhE-unsplash_en6tfm.jpg', (SELECT id FROM categories WHERE name = 'Wine')),
-('Vintage White Wine', 5200.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869201/christine-isakzhanova-L3kQLAmbPWA-unsplash_z49cfx.jpg', (SELECT id FROM categories WHERE name = 'Wine')),
-('Premium Rose Wine', 4800.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869247/fernanda-franca-o04Ae_ZMoZ8-unsplash_j8xj9a.jpg', (SELECT id FROM categories WHERE name = 'Wine')),
-('Luxury Wine Reserve', 7500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869440/teanna-morgan-lWQm9d9aTHA-unsplash_qgl9fb.jpg', (SELECT id FROM categories WHERE name = 'Wine'));
--- Note: You had a duplicate wine URL in your list, so I only added 4 unique ones.
+-- Wine Category -> Assigned to Partner 2 (Gift World)
+INSERT INTO products (partner_id, name, price, stock_quantity, sku, image_url, category_id, is_active) VALUES
+(2, 'Classic Red Wine', 4500.00, 15, 'WINE-001', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869078/aesop-wines-X-Ga6EUFmhE-unsplash_en6tfm.jpg', (SELECT id FROM categories WHERE name = 'Wine'), 1),
+(2, 'Vintage White Wine', 5200.00, 8, 'WINE-002', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869201/christine-isakzhanova-L3kQLAmbPWA-unsplash_z49cfx.jpg', (SELECT id FROM categories WHERE name = 'Wine'), 1),
+(2, 'Premium Rose Wine', 4800.00, 0, 'WINE-003', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869247/fernanda-franca-o04Ae_ZMoZ8-unsplash_j8xj9a.jpg', (SELECT id FROM categories WHERE name = 'Wine'), 0),
+(2, 'Luxury Wine Reserve', 7500.00, 5, 'WINE-004', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869440/teanna-morgan-lWQm9d9aTHA-unsplash_qgl9fb.jpg', (SELECT id FROM categories WHERE name = 'Wine'), 1);
 
--- Watches Category
-INSERT INTO products (name, price, image_url, category_id) VALUES
-('Classic Men Watch', 12000.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869620/fashion-needles-j74VJLrxSyY-unsplash_y8udej.jpg', (SELECT id FROM categories WHERE name = 'Watches')),
-('Elegant Ladies Watch', 14500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869636/fashion-needles-JxHlr52IaIM-unsplash_j68vjj.jpg', (SELECT id FROM categories WHERE name = 'Watches')),
-('Sporty Chronograph', 18000.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869649/hunters-race-dE0sBTZCVoY-unsplash_afncm1.jpg', (SELECT id FROM categories WHERE name = 'Watches')),
-('Minimalist Leather Watch', 9500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869654/john-torcasio-TJrkkhdB39E-unsplash_qupwjf.jpg', (SELECT id FROM categories WHERE name = 'Watches')),
-('Luxury Gold Watch', 25000.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869663/puru-raj-B6z8FAfi7zY-unsplash_awe4la.jpg', (SELECT id FROM categories WHERE name = 'Watches')),
-('Modern Smart Watch', 15000.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869675/mambawatches-ukJdqKqFcDA-unsplash_tqqnyr.jpg', (SELECT id FROM categories WHERE name = 'Watches'));
+-- Watches Category -> Assigned to Partner 3 (Lucky Gifts)
+INSERT INTO products (partner_id, name, price, stock_quantity, sku, image_url, category_id, is_active) VALUES
+(3, 'Classic Men Watch', 12000.00, 10, 'WTCH-001', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869620/fashion-needles-j74VJLrxSyY-unsplash_y8udej.jpg', (SELECT id FROM categories WHERE name = 'Watches'), 1),
+(3, 'Elegant Ladies Watch', 14500.00, 12, 'WTCH-002', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869636/fashion-needles-JxHlr52IaIM-unsplash_j68vjj.jpg', (SELECT id FROM categories WHERE name = 'Watches'), 1),
+(3, 'Sporty Chronograph', 18000.00, 2, 'WTCH-003', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869649/hunters-race-dE0sBTZCVoY-unsplash_afncm1.jpg', (SELECT id FROM categories WHERE name = 'Watches'), 1),
+(3, 'Minimalist Leather Watch', 9500.00, 0, 'WTCH-004', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869654/john-torcasio-TJrkkhdB39E-unsplash_qupwjf.jpg', (SELECT id FROM categories WHERE name = 'Watches'), 0);
 
--- Perfume Category
-INSERT INTO products (name, price, image_url, category_id) VALUES
-('Floral Essence Perfume', 6500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869772/siora-photography-LkT5-JCePUY-unsplash_dccuxb.jpg', (SELECT id FROM categories WHERE name = 'Perfume')),
-('Midnight Bloom Eau de Parfum', 8200.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869784/laura-chouette-gbT2KAq1V5c-unsplash_emctei.jpg', (SELECT id FROM categories WHERE name = 'Perfume')),
-('Ocean Breeze Cologne', 5800.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869797/jeroen-den-otter-2b0JeJTEclQ-unsplash_ox0tm2.jpg', (SELECT id FROM categories WHERE name = 'Perfume')),
-('Spicy Amber Fragrance', 7000.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869806/fernando-andrade-potCPE_Cw8A-unsplash_hugosq.jpg', (SELECT id FROM categories WHERE name = 'Perfume')),
-('Sweet Vanilla Perfume', 6200.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869777/laura-chouette-4sKdeIMiFEI-unsplash_wrghxv.jpg', (SELECT id FROM categories WHERE name = 'Perfume')),
-('Woody Musk Cologne', 7500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869791/jeroen-van-roij-sLQt9PjsCcs-unsplash_giwnsf.jpg', (SELECT id FROM categories WHERE name = 'Perfume'));
+-- Perfume Category -> Assigned to Partner 2 (Gift World)
+INSERT INTO products (partner_id, name, price, stock_quantity, sku, image_url, category_id, is_active) VALUES
+(2, 'Floral Essence Perfume', 6500.00, 20, 'PERF-001', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869772/siora-photography-LkT5-JCePUY-unsplash_dccuxb.jpg', (SELECT id FROM categories WHERE name = 'Perfume'), 1),
+(2, 'Midnight Bloom Eau de Parfum', 8200.00, 15, 'PERF-002', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869784/laura-chouette-gbT2KAq1V5c-unsplash_emctei.jpg', (SELECT id FROM categories WHERE name = 'Perfume'), 1);
 
--- Teddy Bears Category
-INSERT INTO products (name, price, image_url, category_id) VALUES
-('Classic Brown Teddy', 3500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869829/__-drz-__-XGoqsrXWmgw-unsplash_eauziq.jpg', (SELECT id FROM categories WHERE name = 'Teddy Bears')),
-('Giant Huggable Bear', 8500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869833/alicia-christin-gerald-9JnL29YwQQ4-unsplash_sciwwj.jpg', (SELECT id FROM categories WHERE name = 'Teddy Bears')),
-('Cute Pink Teddy', 4200.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869874/oxana-lyashenko-FUFWKF_Tlk0-unsplash_ag1x1w.jpg', (SELECT id FROM categories WHERE name = 'Teddy Bears')),
-('Soft White Bear', 3800.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869851/lucas-van-oort-Tv9w8mgoVzs-unsplash_hoh9ub.jpg', (SELECT id FROM categories WHERE name = 'Teddy Bears')),
-('Little Pocket Teddy', 1500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869865/barry-Kz9-JcSo7Zg-unsplash_vy3nc2.jpg', (SELECT id FROM categories WHERE name = 'Teddy Bears'));
+-- Teddy Bears Category -> Assigned to Partner 3 (Lucky Gifts)
+INSERT INTO products (partner_id, name, price, stock_quantity, sku, image_url, category_id, is_active) VALUES
+(3, 'Classic Brown Teddy', 3500.00, 50, 'TED-001', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869829/__-drz-__-XGoqsrXWmgw-unsplash_eauziq.jpg', (SELECT id FROM categories WHERE name = 'Teddy Bears'), 1),
+(3, 'Giant Huggable Bear', 8500.00, 5, 'TED-002', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869833/alicia-christin-gerald-9JnL29YwQQ4-unsplash_sciwwj.jpg', (SELECT id FROM categories WHERE name = 'Teddy Bears'), 1);
 
--- Bangles Category
-INSERT INTO products (name, price, image_url, category_id) VALUES
-('Gold Plated Bangle Set', 5500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869888/koushalya-karthikeyan-1co0FGg8_W4-unsplash_uteniw.jpg', (SELECT id FROM categories WHERE name = 'Bangles')),
-('Silver Charm Bangles', 4800.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869896/mansi-shah-8angSQtYgKc-unsplash_qejkb1.jpg', (SELECT id FROM categories WHERE name = 'Bangles')),
-('Colorful Glass Bangles', 2500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869908/samar-ahmad--nKCbZlOHek-unsplash_esbmxd.jpg', (SELECT id FROM categories WHERE name = 'Bangles')),
-('Antique Brass Bangles', 3200.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869919/samar-ahmad-zz6-LqiW4mY-unsplash_tl2oxq.jpg', (SELECT id FROM categories WHERE name = 'Bangles')),
-('Diamond Accented Bangle', 12500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869927/vetrivel-viswanathar-o7vTr0qMd54-unsplash_kf9uz0.jpg', (SELECT id FROM categories WHERE name = 'Bangles'));
+-- Bangles Category -> Assigned to Partner 2 (Gift World)
+INSERT INTO products (partner_id, name, price, stock_quantity, sku, image_url, category_id, is_active) VALUES
+(2, 'Gold Plated Bangle Set', 5500.00, 25, 'BANG-001', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869888/koushalya-karthikeyan-1co0FGg8_W4-unsplash_uteniw.jpg', (SELECT id FROM categories WHERE name = 'Bangles'), 1),
+(2, 'Silver Charm Bangles', 4800.00, 30, 'BANG-002', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772869896/mansi-shah-8angSQtYgKc-unsplash_qejkb1.jpg', (SELECT id FROM categories WHERE name = 'Bangles'), 1);
 
--- Chocolates Category
-INSERT INTO products (name, price, image_url, category_id) VALUES
-('Premium Dark Chocolate Box', 2800.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772870229/marqquin-NBd5A6j3pgg-unsplash_jr6zol.jpg', (SELECT id FROM categories WHERE name = 'Chocolates')),
-('Assorted Truffle Collection', 3500.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772870235/kavita-jangid-80zX8-Nz7Os-unsplash_lpiawe.jpg', (SELECT id FROM categories WHERE name = 'Chocolates')),
-('Milk Chocolate Gift Set', 2200.00, 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772870242/sara-cervera-we4l7ch6iwc-unsplash_kxlfwv.jpg', (SELECT id FROM categories WHERE name = 'Chocolates'));
+-- Chocolates Category -> Assigned to Partner 3 (Lucky Gifts)
+INSERT INTO products (partner_id, name, price, stock_quantity, sku, image_url, category_id, is_active) VALUES
+(3, 'Premium Dark Chocolate Box', 2800.00, 40, 'CHOC-001', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772870229/marqquin-NBd5A6j3pgg-unsplash_jr6zol.jpg', (SELECT id FROM categories WHERE name = 'Chocolates'), 1),
+(3, 'Assorted Truffle Collection', 3500.00, 35, 'CHOC-002', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772870235/kavita-jangid-80zX8-Nz7Os-unsplash_lpiawe.jpg', (SELECT id FROM categories WHERE name = 'Chocolates'), 1);
+
+-- 3. Insert Orders (Bulletproof method using usernames)
+INSERT INTO orders (customer_id, partner_id, status, delivery_address, special_notes, total_amount) VALUES
+((SELECT user_id FROM users WHERE username = 'dilshan_k'), 2, 'PENDING', '123 Galle Road, Colombo 03', 'Please deliver after 4 PM', 8450.00),
+((SELECT user_id FROM users WHERE username = 'sanath_j'), 2, 'CONFIRMED', '45 Kandy Road, Peradeniya', 'Call before delivery', 12000.00),
+((SELECT user_id FROM users WHERE username = 'kasun_p'), 2, 'DELIVERED', '12 Temple Trees, Colombo 01', 'Gift wrap needed', 14750.00),
+((SELECT user_id FROM users WHERE username = 'amaya_s'), 2, 'PENDING', '89 Flower Road, Colombo 07', NULL, 9200.00),
+((SELECT user_id FROM users WHERE username = 'nimal_fdo'), 2, 'CANCELLED', '22 Beach Road, Mount Lavinia', 'Customer requested cancellation', 5600.00),
+((SELECT user_id FROM users WHERE username = 'dilshan_k'), 2, 'SHIPPED', '55 High Level Road, Nugegoda', 'Leave at the front desk', 6800.00);

@@ -1,9 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, User } from 'lucide-react';
 import './TopBar.css';
-import logo from '../../assets/logo-removebg-preview.png'; // Adjust path to your logo
+import logo from '../../assets/logo-removebg-preview.png';
 
 const TopBar = () => {
+  const navigate = useNavigate();
+
   return (
     <header className="topbar-container">
 
@@ -18,15 +21,19 @@ const TopBar = () => {
 
       {/* Right Section: Notifications & Profile */}
       <div className="topbar-actions">
-        
+
         {/* Notification Button */}
         <button className="notification-btn">
           <Bell className="notification-icon" />
           <span className="notification-badge"></span>
         </button>
-        
-        {/* Profile Section */}
-        <div className="profile-section">
+
+        {/* Profile Section — click to go to Settings */}
+        <div
+          className="profile-section"
+          onClick={() => navigate('/seller/settings')}
+          style={{ cursor: 'pointer' }}
+        >
           <div className="profile-info">
             <span className="profile-name">Mathew Anderson</span>
             <span className="profile-role">Vendor</span>
@@ -35,7 +42,7 @@ const TopBar = () => {
             <User size={18} />
           </div>
         </div>
-        
+
       </div>
 
     </header>
