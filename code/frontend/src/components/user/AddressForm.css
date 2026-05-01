@@ -1,0 +1,195 @@
+/* ============================================================
+   ADDRESS FORM STYLES - Giftora Theme
+   Navy + Cream + Gold color scheme
+   ============================================================ */
+
+/* ── Container ── */
+.address-form-container {
+  /* Changed from #ffffff to a soft Cream */
+  background: #fdfbf7; 
+  border-radius: 16px;
+  padding: 36px;
+  max-width: 620px;
+  margin: 40px auto;
+  box-shadow: 0 4px 24px rgba(15, 31, 61, 0.08); /* Navy-tinted shadow */
+  font-family: 'Segoe UI', sans-serif;
+  
+  /* Optional: Gold accent border at the top */
+  border-top: 4px solid #c9a84c; 
+}
+
+/* Compact mode for cart page */
+.address-form-container.compact {
+  background: transparent;
+  padding: 0;
+  max-width: 100%;
+  box-shadow: none;
+  margin: 0;
+  border-top: none;
+}
+
+/* ── Title ── */
+.address-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f1f3d; /* Navy */
+  margin: 0 0 6px 0;
+}
+
+.address-sub {
+  font-size: 14px;
+  color: #4b5563; /* Slightly darker for better contrast on cream */
+  margin: 0 0 28px 0;
+}
+
+.address-loading {
+  text-align: center;
+  color: #6b7280;
+  padding: 40px;
+  font-size: 14px;
+}
+
+/* ── Form layout ── */
+.address-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── Field ── */
+.address-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.address-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f1f3d; /* Navy Labels */
+  letter-spacing: 0.3px;
+}
+
+.address-field .optional {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* ── Inputs ── */
+.address-field input,
+.address-field select {
+  /* Pure white inputs to pop against the Cream background */
+  background: #ffffff; 
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: #111827;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.address-field input::placeholder {
+  color: #9ca3af;
+}
+
+.address-field input:focus,
+.address-field select:focus {
+  border-color: #c9a84c; /* Gold border on focus */
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+}
+
+.address-field select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+/* ── Side by side row ── */
+.address-row {
+  display: flex;
+  gap: 16px;
+}
+
+.address-row .address-field {
+  flex: 1;
+}
+
+/* ── Errors ── */
+.address-error {
+  color: #dc2626;
+  font-size: 11px;
+  margin: 0;
+}
+
+.address-general-error {
+  background: #fff1f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+/* ── Success ── */
+.address-success {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #16a34a;
+  font-size: 13px;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ── Save button - matches Giftora gold button ── */
+.address-save-btn {
+  background: #c9a84c; /* Gold */
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 6px;
+  letter-spacing: 0.3px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.address-save-btn:hover {
+  background: #b8943d;
+  transform: translateY(-1px);
+}
+
+.address-save-btn:active {
+  transform: translateY(0);
+}
+
+.address-save-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .address-row {
+    flex-direction: column;
+  }
+
+  .address-form-container {
+    padding: 24px 18px;
+    margin: 20px 16px;
+  }
+}

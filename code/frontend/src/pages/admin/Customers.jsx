@@ -70,16 +70,6 @@ const Customers = () => {
           </div>
         </div>
         
-        <div className="stat-card filtered">
-          <div className="stat-icon">
-            <FaSearch size={24} />
-          </div>
-          <div className="stat-content">
-            <h3 className="stat-number">{filteredCustomers.length}</h3>
-            <p className="stat-label">Filtered Results</p>
-          </div>
-        </div>
-        
         <div className="stat-card with-address">
           <div className="stat-icon">
             <FaMapMarkerAlt size={24} />

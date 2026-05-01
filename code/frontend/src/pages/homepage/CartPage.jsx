@@ -160,12 +160,6 @@ const CartPage = () => {
             <button className="cart-checkout-btn" onClick={() => navigate('/checkout')}>
               Proceed to Checkout →
             </button>
-
-            <div className="cart-summary__badges">
-              <span>🔒 Secure</span>
-              <span>🎁 Gift Wrapped</span>
-              <span>🚚 Free Delivery</span>
-            </div>
           </div>
 
         </div>

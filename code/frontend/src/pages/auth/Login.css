@@ -1,4 +1,24 @@
-/* Login and authentication page styles with 3D flip animation */
+/* ==========================================================================
+   Login and Authentication Page Styles
+   ========================================================================== */
+
+/* Hide the default browser eye icon for password fields (Edge/IE) */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Smooth Page Opening Animation */
+@keyframes smoothPopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
 /* Main page container with gradient background */
 .login-page {
@@ -33,21 +53,26 @@
   }
 }
 
+/* ==========================================================================
+   3D Flip Card Container & Grid Setup
+   ========================================================================== */
+
 /* 3D flip card container with perspective */
 .login-card-wrapper {
   width: 100%;
   max-width: 384px;
-  height: 500px;
   perspective: 1000px;
+  /* Apply the smooth opening animation here */
+  animation: smoothPopIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Inner container for 3D flip animation */
+/* Inner container using CSS Grid to fix the absolute positioning collapse */
 .login-card-inner {
   position: relative;
   width: 100%;
-  height: 100%;
-  transition: transform 0.7s ease;
+  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
   transform-style: preserve-3d;
+  display: grid; 
 }
 
 .login-card-inner.flipped {
@@ -57,8 +82,8 @@
 /* Shared styles for both login and signup card faces */
 .login-card-front,
 .login-card-back {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1 / 2 / 2; /* Both cards sit in the exact same grid cell */
+  height: 100%; /* Makes both faces match the height of the tallest one */
   background-color: #171717;
   border: 1px solid rgba(245, 158, 11, 0.3);
   padding: 40px;
@@ -70,14 +95,16 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   overflow-y: auto;
-  max-height: 600px;
 }
 
 .login-card-back {
   transform: rotateY(180deg);
 }
 
-/* ── Headings ───────────────────────────────── */
+/* ==========================================================================
+   Typography & Content
+   ========================================================================== */
+
 .login-card-front h2,
 .login-card-back h2 {
   font-size: 30px;
@@ -95,6 +122,10 @@
   margin-bottom: 24px;
 }
 
+/* ==========================================================================
+   Form Inputs & Buttons
+   ========================================================================== */
+
 /* Input field row with icon and text input */
 .login-input-row {
   display: flex;
@@ -107,6 +138,10 @@
   margin-bottom: 16px;
   border: 1px solid transparent;
   transition: border 0.2s, box-shadow 0.2s;
+}
+
+.login-card-back .login-input-row {
+  margin-bottom: 12px;
 }
 
 .login-input-row:focus-within {
@@ -139,39 +174,6 @@
   cursor: not-allowed;
 }
 
-/* Error message styling */
-.login-error {
-  font-size: 12px;
-  color: #ef4444;
-  margin-top: -12px;
-  margin-bottom: 12px;
-  margin-left: 8px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  animation: slideDown 0.2s ease-out;
-}
-
-.login-general-error {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-  padding: 10px 12px;
-  border-radius: 6px;
-  margin: 0 0 16px 0;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Password visibility toggle button */
 .login-eye-btn {
   background: none;
@@ -198,21 +200,6 @@
 .login-eye-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-/* Forgot password link */
-.login-forgot {
-  font-size: 14px;
-  color: #f59e0b;
-  cursor: pointer;
-  margin-bottom: 16px;
-  margin-left: 8px;
-  width: fit-content;
-  transition: color 0.2s;
-}
-
-.login-forgot:hover {
-  color: #fcd34d;
 }
 
 /* Submit button for login and signup forms */
@@ -249,18 +236,19 @@
   cursor: not-allowed;
 }
 
-/* Loading spinner animation */
-.spinner-icon {
-  animation: spin 1s linear infinite;
+/* Forgot password link */
+.login-forgot {
+  font-size: 14px;
+  color: #f59e0b;
+  cursor: pointer;
+  margin-bottom: 16px;
+  margin-left: 8px;
+  width: fit-content;
+  transition: color 0.2s;
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.login-forgot:hover {
+  color: #fcd34d;
 }
 
 /* Form toggle link to switch between login and signup */
@@ -282,22 +270,109 @@
   color: #fde68a;
 }
 
-/* ── Smaller gap for signup (more fields) ────── */
-.login-card-back .login-input-row {
+/* ==========================================================================
+   Errors & Loading States
+   ========================================================================== */
+
+/* Error message styling */
+.login-error {
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: -12px;
   margin-bottom: 12px;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: slideDown 0.2s ease-out;
 }
 
-/* Responsive Design */
+.login-general-error {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin: 0 0 16px 0;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading spinner animation */
+.spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Password Strength & Requirements
+   ========================================================================== */
+
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 4px 0;
+}
+
+.strength-bars {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+}
+
+.strength-bar {
+  height: 5px;
+  flex: 1;
+  border-radius: 3px;
+  background-color: #444;
+  transition: background-color 0.3s ease;
+}
+
+.strength-label {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 50px;
+  text-align: right;
+}
+
+.password-requirements {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 8px 0;
+}
+
+.password-requirements li {
+  font-size: 11px;
+  transition: color 0.3s ease;
+  padding: 1px 0;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
 @media (max-width: 768px) {
   .login-card-wrapper {
     max-width: 90%;
-    height: auto;
   }
 
   .login-card-front,
   .login-card-back {
     padding: 32px 24px;
-    max-height: none;
   }
 
   .login-card-front h2,
@@ -307,6 +382,11 @@
 }
 
 @media (max-width: 480px) {
+  /* Ensure the page has padding so the card doesn't hit the screen edges vertically */
+  .login-page {
+    padding: 80px 0 20px 0; 
+  }
+
   .login-logo {
     width: 96px;
     left: 12px;
@@ -343,45 +423,4 @@
     padding: 9px 0;
     font-size: 14px;
   }
-}
-/* ── Password Strength Indicator ── */
-.password-strength {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 6px 0 4px 0;
-}
-
-.strength-bars {
-  display: flex;
-  gap: 5px;
-  flex: 1;
-}
-
-.strength-bar {
-  height: 5px;
-  flex: 1;
-  border-radius: 3px;
-  background-color: #444;
-  transition: background-color 0.3s ease;
-}
-
-.strength-label {
-  font-size: 12px;
-  font-weight: 600;
-  min-width: 50px;
-  text-align: right;
-}
-
-/* ── Password Requirements Checklist ── */
-.password-requirements {
-  list-style: none;
-  padding: 0;
-  margin: 4px 0 8px 0;
-}
-
-.password-requirements li {
-  font-size: 11px;
-  transition: color 0.3s ease;
-  padding: 1px 0;
 }

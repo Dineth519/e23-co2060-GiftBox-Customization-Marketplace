@@ -1,0 +1,210 @@
+/* ==========================================================================
+   Giftora Vendor Registration Styles
+   ========================================================================== */
+
+/* Smooth fade in */
+@keyframes fadeInSlideUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Deep navy background matching the home page */
+.giftora-auth-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #141522; /* Matches your screenshot background */
+  padding: 40px 20px;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* The form card with soft glow/shadow */
+.giftora-vendor-card {
+  background-color: #1E2032; /* Slightly lighter than background */
+  border: 1px solid rgba(229, 184, 92, 0.15); /* Subtle gold border */
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  max-width: 700px;
+  animation: fadeInSlideUp 0.6s ease-out forwards;
+}
+
+.giftora-vendor-card h2 {
+  font-size: 32px;
+  font-weight: 600;
+  color: #F8F9FA;
+  text-align: center;
+  margin-bottom: 8px;
+  font-family: 'Playfair Display', serif; /* Matching your heading style */
+}
+
+.auth-sub {
+  text-align: center;
+  color: #9CA3AF;
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+/* Grid layout for vendor fields */
+.vendor-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+  margin-bottom: 24px;
+}
+
+/* Input rows matching the dark theme */
+.auth-input-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 9999px; /* Pill shape */
+  background-color: #282A42; /* Dark input background */
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.auth-input-row:focus-within {
+  border-color: #E5B85C; /* Gold focus ring */
+  box-shadow: 0 0 0 2px rgba(229, 184, 92, 0.2);
+}
+
+.auth-input-row input {
+  background: transparent;
+  outline: none;
+  border: none;
+  width: 100%;
+  color: #F8F9FA;
+  font-size: 14px;
+}
+
+.auth-input-row input::placeholder {
+  color: #6B7280;
+}
+
+/* Password Eye Button */
+.eye-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.eye-btn img {
+  width: 18px;
+  opacity: 0.5;
+  filter: invert(1); /* Makes black icons white */
+  transition: opacity 0.2s;
+}
+
+.eye-btn:hover img {
+  opacity: 0.9;
+}
+
+/* Giftora Gold Button */
+.giftora-btn-primary {
+  width: 100%;
+  padding: 14px 0;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #F4C970 0%, #D4A345 100%); /* Gold gradient */
+  color: #141522; /* Dark text for contrast */
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.giftora-btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(229, 184, 92, 0.3);
+}
+
+.giftora-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Error Box */
+.auth-error-box {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #FCA5A5;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Bottom Links */
+.auth-toggle-text {
+  text-align: center;
+  margin-top: 24px;
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+.auth-toggle-link {
+  color: #E5B85C;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.auth-toggle-link:hover {
+  color: #F4C970;
+  text-decoration: underline;
+}
+
+/* Responsive fixes */
+@media (max-width: 640px) {
+  .giftora-vendor-card {
+    padding: 32px 24px;
+  }
+  
+  .vendor-form-grid {
+    grid-template-columns: 1fr; /* Stack inputs on mobile */
+    gap: 16px;
+  }
+
+  .giftora-vendor-card h2 {
+    font-size: 26px;
+  }
+}
+/* Styling for the dropdown select menu */
+.auth-input-row select {
+  background: transparent;
+  outline: none;
+  border: none;
+  width: 100%;
+  color: #F8F9FA;
+  font-size: 14px;
+  cursor: pointer;
+  -webkit-appearance: none; /* Removes default OS styling on Mac/iOS */
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Fix for the placeholder color inside the select */
+.auth-input-row select.placeholder-active {
+  color: #6B7280;
+}
+
+/* Styling the dropdown options when opened */
+.auth-input-row select option {
+  background-color: #282A42; /* Matches the input pill background */
+  color: #F8F9FA;
+  padding: 10px;
+}

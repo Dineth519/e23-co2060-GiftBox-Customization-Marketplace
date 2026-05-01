@@ -29,6 +29,9 @@ public class Partner {
     @Column(name = "status")
     private String status; // Values will be 'ACTIVE' or 'PENDING'
 
+    @Column(name = "categories")
+    private String categories;
+
     // Default Constructor
     public Partner() {
     }
@@ -54,4 +57,7 @@ public class Partner {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getCategories() { return categories; }
+    public void setCategories(String categories) { this.categories = categories; }
 }

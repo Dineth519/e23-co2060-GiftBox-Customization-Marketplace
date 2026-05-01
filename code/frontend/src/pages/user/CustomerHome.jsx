@@ -1,6 +1,9 @@
 // Core libraries
 import React, { useState, useEffect } from 'react';
 
+// Routing and navigation
+import { useNavigate } from 'react-router-dom';
+
 // Icons for UI components
 import { FaGift, FaHeart, FaTruck, FaShieldAlt, FaStar, FaArrowRight, FaQuoteLeft } from 'react-icons/fa';
 
@@ -13,6 +16,8 @@ const CustomerHome = () => {
   const [activeCategory, setActiveCategory] = useState(0);
   // Track scroll position for header styling
   const [scrolled, setScrolled] = useState(false);
+  // Navigation hook for programmatic routing
+  const navigate = useNavigate();
 
   // Handle scroll event to update header styling
   useEffect(() => {
@@ -108,11 +113,20 @@ const CustomerHome = () => {
             Each box tells a story, each gift creates a memory.
           </p>
           <div className="hero-cta">
-            <button className="btn-primary">
+            {/* Explore Collections button */}
+            <button 
+              className="btn-primary"
+              onClick={() => navigate('/products')}
+            >
               Explore Collections
               <FaArrowRight className="btn-icon" />
             </button>
-            <button className="btn-secondary">
+
+             {/* Custom Gift Box button */}
+            <button 
+              className="btn-secondary"
+              onClick={() => navigate('/customize')}
+            >
               Custom Gift Box
             </button>
           </div>
@@ -157,10 +171,11 @@ const CustomerHome = () => {
         </div>
         <div className="categories-grid">
           {categories.map((category, idx) => (
-            <div 
+            <div
               className="category-card"
               key={idx}
               style={{ animationDelay: `${idx * 0.1}s` }}
+              onClick={() => navigate('/customize')}
             >
               <div className="category-emoji">{category.emoji}</div>
               <h3 className="category-name">{category.name}</h3>
@@ -203,7 +218,10 @@ const CustomerHome = () => {
                     <span className="currency">LKR</span>
                     <span className="price">{box.price}</span>
                   </div>
-                  <button className="add-to-cart">
+                  <button 
+                    className="add-to-cart"
+                    onClick={() => navigate('/customize')}
+                  >
                     <FaHeart />
                   </button>
                 </div>
@@ -314,7 +332,10 @@ const CustomerHome = () => {
           <p className="cta-subtitle">
             Join thousands of satisfied customers who've made gifting memorable
           </p>
-          <button className="cta-button">
+          <button 
+            className="cta-button"
+            onClick={() => navigate('/customize')}
+          >
             Start Your Gift Journey
             <FaArrowRight className="btn-icon" />
           </button>
