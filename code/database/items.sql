@@ -48,3 +48,12 @@ INSERT INTO products (partner_id, name, price, stock_quantity, sku, image_url, c
 INSERT INTO products (partner_id, name, price, stock_quantity, sku, image_url, category_id, is_active) VALUES
 (3, 'Premium Dark Chocolate Box', 2800.00, 40, 'CHOC-001', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772870229/marqquin-NBd5A6j3pgg-unsplash_jr6zol.jpg', (SELECT id FROM categories WHERE name = 'Chocolates'), 1),
 (3, 'Assorted Truffle Collection', 3500.00, 35, 'CHOC-002', 'https://res.cloudinary.com/dju3eqysw/image/upload/v1772870235/kavita-jangid-80zX8-Nz7Os-unsplash_lpiawe.jpg', (SELECT id FROM categories WHERE name = 'Chocolates'), 1);
+
+-- 3. Insert Orders (Bulletproof method using usernames)
+INSERT INTO orders (customer_id, partner_id, status, delivery_address, special_notes, total_amount) VALUES
+((SELECT user_id FROM users WHERE username = 'dilshan_k'), 2, 'PENDING', '123 Galle Road, Colombo 03', 'Please deliver after 4 PM', 8450.00),
+((SELECT user_id FROM users WHERE username = 'sanath_j'), 2, 'CONFIRMED', '45 Kandy Road, Peradeniya', 'Call before delivery', 12000.00),
+((SELECT user_id FROM users WHERE username = 'kasun_p'), 2, 'DELIVERED', '12 Temple Trees, Colombo 01', 'Gift wrap needed', 14750.00),
+((SELECT user_id FROM users WHERE username = 'amaya_s'), 2, 'PENDING', '89 Flower Road, Colombo 07', NULL, 9200.00),
+((SELECT user_id FROM users WHERE username = 'nimal_fdo'), 2, 'CANCELLED', '22 Beach Road, Mount Lavinia', 'Customer requested cancellation', 5600.00),
+((SELECT user_id FROM users WHERE username = 'dilshan_k'), 2, 'SHIPPED', '55 High Level Road, Nugegoda', 'Leave at the front desk', 6800.00);
