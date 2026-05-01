@@ -290,7 +290,7 @@ const HeroSection = () => {
           </p>
 
           <div className="hero__cta-group">
-            <button className="btn-hero-primary" onClick={() => navigate('/build')}>
+            <button className="btn-hero-primary" onClick={() => navigate('/build-box')}>
               <span className="btn-icon">🎁</span>
               <span>Start Customizing</span>
               <span className="btn-arrow">→</span>

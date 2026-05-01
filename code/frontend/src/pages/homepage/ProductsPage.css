@@ -289,9 +289,11 @@ button {
 }
 
 .pp-sidebar-inner {
+  padding: 35px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-width: 500px;
 }
 /* Sidebar Search */
 
@@ -347,7 +349,30 @@ button {
   background: rgba(201, 169, 97, 0.1);
   color: var(--gold);
 }
-/* Sidebar Sections */
+
+/* Toolbar */
+.pp-toolbar {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 24px;
+  padding: 30px;
+}
+
+.pp-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px; 
+}
+
+.pp-sidebar-search {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-width: 400px; 
+}
 
 .pp-sidebar-section {
   background: var(--white);

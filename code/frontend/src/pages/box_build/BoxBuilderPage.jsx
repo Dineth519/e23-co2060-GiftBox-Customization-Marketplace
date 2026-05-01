@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../../components/homepage/Header';
+import Footer from '../../components/homepage/Footer';
 import './BoxBuilderPage.css';
 
-const CATEGORY_MAP = { 1: 'Wine', 2: 'Watches', 3: 'Perfume', 4: 'Teddy Bears', 5: 'Bangles', 6: 'Chocolates' };
+// Cart Context එකෙන් දත්ත ගැනීම සඳහා
+import { useCart } from '../../context/CartContext'; 
 
 const OCCASIONS = [
   { id: 'Birthday', icon: '🎂', label: 'Birthday' },
@@ -13,33 +16,30 @@ const OCCASIONS = [
 ];
 
 const BOX_SIZES = [
-  { id: 'SMALL', title: 'Small Box', limit: 3, fee: 500, desc: 'Up to 3 items' },
-  { id: 'MEDIUM', title: 'Medium Box', limit: 5, fee: 800, desc: 'Up to 5 items' },
-  { id: 'LARGE', title: 'Large Box', limit: 8, fee: 1200, desc: 'Up to 8 items' }
+  { id: 'SMALL', title: 'Small Box', limit: 3, fee: 500, desc: 'Perfect for a few thoughtful items.' },
+  { id: 'MEDIUM', title: 'Medium Box', limit: 5, fee: 800, desc: 'The most popular choice.' },
+  { id: 'LARGE', title: 'Large Box', limit: 8, fee: 1200, desc: 'For making a grand impression.' }
 ];
 
 const WRAPPING_STYLES = [
-  { id: 'Classic Gold', color: '#C9A84C' },
+  { id: 'Classic Gold', color: '#C9A961' },
   { id: 'Rose Pink', color: '#E8A0BF' },
-  { id: 'Midnight Blue', color: '#1A2340' }
+  { id: 'Midnight Blue', color: '#1A1A2E' }
 ];
+
+const MAX_ITEMS_GLOBAL = 8; // ලොකුම box එකේ සීමාව
 
 const BoxBuilderPage = () => {
   const navigate = useNavigate();
+  const heroRef = useRef(null);
+  
+  const { cartItems } = useCart(); 
+  const availableItems = cartItems || [];
 
-  // API State
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-
-  // Flow State
-  const [currentStep, setCurrentStep] = useState(1);
+  // Form State
   const [occasion, setOccasion] = useState(null);
-  const [boxSize, setBoxSize] = useState(null);
   const [selectedItems, setSelectedItems] = useState({}); // { productId: quantity }
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [boxSize, setBoxSize] = useState(null);
   
   // Personalization State
   const [recipientName, setRecipientName] = useState('');
@@ -47,80 +47,77 @@ const BoxBuilderPage = () => {
   const [wrappingStyle, setWrappingStyle] = useState(null);
   const [deliveryAddress, setDeliveryAddress] = useState('');
 
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Hero Animation
   useEffect(() => {
-    fetch('http://localhost:8080/api/products')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch products');
-        return res.json();
-      })
-      .then(data => {
-        setProducts(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
+    const t = setTimeout(() => {
+      if (heroRef.current) heroRef.current.classList.add('bb-hero--visible');
+    }, 80);
+    return () => clearTimeout(t);
   }, []);
 
-  // Derived Values
-  const categories = useMemo(() => ['All', ...new Set(products.map(p => CATEGORY_MAP[p.categoryId] || 'Other'))], [products]);
-  
-  const displayedProducts = useMemo(() => {
-    if (activeCategory === 'All') return products;
-    return products.filter(p => (CATEGORY_MAP[p.categoryId] || 'Other') === activeCategory);
-  }, [products, activeCategory]);
-
+  // Calculations
   const totalItemsCount = Object.values(selectedItems).reduce((sum, q) => sum + q, 0);
   
   const subtotal = useMemo(() => {
     return Object.entries(selectedItems).reduce((sum, [id, qty]) => {
-      const product = products.find(p => p.id === parseInt(id));
+      const product = availableItems.find(p => p.id === parseInt(id));
       return sum + (product ? product.price * qty : 0);
     }, 0);
-  }, [selectedItems, products]);
+  }, [selectedItems, availableItems]);
 
   const total = subtotal + (boxSize?.fee || 0);
 
   // Handlers
-  const handleNext = () => setCurrentStep(prev => Math.min(prev + 1, 5));
-  const handleBack = () => setCurrentStep(prev => Math.max(prev - 1, 1));
-
   const handleAddItem = (product) => {
-    if (totalItemsCount >= boxSize.limit) return;
-    setSelectedItems(prev => ({
-      ...prev,
-      [product.id]: (prev[product.id] || 0) + 1
-    }));
+    // තෝරාගත් box එකක් ඇත්නම් එහි සීමාව, නැත්නම් උපරිම සීමාව පරීක්ෂා කිරීම
+    const currentLimit = boxSize ? boxSize.limit : MAX_ITEMS_GLOBAL;
+    
+    if (totalItemsCount >= currentLimit) {
+      if (boxSize) {
+        alert(`Your ${boxSize.title} is full! Please upgrade to a larger box in Step 3 to add more items.`);
+      } else {
+        alert("You have reached the maximum capacity (8 items).");
+      }
+      return;
+    }
+
+    setSelectedItems(prev => ({ ...prev, [product.id]: (prev[product.id] || 0) + 1 }));
   };
 
   const handleRemoveItem = (productId) => {
     setSelectedItems(prev => {
       const updated = { ...prev };
-      if (updated[productId] > 1) {
-        updated[productId] -= 1;
-      } else {
-        delete updated[productId];
-      }
+      if (updated[productId] > 1) updated[productId] -= 1;
+      else delete updated[productId];
       return updated;
     });
   };
 
+  const handleBoxSizeSelect = (size) => {
+    if (totalItemsCount > size.limit) {
+      alert(`You have selected ${totalItemsCount} items, but the ${size.title} only holds ${size.limit}. Please remove some items first.`);
+      return;
+    }
+    setBoxSize(size);
+  };
+
+  const canPlaceOrder = () => {
+    return occasion && totalItemsCount > 0 && boxSize && 
+           recipientName.trim() && giftMessage.trim() && 
+           wrappingStyle && deliveryAddress.trim();
+  };
+
   const handlePlaceOrder = async () => {
+    if (!canPlaceOrder()) return;
+    
     setSubmitting(true);
     const orderPayload = {
-      customerId: 5,
-      partnerId: 2,
-      deliveryAddress,
-      occasion,
-      boxSize: boxSize.id,
-      giftMessage,
-      recipientName,
-      wrappingStyle,
-      items: Object.entries(selectedItems).map(([id, qty]) => ({
-        productId: parseInt(id),
-        quantity: qty
-      }))
+      customerId: 5, partnerId: 2, deliveryAddress, occasion, boxSize: boxSize.id,
+      giftMessage, recipientName, wrappingStyle,
+      items: Object.entries(selectedItems).map(([id, qty]) => ({ productId: parseInt(id), quantity: qty }))
     };
 
     try {
@@ -131,6 +128,7 @@ const BoxBuilderPage = () => {
       });
       if (!res.ok) throw new Error('Failed to place order');
       setSubmitSuccess(true);
+      window.scrollTo(0, 0);
     } catch (err) {
       alert('Error placing order: ' + err.message);
     } finally {
@@ -138,280 +136,282 @@ const BoxBuilderPage = () => {
     }
   };
 
-  // Validation
-  const canProceed = () => {
-    if (currentStep === 1) return !!occasion;
-    if (currentStep === 2) return !!boxSize;
-    if (currentStep === 3) return totalItemsCount > 0;
-    if (currentStep === 4) return recipientName.trim() && giftMessage.trim() && wrappingStyle && deliveryAddress.trim();
-    return true;
-  };
-
   if (submitSuccess) {
     return (
-      <div className="bb-success-screen">
-        <div className="bb-success-icon">🎁</div>
-        <h2>Your box is being prepared!</h2>
-        <p>Thank you for choosing Giftora. We're carefully assembling your personalized gift box.</p>
-        <button className="bb-btn-primary" onClick={() => navigate('/')}>Return to Home</button>
+      <div className="bb-page">
+        <Header />
+        <div className="bb-success-screen">
+          <div className="bb-success-icon">🎁</div>
+          <h2 className="bb-success-title">Your Box is Being Prepared!</h2>
+          <p className="bb-success-desc">Thank you for choosing Giftora. Our premium vendors are carefully assembling your personalized gift box.</p>
+          <button className="bb-btn-primary" onClick={() => navigate('/')}>Return to Home</button>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="bb-container">
-      {/* Progress Bar */}
-      <div className="bb-progress-bar">
-        {['Occasion', 'Box Size', 'Pick Items', 'Personalize', 'Preview'].map((label, idx) => {
-          const stepNum = idx + 1;
-          return (
-            <div key={stepNum} className={`bb-step-indicator ${currentStep >= stepNum ? 'active' : ''}`}>
-              <div className="bb-step-circle">{stepNum}</div>
-              <span className="bb-step-label">{label}</span>
-            </div>
-          );
-        })}
-      </div>
+    <div className="bb-page">
+      <Header />
 
-      <div className="bb-main-layout">
-        <div className="bb-content-area">
-          {/* Step 1 */}
-          {currentStep === 1 && (
-            <div className="bb-step-content slide-in">
-              <h2 className="bb-step-title">What are we celebrating?</h2>
-              <div className="bb-grid bb-grid-occasion">
-                {OCCASIONS.map(occ => (
-                  <div 
-                    key={occ.id} 
-                    className={`bb-card ${occasion === occ.id ? 'selected' : ''}`}
-                    onClick={() => setOccasion(occ.id)}
-                  >
-                    <div className="bb-card-icon">{occ.icon}</div>
-                    <div className="bb-card-label">{occ.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* ── HERO ── */}
+      <section className="bb-hero">
+        <div className="bb-hero__orb bb-hero__orb--1" />
+        <div className="bb-hero__orb bb-hero__orb--2" />
+        <div className="bb-hero__grid" />
 
-          {/* Step 2 */}
-          {currentStep === 2 && (
-            <div className="bb-step-content slide-in">
-              <h2 className="bb-step-title">Choose your box size</h2>
-              <div className="bb-grid bb-grid-size">
-                {BOX_SIZES.map(size => (
-                  <div 
-                    key={size.id} 
-                    className={`bb-card bb-size-card ${boxSize?.id === size.id ? 'selected' : ''}`}
-                    onClick={() => setBoxSize(size)}
-                  >
-                    <h3>{size.title}</h3>
-                    <p className="bb-size-desc">{size.desc}</p>
-                    <div className="bb-size-fee">+LKR {size.fee} box fee</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 3 */}
-          {currentStep === 3 && (
-            <div className="bb-step-content slide-in">
-              <div className="bb-step-header">
-                <h2 className="bb-step-title">Pick your items</h2>
-                <div className="bb-capacity-badge">
-                  {totalItemsCount} / {boxSize.limit} Items Selected
-                </div>
-              </div>
-
-              {loading && <div className="bb-spinner">Loading products...</div>}
-              {error && <div className="bb-error">Error: {error}</div>}
-
-              {!loading && !error && (
-                <>
-                  <div className="bb-category-tabs">
-                    {categories.map(cat => (
-                      <button 
-                        key={cat} 
-                        className={`bb-tab ${activeCategory === cat ? 'active' : ''}`}
-                        onClick={() => setActiveCategory(cat)}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="bb-grid bb-grid-products">
-                    {displayedProducts.map(p => {
-                      const qty = selectedItems[p.id] || 0;
-                      const isMaxedOut = totalItemsCount >= boxSize.limit && qty === 0;
-
-                      return (
-                        <div key={p.id} className="bb-product-card">
-                          <img src={p.imageUrl} alt={p.name} className="bb-product-img" />
-                          <div className="bb-product-info">
-                            <h4>{p.name}</h4>
-                            <div className="bb-product-price">LKR {p.price.toLocaleString()}</div>
-                            
-                            {qty > 0 ? (
-                              <div className="bb-qty-controls">
-                                <button onClick={() => handleRemoveItem(p.id)}>-</button>
-                                <span>{qty}</span>
-                                <button onClick={() => handleAddItem(p)} disabled={totalItemsCount >= boxSize.limit}>+</button>
-                              </div>
-                            ) : (
-                              <button 
-                                className="bb-btn-add" 
-                                onClick={() => handleAddItem(p)}
-                                disabled={isMaxedOut}
-                              >
-                                {isMaxedOut ? 'Limit Reached' : 'Add Item'}
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Step 4 */}
-          {currentStep === 4 && (
-            <div className="bb-step-content slide-in">
-              <h2 className="bb-step-title">Personalize your gift</h2>
-              <div className="bb-form">
-                <div className="bb-form-group">
-                  <label>Recipient Name</label>
-                  <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} placeholder="Who is this for?" />
-                </div>
-                
-                <div className="bb-form-group">
-                  <label>Gift Message <span className="bb-char-count">{giftMessage.length}/150</span></label>
-                  <textarea 
-                    maxLength={150} 
-                    value={giftMessage} 
-                    onChange={e => setGiftMessage(e.target.value)} 
-                    placeholder="Write a heartfelt message..."
-                    rows={4}
-                  />
-                </div>
-
-                <div className="bb-form-group">
-                  <label>Wrapping Style</label>
-                  <div className="bb-wrapping-options">
-                    {WRAPPING_STYLES.map(style => (
-                      <div 
-                        key={style.id}
-                        className={`bb-wrap-card ${wrappingStyle === style.id ? 'selected' : ''}`}
-                        onClick={() => setWrappingStyle(style.id)}
-                      >
-                        <div className="bb-color-swatch" style={{ backgroundColor: style.color }}></div>
-                        <span>{style.id}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bb-form-group">
-                  <label>Delivery Address</label>
-                  <input type="text" value={deliveryAddress} onChange={e => setDeliveryAddress(e.target.value)} placeholder="Full delivery address" />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 5 */}
-          {currentStep === 5 && (
-            <div className="bb-step-content slide-in bb-preview-step">
-              <h2 className="bb-step-title">Review your custom box</h2>
-              
-              <div className="bb-preview-grid">
-                <div className="bb-preview-section">
-                  <h3>Box Details</h3>
-                  <p><strong>Occasion:</strong> {occasion}</p>
-                  <p><strong>Size:</strong> {boxSize.title}</p>
-                  <p><strong>Wrapping:</strong> {wrappingStyle}</p>
-                  <p><strong>Deliver To:</strong> {recipientName} ({deliveryAddress})</p>
-                  <div className="bb-preview-message">
-                    " {giftMessage} "
-                  </div>
-                </div>
-
-                <div className="bb-preview-section">
-                  <h3>Selected Items</h3>
-                  <div className="bb-preview-items">
-                    {Object.entries(selectedItems).map(([id, qty]) => {
-                      const p = products.find(prod => prod.id === parseInt(id));
-                      if (!p) return null;
-                      return (
-                        <div key={id} className="bb-preview-item">
-                          <span>{qty}x {p.name}</span>
-                          <span>LKR {(p.price * qty).toLocaleString()}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  
-                  <div className="bb-preview-breakdown">
-                    <div className="bb-breakdown-row">
-                      <span>Items Subtotal</span>
-                      <span>LKR {subtotal.toLocaleString()}</span>
-                    </div>
-                    <div className="bb-breakdown-row">
-                      <span>Box Fee ({boxSize.title})</span>
-                      <span>LKR {boxSize.fee.toLocaleString()}</span>
-                    </div>
-                    <div className="bb-breakdown-row bb-total-row">
-                      <span>Total</span>
-                      <span>LKR {total.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Navigation Buttons */}
-          <div className="bb-nav-buttons">
-            {currentStep > 1 ? (
-              <button className="bb-btn-secondary" onClick={handleBack} disabled={submitting}>Back</button>
-            ) : <div/>}
-
-            {currentStep < 5 ? (
-              <button className="bb-btn-primary" onClick={handleNext} disabled={!canProceed()}>Next Step</button>
-            ) : (
-              <button className="bb-btn-primary bb-btn-submit" onClick={handlePlaceOrder} disabled={submitting}>
-                {submitting ? 'Processing...' : 'Place Order 🎁'}
-              </button>
-            )}
-          </div>
+        <div className="bb-hero__inner" ref={heroRef}>
+          <div className="bb-hero__label">Giftora Exclusive</div>
+          <h1 className="bb-hero__title">
+            Curate Your <br />
+            <span className="bb-hero__title-accent">Perfect Box</span>
+          </h1>
+          <p className="bb-hero__sub">
+            Follow the sections below to build a deeply personal, beautifully packaged gift. Hand-picked by you, delivered by us.
+          </p>
         </div>
+        
+        <div className="bb-hero__pills">
+          {['1. Occasion', '2. Add Items', '3. Box Size', '4. Personalize', '5. Checkout'].map((p) => (
+            <span key={p} className="bb-hero-pill">{p}</span>
+          ))}
+        </div>
+      </section>
 
-        {/* Sticky Sidebar (Steps 3-5) */}
-        {currentStep >= 3 && currentStep <= 4 && (
-          <div className="bb-sidebar">
-            <div className="bb-sidebar-sticky">
-              <h3>Box Summary</h3>
-              <div className="bb-summary-stats">
-                <p>Capacity: {totalItemsCount} / {boxSize.limit}</p>
-                <div className="bb-summary-items">
-                  {Object.entries(selectedItems).map(([id, qty]) => {
-                    const p = products.find(prod => prod.id === parseInt(id));
-                    return p ? <div key={id} className="bb-summary-item-tiny">{qty}x {p.name}</div> : null;
+      {/* ── MAIN SCROLLING LAYOUT ── */}
+      <div className="bb-layout-wrapper">
+        <div className="bb-main-content">
+          
+          {/* STEP 01: OCCASION */}
+          <section className="bb-section" id="step-occasion">
+            <div className="bb-section-header">
+              <div className="bb-section-label">Step 01</div>
+              <h2 className="bb-section-title">What are we celebrating?</h2>
+            </div>
+            <div className="bb-grid-occasion">
+              {OCCASIONS.map(occ => (
+                <div 
+                  key={occ.id} 
+                  className={`bb-card ${occasion === occ.id ? 'bb-card--active' : ''}`}
+                  onClick={() => setOccasion(occ.id)}
+                >
+                  <div className="bb-card-icon">{occ.icon}</div>
+                  <h4 className="bb-card-title">{occ.label}</h4>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* STEP 02: ITEMS (CART ITEMS ONLY) */}
+          <section className="bb-section" id="step-items">
+            <div className="bb-section-header">
+              <div className="bb-section-label">Step 02</div>
+              <h2 className="bb-section-title">Pick your premium items</h2>
+              <p className="bb-section-sub">Select items directly from your cart to add into the box.</p>
+            </div>
+
+            {availableItems.length === 0 ? (
+              <div className="bb-empty-cart">
+                <div className="bb-empty-icon">🛒</div>
+                <p>Your cart is currently empty.</p>
+                <button className="bb-btn-primary" onClick={() => navigate('/products')}>
+                  Browse Premium Items
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="bb-grid-products">
+                  {availableItems.map(p => {
+                    const qty = selectedItems[p.id] || 0;
+                    const currentLimit = boxSize ? boxSize.limit : MAX_ITEMS_GLOBAL;
+                    const isMaxedOut = totalItemsCount >= currentLimit && qty === 0;
+
+                    return (
+                      <div key={p.id} className="bb-product-card">
+                        <img src={p.imageUrl} alt={p.name} className="bb-product-img" loading="lazy" />
+                        <div className="bb-product-body">
+                          <h4 className="bb-product-title">{p.name}</h4>
+                          <div className="bb-product-price">LKR {p.price.toLocaleString()}</div>
+                          
+                          {qty > 0 ? (
+                            <div className="bb-qty-controls">
+                              <button onClick={() => handleRemoveItem(p.id)}>−</button>
+                              <span>{qty}</span>
+                              <button onClick={() => handleAddItem(p)} disabled={isMaxedOut}>+</button>
+                            </div>
+                          ) : (
+                            <button 
+                              className="bb-btn-add" 
+                              onClick={() => handleAddItem(p)}
+                              disabled={isMaxedOut}
+                            >
+                              {isMaxedOut ? 'Limit Reached' : 'Add to Box'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
                   })}
                 </div>
+
+                <div className="bb-show-more-wrap">
+                  <button className="bb-btn-secondary" onClick={() => navigate('/products')}>
+                    + Explore more products
+                  </button>
+                </div>
+              </>
+            )}
+          </section>
+
+          {/* STEP 03: SIZE */}
+          <section className="bb-section" id="step-size">
+            <div className="bb-section-header">
+              <div className="bb-section-label">Step 03</div>
+              <h2 className="bb-section-title">Choose your box size</h2>
+              {totalItemsCount > 0 && <p className="bb-section-sub">You have selected {totalItemsCount} items. Choose a box that fits!</p>}
+            </div>
+            <div className="bb-grid-size">
+              {BOX_SIZES.map(size => {
+                const isTooSmall = totalItemsCount > size.limit;
+                return (
+                  <div 
+                    key={size.id} 
+                    className={`bb-card bb-size-card ${boxSize?.id === size.id ? 'bb-card--active' : ''} ${isTooSmall ? 'bb-card--disabled' : ''}`}
+                    onClick={() => handleBoxSizeSelect(size)}
+                  >
+                    <h4 className="bb-card-title">{size.title}</h4>
+                    <p className="bb-card-desc">{size.desc}</p>
+                    <div className="bb-size-fee">+LKR {size.fee.toLocaleString()} box fee</div>
+                    <div className="bb-size-limit">Up to {size.limit} items</div>
+                    
+                    {isTooSmall && <div className="bb-size-warning">Too small for selected items</div>}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* STEP 04: PERSONALIZE */}
+          <section className="bb-section bb-section--dark" id="step-personalize">
+            <div className="bb-section-header">
+              <div className="bb-section-label" style={{color: 'var(--gold)'}}>Step 04</div>
+              <h2 className="bb-section-title" style={{color: 'var(--white)'}}>Personalize your gift</h2>
+            </div>
+            
+            <div className="bb-form-grid">
+              <div className="bb-input-group">
+                <label>Recipient Name</label>
+                <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} placeholder="Who is this for?" />
               </div>
-              <div className="bb-summary-total">
-                <span>Total Estim.</span>
-                <h4>LKR {total.toLocaleString()}</h4>
+              
+              <div className="bb-input-group bb-col-span-full">
+                <label>
+                  Gift Message
+                  <span className="bb-char-count">{giftMessage.length}/150</span>
+                </label>
+                <textarea 
+                  maxLength={150} rows={3} value={giftMessage} 
+                  onChange={e => setGiftMessage(e.target.value)} 
+                  placeholder="Write a heartfelt message to be printed on a premium card..."
+                />
+              </div>
+
+              <div className="bb-input-group bb-col-span-full">
+                <label>Wrapping Style</label>
+                <div className="bb-wrap-options">
+                  {WRAPPING_STYLES.map(style => (
+                    <div 
+                      key={style.id}
+                      className={`bb-wrap-card ${wrappingStyle === style.id ? 'bb-wrap-card--active' : ''}`}
+                      onClick={() => setWrappingStyle(style.id)}
+                    >
+                      <div className="bb-color-swatch" style={{ backgroundColor: style.color }} />
+                      <span>{style.id}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bb-input-group bb-col-span-full">
+                <label>Delivery Address</label>
+                <input type="text" value={deliveryAddress} onChange={e => setDeliveryAddress(e.target.value)} placeholder="Full delivery address" />
               </div>
             </div>
+          </section>
+        </div>
+
+        {/* ── STICKY SIDEBAR (Order Summary) ── */}
+        <aside className="bb-sidebar">
+          <div className="bb-sticky-panel">
+            <h3 className="bb-sticky-title">Your Custom Box</h3>
+            
+            <div className="bb-sticky-section">
+              <div className="bb-sticky-row">
+                <span className="bb-label">Occasion</span>
+                <span className="bb-value">{occasion || '—'}</span>
+              </div>
+              <div className="bb-sticky-row">
+                <span className="bb-label">Box Size</span>
+                <span className="bb-value">{boxSize ? boxSize.title : '—'}</span>
+              </div>
+            </div>
+
+            <div className="bb-sticky-items">
+              <div className="bb-items-header">
+                <span className="bb-label">Items Selected</span>
+                <span className="bb-capacity">{totalItemsCount} / {boxSize ? boxSize.limit : MAX_ITEMS_GLOBAL}</span>
+              </div>
+              
+              {Object.entries(selectedItems).length === 0 ? (
+                <div className="bb-empty-items">No items added yet.</div>
+              ) : (
+                <div className="bb-item-list">
+                  {Object.entries(selectedItems).map(([id, qty]) => {
+                    const p = availableItems.find(prod => prod.id === parseInt(id));
+                    if (!p) return null;
+                    return (
+                      <div key={id} className="bb-item-row">
+                        <span className="bb-item-name">{qty}x {p.name}</span>
+                        <span className="bb-item-price">LKR {(p.price * qty).toLocaleString()}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="bb-sticky-totals">
+              <div className="bb-total-row">
+                <span>Items Subtotal</span>
+                <span>LKR {subtotal.toLocaleString()}</span>
+              </div>
+              <div className="bb-total-row">
+                <span>Box & Packaging Fee</span>
+                <span>LKR {boxSize ? boxSize.fee.toLocaleString() : '0'}</span>
+              </div>
+              <div className="bb-total-row bb-grand-total">
+                <span>Total</span>
+                <span>LKR {total.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <button 
+              className="bb-btn-submit" 
+              onClick={handlePlaceOrder}
+              disabled={submitting || !canPlaceOrder()}
+            >
+              {submitting ? 'Processing...' : 'Place Order 🎁'}
+            </button>
+            
+            {!canPlaceOrder() && (
+              <p className="bb-help-text">Complete all sections to enable checkout.</p>
+            )}
           </div>
-        )}
+        </aside>
       </div>
+
+      <Footer />
     </div>
   );
 };

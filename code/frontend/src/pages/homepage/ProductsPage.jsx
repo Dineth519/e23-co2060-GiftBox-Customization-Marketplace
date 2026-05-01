@@ -119,33 +119,35 @@ const ProductsPage = () => {
         </div>
       </div>
 
-      {/* ── Main content area ── */}
-      <div className="pp-sidebar-inner">
-        {/* Search */}
-        <div className="pp-sidebar-search">
-          <span className="pp-search-icon">🔍</span>
-          <input
-            type="text"
-            className="pp-search-input"
-            placeholder="Search gifts…"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && <button className="pp-search-clear" onClick={() => setSearchQuery('')}>✕</button>}
-        </div>
-      </div>
-
       {/* ── Products Area ── */}
       <div className="pp-content">
-        {/* Toolbar */}
+        
+        {/* ── Combined Toolbar (Search + Filters/Sort) ── */}
         <div className="pp-toolbar">
-          <button className="pp-filter-toggle" onClick={() => setSidebarOpen(s => !s)}>
-            ⚙ Filters {activeCategory !== 'All' && <span className="pp-filter-badge">1</span>}
-          </button>
+          
+          {/* Search Bar */}
+          <div className="pp-sidebar-search">
+            <span className="pp-search-icon">🔍</span>
+            <input
+              type="text"
+              className="pp-search-input"
+              placeholder="Search gifts…"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && <button className="pp-search-clear" onClick={() => setSearchQuery('')}>✕</button>}
+          </div>
+
+          {/* Toolbar Right */}
           <div className="pp-toolbar-right">
+            <button className="pp-filter-toggle" onClick={() => setSidebarOpen(s => !s)}>
+              ⚙ Filters {activeCategory !== 'All' && <span className="pp-filter-badge">1</span>}
+            </button>
+            
             <span className="pp-result-count">
               {loading ? '' : <><strong>{displayProducts.length}</strong> results</>}
             </span>
+            
             {/* Desktop sort quick-select */}
             <div className="pp-sort-quick">
               {SORT_OPTIONS.map(opt => (
@@ -155,6 +157,7 @@ const ProductsPage = () => {
               ))}
             </div>
           </div>
+
         </div>
 
         {/* Loading skeleton */}
