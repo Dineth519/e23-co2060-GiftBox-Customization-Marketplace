@@ -15,6 +15,7 @@ public class Product {
     @Column(name = "partner_id", nullable = false)
     private Integer partnerId;
 
+    @JsonProperty("categoryId")
     @Column(name = "category_id")
     private Integer categoryId;
 
