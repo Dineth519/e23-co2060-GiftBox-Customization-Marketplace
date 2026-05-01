@@ -247,6 +247,75 @@ Configure your MySQL connection in `backend/src/main/resources/application.prope
 
 ---
 
+## 🔌 API Endpoints
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login and receive JWT |
+| POST | `/api/auth/verify` | Verify email address |
+
+### Customer
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/customer/profile` | Get customer profile |
+| PUT | `/api/customer/profile` | Update profile |
+| GET | `/api/orders/customer` | Get all customer orders |
+| GET | `/api/orders/{id}` | Get single order detail |
+| POST | `/api/cart/add` | Add customized box to cart |
+
+### Products & Items
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/items` | Get all gift items |
+| GET | `/api/boxes/sizes` | Get available box sizes |
+
+### Seller
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/seller/items` | Get seller's listed items |
+| POST | `/api/seller/items` | Add new item |
+| PUT | `/api/seller/items/{id}` | Update item |
+| GET | `/api/seller/orders` | Get seller's orders |
+
+---
+
+## 🌿 Git Workflow
+
+```
+main          ← production releases only
+dev           ← integration branch (everyone merges here)
+feature/xxx   ← individual feature branches
+fix/xxx       ← bug fix branches
+```
+
+```bash
+# 1. Always pull latest dev before starting
+git checkout dev
+git pull origin dev
+
+# 2. Create your feature branch
+git checkout -b feature/your-feature-name
+
+# 3. Work and commit regularly
+git add .
+git commit -m "feat: describe what you did"
+
+# 4. Push and open Pull Request → target: dev
+git push origin feature/your-feature-name
+```
+
+| Commit Prefix | Use for |
+|---------------|---------|
+| `feat:` | New feature |
+| `fix:` | Bug fix |
+| `docs:` | Documentation change |
+| `merge:` | Resolving merge conflict |
+
+---
+
+---
 ## 🔗 Links
 
 - [Department of Computer Engineering](http://www.ce.pdn.ac.lk/)
