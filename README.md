@@ -97,7 +97,7 @@ A single customer order flows through:
 ---
 
 ## 📁 Project Structure
-
+```
 e23-co2060-GiftBox-Customization-Marketplace/
 ├── code/
 │   ├── backend/
@@ -209,7 +209,7 @@ e23-co2060-GiftBox-Customization-Marketplace/
 | Phase 5 | 23–28 | Testing, Optimization & Final Submission |
 
 **Final Deadline:** July 26, 2026
-
+```
 ---
 
 ## 🚀 Getting Started
