@@ -142,16 +142,32 @@ const Login = () => {
 
         if (data.success === true) {
           const userRole = data.role;
+          // FIXED — only saves token if it actually exists
           localStorage.setItem('userRole', userRole);
           localStorage.setItem('username', username);
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('userId', data.userId);
 
-          if (userRole === 'ADMIN') navigate('/admin');
-          else if (userRole === 'SELLER' || userRole === 'PARTNER') navigate('/seller');
-          else if (userRole === 'CUSTOMER') navigate('/home');
-          else if (userRole === 'ASSEMBLER') navigate('/assembler-dashboard');
-          else navigate('/');
+          // Only save token if backend actually sends one
+          if (data.token) {
+            localStorage.setItem('token', data.token);
+          }
+
+          // Only save userId if backend actually sends one  
+          if (data.userId) {
+            localStorage.setItem('userId', data.userId);
+          }
+
+          // Route user to appropriate dashboard based on role
+          if (userRole === 'ADMIN') {
+            navigate('/admin');
+          } else if (userRole === 'SELLER' || userRole === 'PARTNER') {
+            navigate('/seller');
+          } else if (userRole === 'CUSTOMER') {
+            navigate('/home');
+          } else if (userRole === 'ASSEMBLER') {
+            navigate('/assembler-dashboard');
+          } else {
+            navigate('/');
+          }
         } else {
           const errorMessage = data.message || 'Login failed. Please check your credentials.';
           setPassword('');
