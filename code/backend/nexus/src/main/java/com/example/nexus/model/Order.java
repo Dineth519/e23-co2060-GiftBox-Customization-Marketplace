@@ -4,42 +4,51 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import org.checkerframework.checker.units.qual.C;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "orders")
-@Data 
+@Data
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
+    @JsonProperty("order_id")
     private Integer orderId;
 
     @Column(name = "customer_id")
+    @JsonProperty("customer_id")
     private Integer customerId;
 
     @Column(name = "partner_id")
+    @JsonProperty("partner_id")
     private Integer partnerId;
 
     @Column(name = "assembler_id")
+    @JsonProperty("assembler_id")
     private Integer assemblerId;
 
     @Column(name = "status")
-    private String status; 
+    private String status;
+
     @Column(name = "delivery_address")
+    @JsonProperty("delivery_address")
     private String deliveryAddress;
 
     @Column(name = "special_notes")
+    @JsonProperty("special_notes")
     private String specialNotes;
 
     @Column(name = "total_amount")
+    @JsonProperty("total_amount")
     private BigDecimal totalAmount;
 
-    @Column(insertable = false, updatable = false)
+    @Column(name = "created_at", insertable = false, updatable = false)
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
-    @Column(insertable = false, updatable = false)
+    @Column(name = "updated_at", insertable = false, updatable = false)
+    @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 }

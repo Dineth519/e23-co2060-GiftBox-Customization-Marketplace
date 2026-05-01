@@ -34,3 +34,21 @@ INSERT INTO users (name, username, email, password, role, is_verified) VALUES
 -- 5. Customer Addresses
 UPDATE customers SET address = '123 Lotus Rd, Colombo' WHERE customer_id = 5;
 UPDATE customers SET address = '45 Kandy Rd, Kurunegala' WHERE customer_id = 6;
+
+-- 6. Consolidated Orders for Graphs (Weekly & Monthly Stats)
+INSERT INTO orders (customer_id, partner_id, status, total_amount, created_at, delivery_address) VALUES
+-- for the past week 
+(5, 2, 'DELIVERED', 4500.00,  DATE_SUB(NOW(), INTERVAL 6 DAY), 'Colombo'),
+(6, 2, 'DELIVERED', 12000.00, DATE_SUB(NOW(), INTERVAL 5 DAY), 'Kandy'),
+(7, 2, 'SHIPPED',   8500.00,  DATE_SUB(NOW(), INTERVAL 4 DAY), 'Galle'),
+(8, 2, 'DELIVERED', 15000.00, DATE_SUB(NOW(), INTERVAL 3 DAY), 'Jaffna'),
+(9, 2, 'CONFIRMED', 7200.00,  DATE_SUB(NOW(), INTERVAL 2 DAY), 'Negombo'), -- 'PROCESSING' වෙනුවට 'CONFIRMED'
+(5, 2, 'PENDING',   5400.00,  DATE_SUB(NOW(), INTERVAL 1 DAY), 'Matara'),
+(6, 2, 'DELIVERED', 9800.00,  CURDATE(), 'Colombo'),
+
+-- for the past month
+(7, 2, 'DELIVERED', 150000.00, '2025-12-15 10:00:00', 'Colombo'),
+(8, 2, 'DELIVERED', 185000.00, '2026-01-20 11:30:00', 'Kandy'),
+(9, 2, 'DELIVERED', 210000.00, '2026-02-10 09:15:00', 'Galle'),
+(5, 2, 'DELIVERED', 245000.00, '2026-03-05 14:20:00', 'Colombo'),
+(6, 2, 'DELIVERED', 310000.00, '2026-04-12 16:45:00', 'Kurunegala');
