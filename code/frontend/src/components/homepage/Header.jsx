@@ -82,8 +82,8 @@ const Header = () => {
             { label: 'Products',    route: '/products' },
             { label: 'How It Works', route: '/how-it-works'    },
             { label: 'About Us',       route: '/about-us'    },
-            { label: 'Build a Box', route: '/customize' },
-            { label: 'Vendors',     route: '/vendors'   },
+            { label: 'Build a Box', route: '/build-box' },
+            { label: 'Join as Vendor',     route: '/vendor-landing'   },
           ].map(item => (
             <button
               key={item.label}
@@ -132,7 +132,7 @@ const Header = () => {
                     📦 My Orders
                   </button>
 
-                  <button className="dropdown-item" onClick={() => goTo('/customize')}>
+                  <button className="dropdown-item" onClick={() => goTo('/build-box')}>
                     🎁 Build a Box
                   </button>
 
@@ -163,7 +163,7 @@ const Header = () => {
           {/* Gold "Start Building" button — always visible */}
           <button
             className="header-btn-gold"
-            onClick={() => navigate('/customize')}
+            onClick={() => navigate('/build-box')}
           >
             🎀 Start Building
           </button>
