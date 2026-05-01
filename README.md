@@ -2,8 +2,27 @@
 
 > A centralized multi-vendor platform where customers can browse items from multiple vendors, assemble customized gift boxes, and have them quality-checked, professionally packaged, and delivered — all through one seamless experience.
 
----
+![React](https://img.shields.io/badge/React-v18+-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-v3+-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-v8+-4479A1?style=flat-square&logo=mysql&logoColor=white)
+![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens)
+![Status](https://img.shields.io/badge/Status-In%20Development-F0C96A?style=flat-square)
 
+---
+## 📌 Table of Contents
+- [The Problem](#-the-problem)
+- [Our Solution](#-our-solution)
+- [Key Features](#-key-features)
+- [Tech Stack](#-technology-stack)
+- [System Architecture](#-system-architecture)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [API Endpoints](#-api-endpoints)
+- [Git Workflow](#-git-workflow)
+- [Project Timeline](#-project-timeline)
+- [Team](#-team)
+- [Links](#-links)
+  
 ## 👥 Team Nexus
 
 | Student ID | Name | Email |
@@ -64,7 +83,6 @@ Giftora introduces a **centralized assembly workflow**:
 | Database | MySQL (v8+) |
 | Authentication | JWT (JSON Web Tokens) |
 | Communication | RESTful APIs over HTTPS |
-| Containerization | Docker |
 | Version Control | Git / GitHub |
 
 ---
@@ -84,6 +102,108 @@ A single customer order flows through:
 
 ---
 
+## 📁 Project Structure
+```
+e23-co2060-GiftBox-Customization-Marketplace/
+├── code/
+│   ├── backend/
+│   │   └── nexus/
+│   │       ├── src/
+│   │       │   ├── main/
+│   │       │   │   ├── java/com/example/nexus/
+│   │       │   │   │   ├── config/
+│   │       │   │   │   │   └── SecurityConfig.java
+│   │       │   │   │   ├── controller/
+│   │       │   │   │   │   ├── AuthController.java
+│   │       │   │   │   │   ├── CartController.java
+│   │       │   │   │   │   ├── OrderController.java
+│   │       │   │   │   │   ├── PartnerController.java
+│   │       │   │   │   │   ├── ProductController.java
+│   │       │   │   │   │   ├── SellerDashboardController.java
+│   │       │   │   │   │   └── UserController.java
+│   │       │   │   │   ├── dto/
+│   │       │   │   │   ├── model/
+│   │       │   │   │   │   ├── CartItem.java
+│   │       │   │   │   │   ├── Order.java
+│   │       │   │   │   │   ├── Partner.java
+│   │       │   │   │   │   ├── Product.java
+│   │       │   │   │   │   ├── Role.java
+│   │       │   │   │   │   ├── SessionCartManager.java
+│   │       │   │   │   │   └── User.java
+│   │       │   │   │   ├── repository/
+│   │       │   │   │   │   ├── OrderRepository.java
+│   │       │   │   │   │   ├── PartnerRepository.java
+│   │       │   │   │   │   ├── ProductRepository.java
+│   │       │   │   │   │   └── UserRepository.java
+│   │       │   │   │   ├── service/
+│   │       │   │   │   └── NexusApplication.java
+│   │       │   │   └── resources/
+│   │       │   │       ├── application.properties
+│   │       │   │       ├── application-arch.properties
+│   │       │   │       └── application-windows.properties
+│   │       │   └── test/
+│   │       └── pom.xml
+│   ├── database/
+│   │   ├── data.sql
+│   │   ├── items.sql
+│   │   ├── schema.sql
+│   │   └── triggers.sql
+│   └── frontend/
+│       ├── public/
+│       │   ├── index.html
+│       │   └── logo.jpeg
+│       └── src/
+│           ├── assets/
+│           │   └── login/
+│           ├── components/
+│           │   ├── admin/
+│           │   ├── homepage/
+│           │   │   ├── CartBadge.jsx
+│           │   │   ├── Footer.jsx
+│           │   │   └── Header.jsx
+│           │   ├── seller/
+│           │   └── user/
+│           ├── context/
+│           ├── layouts/
+│           │   ├── AdminLayout.jsx
+│           │   ├── CustomerLayout.jsx
+│           │   └── SellerLayout.jsx
+│           └── pages/
+│               ├── admin/
+│               │   ├── Customers.jsx
+│               │   ├── Dashboard.jsx
+│               │   ├── Partners.jsx
+│               │   ├── PendingPartners.jsx
+│               │   ├── Settings.jsx
+│               │   └── StaffManagement.jsx
+│               ├── auth/
+│               │   ├── Login.jsx
+│               │   └── VendorRegistration.jsx
+│               ├── homepage/
+│               │   ├── AboutUsPage.jsx
+│               │   ├── CartPage.jsx
+│               │   ├── HomePage.jsx
+│               │   ├── HowItWorksPage.jsx
+│               │   ├── Products.jsx
+│               │   ├── ProductsPage.jsx
+│               │   └── VendorLanding.jsx
+│               ├── seller/
+│               │   ├── AddItems.jsx
+│               │   ├── MyItems.jsx
+│               │   ├── SellerDashboard.jsx
+│               │   └── Settings.jsx
+│               └── user/
+│                   ├── CustomerHome.jsx
+│                   ├── GiftCustomizer.jsx
+│                   ├── OrderDetail.jsx
+│                   ├── Orders.jsx
+│                   ├── Profile.jsx
+│                   └── Verify.jsx
+└── docs/
+    └── data/
+
+---
+
 ## 🗓️ Project Timeline
 
 | Phase | Weeks | Focus |
@@ -95,7 +215,7 @@ A single customer order flows through:
 | Phase 5 | 23–28 | Testing, Optimization & Final Submission |
 
 **Final Deadline:** July 26, 2026
-
+```
 ---
 
 ## 🚀 Getting Started
@@ -127,6 +247,75 @@ Configure your MySQL connection in `backend/src/main/resources/application.prope
 
 ---
 
+## 🔌 API Endpoints
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login and receive JWT |
+| POST | `/api/auth/verify` | Verify email address |
+
+### Customer
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/customer/profile` | Get customer profile |
+| PUT | `/api/customer/profile` | Update profile |
+| GET | `/api/orders/customer` | Get all customer orders |
+| GET | `/api/orders/{id}` | Get single order detail |
+| POST | `/api/cart/add` | Add customized box to cart |
+
+### Products & Items
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/items` | Get all gift items |
+| GET | `/api/boxes/sizes` | Get available box sizes |
+
+### Seller
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/seller/items` | Get seller's listed items |
+| POST | `/api/seller/items` | Add new item |
+| PUT | `/api/seller/items/{id}` | Update item |
+| GET | `/api/seller/orders` | Get seller's orders |
+
+---
+
+## 🌿 Git Workflow
+
+```
+main          ← production releases only
+dev           ← integration branch (everyone merges here)
+feature/xxx   ← individual feature branches
+fix/xxx       ← bug fix branches
+```
+
+```bash
+# 1. Always pull latest dev before starting
+git checkout dev
+git pull origin dev
+
+# 2. Create your feature branch
+git checkout -b feature/your-feature-name
+
+# 3. Work and commit regularly
+git add .
+git commit -m "feat: describe what you did"
+
+# 4. Push and open Pull Request → target: dev
+git push origin feature/your-feature-name
+```
+
+| Commit Prefix | Use for |
+|---------------|---------|
+| `feat:` | New feature |
+| `fix:` | Bug fix |
+| `docs:` | Documentation change |
+| `merge:` | Resolving merge conflict |
+
+---
+
+---
 ## 🔗 Links
 
 - [Department of Computer Engineering](http://www.ce.pdn.ac.lk/)

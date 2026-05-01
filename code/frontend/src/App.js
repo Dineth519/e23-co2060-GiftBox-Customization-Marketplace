@@ -14,6 +14,7 @@ import VendorLanding from './pages/homepage/VendorLanding.jsx';
 import GiftCustomizer from './pages/user/GiftCustomizer.jsx';
 import CustomerOrders from './pages/user/Orders.jsx';
 import OrderDetail from './pages/user/OrderDetail.jsx';
+import Profile from './pages/user/Profile.jsx';
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
@@ -88,6 +89,7 @@ function App() {
           <Route path="/customize" element={<LayoutWrapper><GiftCustomizer /></LayoutWrapper>} />
           <Route path="/orders" element={<LayoutWrapper><Orders /></LayoutWrapper>} />
           <Route path="/orders/:orderId" element={<LayoutWrapper><OrderDetail /></LayoutWrapper>} />
+          <Route path="/profile" element={<LayoutWrapper><Profile /></LayoutWrapper>} />
 
           {/* Seller routes */}
           <Route path="/seller/*" element={
