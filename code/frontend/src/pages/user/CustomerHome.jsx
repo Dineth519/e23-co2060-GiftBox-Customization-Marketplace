@@ -28,16 +28,6 @@ const CustomerHome = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Product categories for gift selection
-  const categories = [
-    { name: 'Birthday Bliss', emoji: '🎂', description: 'Celebrate with joy' },
-    { name: 'Romance', emoji: '💝', description: 'Express your love' },
-    { name: 'Corporate Gifts', emoji: '🎁', description: 'Professional excellence' },
-    { name: 'Celebrations', emoji: '🎉', description: 'Mark the moment' },
-    { name: 'Wellness', emoji: '🧘', description: 'Self-care treasures' },
-    { name: 'Gourmet', emoji: '🍫', description: 'Delicious delights' }
-  ];
-
   // Best-selling gift boxes with ratings and pricing
   const featuredBoxes = [
     {
@@ -83,14 +73,6 @@ const CustomerHome = () => {
       text: 'Perfect for our wedding favors! The team helped us create something truly unique for our guests.',
       rating: 5
     }
-  ];
-
-  // Verified partner vendors providing quality items
-  const vendors = [
-    { name: 'Sweet Delights', specialty: 'Artisan Chocolates', icon: '🍫' },
-    { name: 'Flower Paradise', specialty: 'Fresh Blooms', icon: '🌸' },
-    { name: 'Choco Heaven', specialty: 'Gourmet Treats', icon: '🎂' },
-    { name: 'Gift Gallery', specialty: 'Curated Items', icon: '🎨' }
   ];
 
   // Render complete customer home page with all sections
@@ -160,29 +142,6 @@ const CustomerHome = () => {
             <div className="card-emoji">🌸</div>
             <div className="card-shine"></div>
           </div>
-        </div>
-      </section>
-
-      {/* Categories section for browsing gifts by occasion */}
-      <section className="categories-section">
-        <div className="section-header">
-          <h2 className="section-title">Shop by Occasion</h2>
-          <p className="section-subtitle">Find the perfect gift for every moment</p>
-        </div>
-        <div className="categories-grid">
-          {categories.map((category, idx) => (
-            <div
-              className="category-card"
-              key={idx}
-              style={{ animationDelay: `${idx * 0.1}s` }}
-              onClick={() => navigate('/customize')}
-            >
-              <div className="category-emoji">{category.emoji}</div>
-              <h3 className="category-name">{category.name}</h3>
-              <p className="category-desc">{category.description}</p>
-              <div className="category-arrow">→</div>
-            </div>
-          ))}
         </div>
       </section>
 
@@ -295,30 +254,6 @@ const CustomerHome = () => {
                   <div className="author-name">{testimonial.name}</div>
                   <div className="author-role">{testimonial.role}</div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Trusted vendor partners providing quality items for gift boxes */}
-      <section className="vendors-section">
-        <div className="section-header">
-          <h2 className="section-title">Our Trusted Partners</h2>
-          <p className="section-subtitle">Collaborating with the finest artisans</p>
-        </div>
-        <div className="vendors-grid">
-          {vendors.map((vendor, idx) => (
-            <div 
-              className="vendor-card"
-              key={idx}
-              style={{ animationDelay: `${idx * 0.1}s` }}
-            >
-              <div className="vendor-icon">{vendor.icon}</div>
-              <h3 className="vendor-name">{vendor.name}</h3>
-              <p className="vendor-specialty">{vendor.specialty}</p>
-              <div className="vendor-badge">
-                <FaShieldAlt /> Verified
               </div>
             </div>
           ))}
