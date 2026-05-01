@@ -2,6 +2,12 @@
 
 > A centralized multi-vendor platform where customers can browse items from multiple vendors, assemble customized gift boxes, and have them quality-checked, professionally packaged, and delivered — all through one seamless experience.
 
+![React](https://img.shields.io/badge/React-v18+-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-v3+-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-v8+-4479A1?style=flat-square&logo=mysql&logoColor=white)
+![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens)
+![Status](https://img.shields.io/badge/Status-In%20Development-F0C96A?style=flat-square)
+
 ---
 ## 📌 Table of Contents
 - [The Problem](#-the-problem)
