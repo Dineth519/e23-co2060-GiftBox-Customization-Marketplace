@@ -1,0 +1,35 @@
+/* ============================================================
+   VendorLanding.css
+   Small theme overrides on top of HomePage.css
+   Giftora: Light Blue + Gold + White
+   ============================================================ */
+
+/* ── Hero centered layout ── */
+.vl-hero-content {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Benefits grid responsive ── */
+.vl-benefits-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+  margin-top: 40px;
+}
+
+/* ── Override hero background for vendor page ── */
+.vl-hero.hero {
+  background: linear-gradient(160deg, #0d1b2e 0%, #141522 60%, #0a1628 100%);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .vl-benefits-grid {
+    grid-template-columns: 1fr;
+  }
+}

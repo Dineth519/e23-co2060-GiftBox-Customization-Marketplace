@@ -6,8 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/homepage/Header';
 import Footer from '../../components/homepage/Footer';
 
-// We can reuse the exact same CSS file as the homepage to keep the theme identical!
-import './HomePage.css'; 
+// Reuse the homepage CSS for shared components
+import './HomePage.css';
+import './VendorLanding.css';
 
 // ─── Data for Vendors ────────────────────────────────────────────────────────
 
@@ -25,9 +26,9 @@ const VENDOR_STEPS = [
 ];
 
 const VENDOR_TESTIMONIALS = [
-  { name: 'Sarah L.',       shop: 'Sweet Delights', quote: 'Joining Giftora changed our bakery. We went from 10 orders a week to 50+ just from people adding our brownies to custom gift boxes!', stars: 5, initial: 'S' },
-  { name: 'Malik F.',       shop: 'Glow Candles',   quote: 'The fact that I don’t have to worry about the final luxury packaging or island-wide delivery is a lifesaver. Highly recommended.', stars: 5, initial: 'M' },
-  { name: 'Nethmi de Silva',shop: 'Blossom Co.',    quote: 'The dashboard is so easy to use. I can track my inventory and see exactly what is trending right now.', stars: 5, initial: 'N' },
+  { name: 'Sarah L.',        shop: 'Sweet Delights', quote: 'Joining Giftora changed our bakery. We went from 10 orders a week to 50+ just from people adding our brownies to custom gift boxes!', stars: 5, initial: 'S' },
+  { name: 'Malik F.',        shop: 'Glow Candles',   quote: "The fact that I don't have to worry about the final luxury packaging or island-wide delivery is a lifesaver. Highly recommended.", stars: 5, initial: 'M' },
+  { name: 'Nethmi de Silva', shop: 'Blossom Co.',    quote: 'The dashboard is so easy to use. I can track my inventory and see exactly what is trending right now.', stars: 5, initial: 'N' },
 ];
 
 const VENDOR_STATS = [
@@ -37,17 +38,16 @@ const VENDOR_STATS = [
 ];
 
 const VALUE_STATS = [
-  { num: 10000, suffix: '+', label: 'Active Customers', desc: 'Looking for the perfect gift daily', icon: '🛍️' },
-  { num: 30,    suffix: '%', label: 'Avg. Sales Boost', desc: 'Growth seen by our top vendors', icon: '📈' },
-  { num: 0,     suffix: '',  label: 'Listing Fees',     desc: 'Start selling with zero upfront risk', icon: '🛡️' },
+  { num: 10000, suffix: '+', label: 'Active Customers', desc: 'Looking for the perfect gift daily',   icon: '🛍️' },
+  { num: 30,    suffix: '%', label: 'Avg. Sales Boost',  desc: 'Growth seen by our top vendors',       icon: '📈' },
+  { num: 0,     suffix: '',  label: 'Listing Fees',      desc: 'Start selling with zero upfront risk', icon: '🛡️' },
 ];
 
-// ─── Scroll-reveal hook (Reused from HomePage) ────────────────────────────────
+// ─── Hooks ────────────────────────────────────────────────────────────────────
 
 function useReveal(threshold = 0.15) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -58,11 +58,9 @@ function useReveal(threshold = 0.15) {
     obs.observe(el);
     return () => obs.disconnect();
   }, [threshold]);
-
   return [ref, visible];
 }
 
-// ─── Animated counter hook (Reused from HomePage) ─────────────────────────────
 function useCountUp(target, duration = 2000, start = false) {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -90,26 +88,23 @@ const StatCounter = ({ num, suffix, start }) => {
 const VendorHero = () => {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
-
   useEffect(() => { setTimeout(() => setMounted(true), 80); }, []);
 
   return (
-    <section className="hero">
-      {/* Reusing the orb aesthetic, no video needed here */}
+    <section className="hero vl-hero">
       <div className="hero-orb hero-orb--gold hero-orb--prominent" />
       <div className="hero-orb hero-orb--blue hero-orb--prominent" />
       <div className="hero-orb hero-orb--mid" />
       <div className="hero-grain" />
 
       <div className={`hero__inner ${mounted ? 'hero--mounted' : ''}`}>
-        <div className="hero__content" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          
+        <div className="hero__content vl-hero-content">
           <div className="hero__eyebrow" style={{ justifyContent: 'center' }}>
             <span className="eyebrow-dot" />
             <span>Partner With Giftora</span>
           </div>
 
-          <h1 className="hero__title" style={{ fontSize: '3.5rem' }}>
+          <h1 className="hero__title" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
             Grow Your Brand.<br />
             <span className="hero__title-accent">Zero Hassle.</span>
           </h1>
@@ -148,8 +143,7 @@ const VendorBenefits = () => {
       <div className="section-inner">
         <div className="section-label center">Benefits</div>
         <h2 className="section-title center">Why Sell on Giftora?</h2>
-        
-        <div className="how-it-works__steps" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', marginTop: '40px' }}>
+        <div className="how-it-works__steps vl-benefits-grid">
           {VENDOR_FEATURES.map((f, i) => (
             <div key={i} className="step-card" style={{ animationDelay: `${i * 0.13}s`, textAlign: 'center', width: '100%' }}>
               <div className="step-card__icon" style={{ margin: '0 auto' }}>{f.icon}</div>
@@ -170,7 +164,6 @@ const VendorHowItWorks = () => {
       <div className="section-inner">
         <div className="section-label center">Process</div>
         <h2 className="section-title center">How Becoming a Partner Works</h2>
-
         <div className="how-it-works__steps">
           {VENDOR_STEPS.map((step, i) => (
             <React.Fragment key={i}>
@@ -197,7 +190,6 @@ const VendorStats = () => {
       <div className="section-inner">
         <div className="section-label center">By The Numbers</div>
         <h2 className="section-title center">Your Business, Scaled</h2>
-
         <div className="why-giftora__grid">
           {VALUE_STATS.map((s, i) => (
             <div key={i} className="why-card" style={{ animationDelay: `${i * 0.15}s` }}>
@@ -224,7 +216,6 @@ const VendorTestimonials = () => {
       <div className="section-inner">
         <div className="section-label center">Success Stories</div>
         <h2 className="section-title center">Hear From Our Partners</h2>
-
         <div className="testimonials__grid">
           {VENDOR_TESTIMONIALS.map((t, i) => (
             <div key={i} className="testimonial-card" style={{ animationDelay: `${i * 0.1}s` }}>

@@ -1,26 +1,38 @@
 /* ==========================================================================
-   Login and Authentication Page Styles
+   Login and Authentication Page Styles - Giftora Soft Light Theme
+   Light Blue Background + Giftora Yellow Accents
    ========================================================================== */
 
-/* Hide the default browser eye icon for password fields (Edge/IE) */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* Hide the default browser eye icon for password fields */
 input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
-  display: none;
-}
+input[type="password"]::-ms-clear { display: none; }
+input::-webkit-credentials-auto-fill-button { visibility: hidden; }
 
-/* Smooth Page Opening Animation */
+/* ── Animations ── */
 @keyframes smoothPopIn {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  0%   { opacity: 0; transform: translateY(24px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes logoSlideIn {
+  0%   { opacity: 0; transform: translateX(-16px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-24px) scale(1.04); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
-/* Main page container with gradient background */
+/* ── Page Background ── */
 .login-page {
   display: flex;
   flex-direction: column;
@@ -28,11 +40,41 @@ input[type="password"]::-ms-clear {
   justify-content: center;
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 40%, #f59e0b 100%);
+  /* Softer, richer light blue gradient to reduce glare */
+  background: linear-gradient(160deg, #d8eaf7 0%, #b8d8f2 50%, #9dc7e8 100%);
   position: relative;
+  padding: 80px 16px 32px;
+  box-sizing: border-box;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
 }
 
-/* Logo positioning at top left of page */
+/* ── Decorative background orbs ── */
+.login-page::before {
+  content: '';
+  position: fixed;
+  top: -140px; right: -120px;
+  width: 480px; height: 480px;
+  /* Deepened the blue orb slightly for better contrast */
+  background: radial-gradient(circle, rgba(26, 143, 209, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  animation: orbFloat 9s ease-in-out infinite;
+}
+.login-page::after {
+  content: '';
+  position: fixed;
+  bottom: -100px; left: -80px;
+  width: 380px; height: 380px;
+  /* Stronger Giftora yellow orb */
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.35) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  animation: orbFloat 11s ease-in-out infinite reverse;
+}
+
+/* ── Logo ── */
 .login-logo {
   position: absolute;
   left: 20px;
@@ -40,55 +82,50 @@ input[type="password"]::-ms-clear {
   width: 112px;
   cursor: pointer;
   transition: transform 0.3s ease;
+  animation: logoSlideIn 0.5s ease-out 0.1s both;
+  z-index: 10;
 }
-
-.login-logo:hover {
-  transform: scale(1.05);
-}
+.login-logo:hover { transform: scale(1.05); }
 
 @media (min-width: 640px) {
-  .login-logo {
-    left: 80px;
-    width: 128px;
-  }
+  .login-logo { left: 80px; width: 128px; }
 }
 
-/* ==========================================================================
-   3D Flip Card Container & Grid Setup
-   ========================================================================== */
-
-/* 3D flip card container with perspective */
+/* ── Card wrapper ── */
 .login-card-wrapper {
   width: 100%;
-  max-width: 384px;
+  max-width: 400px;
   perspective: 1000px;
-  /* Apply the smooth opening animation here */
-  animation: smoothPopIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: smoothPopIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+  position: relative;
+  z-index: 1;
 }
 
-/* Inner container using CSS Grid to fix the absolute positioning collapse */
+/* ── Flip inner ── */
 .login-card-inner {
   position: relative;
   width: 100%;
   transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
   transform-style: preserve-3d;
-  display: grid; 
+  display: grid;
 }
+.login-card-inner.flipped { transform: rotateY(180deg); }
 
-.login-card-inner.flipped {
-  transform: rotateY(180deg);
-}
-
-/* Shared styles for both login and signup card faces */
+/* ── Card faces (The Island) ── */
 .login-card-front,
 .login-card-back {
-  grid-area: 1 / 1 / 2 / 2; /* Both cards sit in the exact same grid cell */
-  height: 100%; /* Makes both faces match the height of the tallest one */
-  background-color: #171717;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  grid-area: 1 / 1 / 2 / 2;
+  height: 100%;
+  /* Warm off-white/cream instead of harsh pure white */
+  background: rgba(255, 254, 250, 0.95);
+  backdrop-filter: blur(20px);
+  /* Giftora yellow border */
+  border: 1px solid rgba(201, 168, 76, 0.6); 
   padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(217, 119, 6, 0.3);
+  border-radius: 20px;
+  /* Soft blue-tinted shadow */
+  box-shadow: 0 12px 40px rgba(26, 143, 209, 0.15), 
+              0 1px 0 rgba(255, 255, 255, 0.8) inset;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -96,63 +133,55 @@ input[type="password"]::-ms-clear {
   backface-visibility: hidden;
   overflow-y: auto;
 }
+.login-card-back { transform: rotateY(180deg); }
 
-.login-card-back {
-  transform: rotateY(180deg);
-}
-
-/* ==========================================================================
-   Typography & Content
-   ========================================================================== */
-
+/* ── Headings ── */
 .login-card-front h2,
 .login-card-back h2 {
-  font-size: 30px;
-  font-weight: 600;
-  color: white;
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0d1b2e; /* Dark Navy for contrast */
   text-align: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .login-card-front p.login-sub,
 .login-card-back p.login-sub {
   text-align: center;
-  color: rgba(253, 230, 138, 0.7);
+  color: #4a627a; /* Medium blue-gray */
   font-size: 14px;
   margin-bottom: 24px;
 }
 
-/* ==========================================================================
-   Form Inputs & Buttons
-   ========================================================================== */
-
-/* Input field row with icon and text input */
+/* ── Input rows ── */
 .login-input-row {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 20px;
-  border-radius: 9999px;
-  background-color: #262626;
-  margin-bottom: 16px;
-  border: 1px solid transparent;
-  transition: border 0.2s, box-shadow 0.2s;
+  padding: 11px 18px;
+  border-radius: 12px;
+  /* Very soft blue tint for inputs */
+  background: #eef5fb; 
+  margin-bottom: 14px;
+  border: 1.5px solid #d1e3f2;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  box-sizing: border-box;
 }
-
-.login-card-back .login-input-row {
-  margin-bottom: 12px;
-}
+.login-card-back .login-input-row { margin-bottom: 10px; }
 
 .login-input-row:focus-within {
-  border-color: #f59e0b;
-  box-shadow: 0 0 0 1px #f59e0b;
+  /* Giftora Yellow focus state */
+  border-color: #c9a84c;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
 }
 
 .login-input-row img {
-  width: 20px;
-  height: 20px;
+  width: 18px; height: 18px;
   flex-shrink: 0;
+  filter: brightness(0) opacity(0.4); 
 }
 
 .login-input-row input {
@@ -160,267 +189,163 @@ input[type="password"]::-ms-clear {
   outline: none;
   border: none;
   width: 100%;
-  color: white;
+  color: #0d1b2e; 
   font-size: 14px;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
 }
+.login-input-row input::placeholder { color: #8ba3b8; }
+.login-input-row input:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.login-input-row input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.login-input-row input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Password visibility toggle button */
+/* ── Eye button ── */
 .login-eye-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  outline: none;
-  display: flex;
-  align-items: center;
-  transition: opacity 0.2s;
+  background: none; border: none; padding: 0;
+  cursor: pointer; outline: none;
+  display: flex; align-items: center;
+  flex-shrink: 0; transition: opacity 0.2s;
 }
-
 .login-eye-btn img {
-  width: 20px;
-  opacity: 0.6;
-  filter: invert(1);
+  width: 18px;
+  filter: brightness(0) opacity(0.4);
   transition: opacity 0.2s;
 }
+.login-eye-btn:hover:not(:disabled) img { opacity: 0.8; }
+.login-eye-btn:disabled { opacity: 0.2; cursor: not-allowed; }
 
-.login-eye-btn:hover:not(:disabled) img {
-  opacity: 1;
-}
-
-.login-eye-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Submit button for login and signup forms */
+/* ── Submit button ── */
 .login-submit-btn {
   width: 100%;
-  padding: 10px 0;
-  border-radius: 9999px;
-  background: linear-gradient(to right, #92400e, #ca8a04);
-  color: white;
-  font-weight: 500;
+  padding: 12px 0;
+  border-radius: 12px;
+  /* Giftora Yellow Button */
+  background: linear-gradient(135deg, #f4c970, #c9a84c);
+  color: #0d1b2e; /* Dark navy text for contrast on yellow */
+  font-weight: 700;
   font-size: 15px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(201, 168, 76, 0.4);
   transition: all 0.2s ease;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 }
-
 .login-submit-btn:hover:not(:disabled) {
-  background: linear-gradient(to right, #b45309, #eab308);
-  transform: scale(1.05);
+  background: linear-gradient(135deg, #fce196, #d4b55b);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(201, 168, 76, 0.5);
 }
+.login-submit-btn:active:not(:disabled) { transform: translateY(0); }
+.login-submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-.login-submit-btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.login-submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* Forgot password link */
+/* ── Forgot password ── */
 .login-forgot {
-  font-size: 14px;
-  color: #f59e0b;
+  font-size: 13px;
+  color: #1a8fd1; /* Blue link */
   cursor: pointer;
-  margin-bottom: 16px;
-  margin-left: 8px;
+  margin-bottom: 14px;
+  margin-left: 4px;
   width: fit-content;
   transition: color 0.2s;
+  font-weight: 600;
 }
+.login-forgot:hover { color: #0e6fa8; }
 
-.login-forgot:hover {
-  color: #fcd34d;
-}
-
-/* Form toggle link to switch between login and signup */
+/* ── Toggle text ── */
 .login-toggle-text {
   text-align: center;
-  margin-top: 16px;
-  color: #737373;
+  margin-top: 18px;
+  color: #4a627a;
   font-size: 14px;
 }
-
 .login-toggle-link {
-  color: #fbbf24;
+  color: #b89020; /* Giftora Yellow link */
   cursor: pointer;
   text-decoration: underline;
+  font-weight: 700;
   transition: color 0.2s;
 }
+.login-toggle-link:hover { color: #8e6f18; }
 
-.login-toggle-link:hover {
-  color: #fde68a;
-}
-
-/* ==========================================================================
-   Errors & Loading States
-   ========================================================================== */
-
-/* Error message styling */
+/* ── Errors ── */
 .login-error {
   font-size: 12px;
   color: #ef4444;
-  margin-top: -12px;
-  margin-bottom: 12px;
-  margin-left: 8px;
+  margin-top: -8px;
+  margin-bottom: 10px;
+  margin-left: 4px;
   display: flex;
   align-items: center;
   gap: 4px;
   animation: slideDown 0.2s ease-out;
 }
-
 .login-general-error {
-  background-color: rgba(239, 68, 68, 0.15);
+  background: #fef2f2;
   color: #ef4444;
-  padding: 10px 12px;
-  border-radius: 6px;
-  margin: 0 0 16px 0;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin: 0 0 14px 0;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  font-size: 13px;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ── Spinner ── */
+.spinner-icon { animation: spin 1s linear infinite; }
 
-/* Loading spinner animation */
-.spinner-icon {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* ==========================================================================
-   Password Strength & Requirements
-   ========================================================================== */
-
+/* ── Password strength ── */
 .password-strength {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 6px 0 4px 0;
+  margin: -2px 0 8px 0;
 }
-
-.strength-bars {
-  display: flex;
-  gap: 5px;
-  flex: 1;
-}
-
+.strength-bars { display: flex; gap: 5px; flex: 1; }
 .strength-bar {
-  height: 5px;
-  flex: 1;
-  border-radius: 3px;
-  background-color: #444;
+  height: 4px; flex: 1; border-radius: 3px;
+  background-color: #d1e3f2;
   transition: background-color 0.3s ease;
 }
-
 .strength-label {
-  font-size: 12px;
-  font-weight: 600;
-  min-width: 50px;
-  text-align: right;
+  font-size: 11px; font-weight: 600;
+  min-width: 48px; text-align: right;
+  color: #4a627a;
 }
 
+/* ── Requirements checklist ── */
 .password-requirements {
-  list-style: none;
-  padding: 0;
-  margin: 4px 0 8px 0;
+  list-style: none; padding: 0;
+  margin: 0 0 8px 2px;
 }
-
 .password-requirements li {
   font-size: 11px;
   transition: color 0.3s ease;
   padding: 1px 0;
+  color: #4a627a;
 }
 
 /* ==========================================================================
-   Responsive Design
+   Responsive
    ========================================================================== */
-
 @media (max-width: 768px) {
-  .login-card-wrapper {
-    max-width: 90%;
-  }
-
-  .login-card-front,
-  .login-card-back {
-    padding: 32px 24px;
-  }
-
-  .login-card-front h2,
-  .login-card-back h2 {
-    font-size: 26px;
-  }
+  .login-card-wrapper { max-width: 90%; }
+  .login-card-front, .login-card-back { padding: 32px 24px; }
+  .login-card-front h2, .login-card-back h2 { font-size: 24px; }
 }
 
 @media (max-width: 480px) {
-  /* Ensure the page has padding so the card doesn't hit the screen edges vertically */
-  .login-page {
-    padding: 80px 0 20px 0; 
-  }
+  .login-page { padding: 72px 12px 24px; justify-content: flex-start; padding-top: 80px; }
+  .login-logo { width: 90px; left: 12px; top: 14px; }
+  .login-card-wrapper { max-width: calc(100% - 24px); margin: 0 12px; }
+  .login-card-front, .login-card-back { padding: 28px 18px; border-radius: 14px; }
+  .login-card-front h2, .login-card-back h2 { font-size: 22px; }
+  .login-card-front p.login-sub, .login-card-back p.login-sub { font-size: 13px; }
+  .login-input-row { padding: 10px 14px; margin-bottom: 10px; }
+  .login-submit-btn { padding: 10px 0; font-size: 14px; }
+  .password-requirements li { font-size: 10px; }
+}
 
-  .login-logo {
-    width: 96px;
-    left: 12px;
-    top: 12px;
-  }
-
-  .login-card-wrapper {
-    max-width: calc(100% - 24px);
-    margin: 0 12px;
-  }
-
-  .login-card-front,
-  .login-card-back {
-    padding: 28px 20px;
-    border-radius: 10px;
-  }
-
-  .login-card-front h2,
-  .login-card-back h2 {
-    font-size: 22px;
-  }
-
-  .login-card-front p.login-sub,
-  .login-card-back p.login-sub {
-    font-size: 13px;
-  }
-
-  .login-input-row {
-    padding: 10px 16px;
-    margin-bottom: 12px;
-  }
-
-  .login-submit-btn {
-    padding: 9px 0;
-    font-size: 14px;
-  }
+@media (max-width: 360px) {
+  .login-card-front, .login-card-back { padding: 22px 14px; }
+  .login-card-front h2, .login-card-back h2 { font-size: 20px; }
 }
