@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { FaArrowLeft, FaPlus, FaUpload, FaBoxOpen, FaDollarSign, FaImage } from 'react-icons/fa';
 import './AddItems.css';
 
@@ -63,6 +64,7 @@ const AddItems = () => {
       id: Date.now() + Math.random(),
       name: f.name,
       url: URL.createObjectURL(f),
+      file: f
     }));
     setImages(prev => [...prev, ...newImgs].slice(0, 5));
   };
@@ -70,20 +72,60 @@ const AddItems = () => {
   const removeImage = (id) => setImages(prev => prev.filter(i => i.id !== id));
 
   // ── Submit ──
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name || !form.category || !form.price || !form.stock) {
       alert('Please fill in all required fields.');
       return;
     }
-    // Payload includes is_active boolean directly
-    const payload = { ...form, is_active: form.is_active };
-    console.log('Submitting:', payload);
 
     setSubmitted(true);
-    setTimeout(() => {
+
+    try {
+      let uploadedImageUrl = '';
+
+      // 1. පින්තූරයක් තියෙනවා නම් මුලින්ම Cloudinary එකට Upload කිරීම
+      if (images.length > 0) {
+        const formData = new FormData();
+        formData.append('file', images[0].file); // Main image එක පමණක් යවමු
+        formData.append('upload_preset', 'giftora_items'); // Cloudinary Preset එක දෙන්න
+        formData.append('cloud_name', 'dju3eqysw'); // ඔයාගේ Cloudinary Name එක
+
+        const cloudinaryRes = await axios.post(
+          'https://api.cloudinary.com/v1_1/dju3eqysw/image/upload',
+          formData
+        );
+        uploadedImageUrl = cloudinaryRes.data.secure_url; // Upload වුණු පින්තූරයේ URL එක
+      }
+
+      // 2. Spring Boot Backend එකට යවන Payload එක හැදීම
+      const payload = {
+        name: form.name,
+        description: form.description,
+        price: Number(form.price),
+        discountPrice: form.discountPrice ? Number(form.discountPrice) : null,
+        stockQuantity: parseInt(form.stock, 10),
+        sku: form.sku ? form.sku : null,
+        isActive: form.is_active ? 1 : 0, // Boolean එක 1 හෝ 0 බවට පත් කිරීම
+        imageUrl: uploadedImageUrl || 'https://via.placeholder.com/220x150?text=No+Image', // පින්තූරයක් නැත්නම් Default එකක්
+        categoryId: 1 // දැනට 1 ලෙස යවමු. පසුව මෙය Category Dropdown එකේ ID එකට සම්බන්ධ කරන්න.
+      };
+
+      const SELLER_ID = 2; // දැනට Gift World ගේ ID එක 
+
+      // 3. Spring Boot API එකට POST Request එක යැවීම
+      await axios.post(`http://localhost:8080/api/sellers/${SELLER_ID}/products`, payload);
+
+      // සාර්ථක වුණාම My Items පිටුවට යැවීම
+      setTimeout(() => {
+        setSubmitted(false);
+        navigate('/seller/my-items');
+      }, 1000);
+
+    } catch (error) {
+      console.error('Error saving item:', error);
+      alert('Failed to save the item. Please try again.');
       setSubmitted(false);
-      navigate('/seller/my-items');
-    }, 2000);
+    }
   };
 
   return (

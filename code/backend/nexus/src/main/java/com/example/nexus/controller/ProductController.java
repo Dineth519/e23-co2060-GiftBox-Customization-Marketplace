@@ -1,12 +1,14 @@
 package com.example.nexus.controller;
 
 import com.example.nexus.dto.ProductDTO;
+import com.example.nexus.model.Product;
 import com.example.nexus.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/sellers")
@@ -46,5 +48,37 @@ public class ProductController {
                 
                 return dto;
             }).collect(Collectors.toList());
+    }
+
+    @PostMapping("/{sellerId}/products")
+    public Product addProduct(@PathVariable Integer sellerId, @RequestBody Product product) {
+        
+        product.setPartnerId(sellerId);
+        
+        return productRepository.save(product);
+    } 
+
+    @PutMapping("/products/{id}")
+    public org.springframework.http.ResponseEntity<?> updateProduct(@PathVariable Integer id, @RequestBody Product updatedProduct) {
+        return productRepository.findById(id).map(product -> {
+            
+            if(updatedProduct.getName() != null) product.setName(updatedProduct.getName());
+            if(updatedProduct.getPrice() != null) product.setPrice(updatedProduct.getPrice());
+            if(updatedProduct.getStockQuantity() != null) product.setStockQuantity(updatedProduct.getStockQuantity());
+            if(updatedProduct.getIsActive() != null) product.setIsActive(updatedProduct.getIsActive());
+            
+            productRepository.save(product);
+            return org.springframework.http.ResponseEntity.ok().body("Product updated successfully");
+            
+        }).orElse(org.springframework.http.ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/products/{id}")
+    public org.springframework.http.ResponseEntity<?> deleteProduct(@PathVariable Integer id) {
+        if (!productRepository.existsById(id)) {
+            return org.springframework.http.ResponseEntity.notFound().build();
+        }
+        productRepository.deleteById(id);
+        return org.springframework.http.ResponseEntity.ok().body("Product deleted successfully");
     }
 }

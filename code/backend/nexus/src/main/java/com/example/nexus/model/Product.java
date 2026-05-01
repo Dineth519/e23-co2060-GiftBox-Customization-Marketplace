@@ -26,9 +26,11 @@ public class Product {
     @Column(nullable = false)
     private BigDecimal price;
 
+    @JsonProperty("discountPrice")
     @Column(name = "discount_price")
     private BigDecimal discountPrice;
 
+    @JsonProperty("stockQuantity")
     @Column(name = "stock_quantity")
     private Integer stockQuantity;
 
@@ -39,6 +41,7 @@ public class Product {
     @Column(name = "image_url", nullable = false, length = 500)
     private String imageUrl;
 
+    @JsonProperty("isActive")
     @Column(name = "is_active")
     private Integer isActive; // 1 = Active, 0 = Inactive
 
@@ -59,11 +62,20 @@ public class Product {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
 
+    public BigDecimal getDiscountPrice() { return discountPrice; }
+    public void setDiscountPrice(BigDecimal discountPrice) { this.discountPrice = discountPrice; }
+
     public Integer getStockQuantity() { return stockQuantity; }
     public void setStockQuantity(Integer stockQuantity) { this.stockQuantity = stockQuantity; }
+
+    public String getSku() { return sku; }
+    public void setSku(String sku) { this.sku = sku; }
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
