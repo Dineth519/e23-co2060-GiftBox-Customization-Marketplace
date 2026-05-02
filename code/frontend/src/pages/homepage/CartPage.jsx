@@ -1,3 +1,8 @@
+// pages/homepage/CartPage.jsx
+// Public cart — used by landing page visitors (not logged in)
+// Uses homepage Header (transparent → solid on scroll) + Footer
+// Route: /cart
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
@@ -7,20 +12,9 @@ import './CartPage.css';
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const {
-    cartItems,
-    cartTotal,
-    itemCount,
-    removeItem,
-    updateQty,
-    clearCart,
-    loadCart,
-  } = useCart();
+  const { cartItems, cartTotal, itemCount, removeItem, updateQty, clearCart, loadCart } = useCart();
 
-  // scrolled=false → header transparent (white text on navy hero)
-  // scrolled=true  → header solid navy (after scrolling past hero)
   const [scrolled, setScrolled] = useState(false);
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll);
@@ -29,7 +23,6 @@ const CartPage = () => {
 
   useEffect(() => { loadCart(); }, []);
 
-  // ── Empty State ──────────────────────────────────────────────
   if (cartItems.length === 0) {
     return (
       <div className="cart-page">
@@ -39,13 +32,8 @@ const CartPage = () => {
             <div className="cart-empty">
               <div className="cart-empty__icon">🛒</div>
               <h2 className="cart-empty__title">Your cart is empty</h2>
-              <p className="cart-empty__desc">
-                Browse our collection and add something special
-              </p>
-              <button
-                className="cart-empty__btn"
-                onClick={() => navigate('/products')}
-              >
+              <p className="cart-empty__desc">Browse our collection and add something special</p>
+              <button className="cart-empty__btn" onClick={() => navigate('/products')}>
                 Browse Gifts →
               </button>
             </div>
@@ -58,10 +46,8 @@ const CartPage = () => {
   return (
     <div className="cart-page">
       <Header scrolled={scrolled} />
-
       <main className="cart-main">
 
-        {/* Hero — navy starts from very top, padding-top covers header */}
         <div className="cart-hero">
           <div className="cart-hero__orb cart-hero__orb--1" />
           <div className="cart-hero__orb cart-hero__orb--2" />
@@ -73,24 +59,13 @@ const CartPage = () => {
         </div>
 
         <div className="cart-body">
-
-          {/* Items List */}
           <div className="cart-items">
-
             <div className="cart-items__header">
-              <span>Product</span>
-              <span>Price</span>
-              <span>Quantity</span>
-              <span>Subtotal</span>
-              <span></span>
+              <span>Product</span><span>Price</span><span>Quantity</span><span>Subtotal</span><span></span>
             </div>
 
             {cartItems.map((item, i) => (
-              <div
-                key={item.productId}
-                className="cart-item"
-                style={{ animationDelay: `${i * 0.06}s` }}
-              >
+              <div key={item.productId} className="cart-item" style={{ animationDelay: `${i * 0.06}s` }}>
                 <div className="cart-item__product">
                   <div className="cart-item__img-wrap">
                     <img src={item.imageUrl} alt={item.name} className="cart-item__img" />
@@ -100,26 +75,14 @@ const CartPage = () => {
                     <div className="cart-item__vendor">Giftora Exclusive</div>
                   </div>
                 </div>
-
-                <div className="cart-item__price">
-                  LKR {Number(item.price).toLocaleString()}
-                </div>
-
+                <div className="cart-item__price">LKR {Number(item.price).toLocaleString()}</div>
                 <div className="cart-item__qty">
                   <button className="qty-btn" onClick={() => updateQty(item.productId, item.quantity - 1)}>−</button>
                   <span className="qty-value">{item.quantity}</span>
                   <button className="qty-btn" onClick={() => updateQty(item.productId, item.quantity + 1)}>+</button>
                 </div>
-
-                <div className="cart-item__subtotal">
-                  LKR {Number(item.price * item.quantity).toLocaleString()}
-                </div>
-
-                <button
-                  className="cart-item__remove"
-                  onClick={() => removeItem(item.productId)}
-                  title="Remove item"
-                >✕</button>
+                <div className="cart-item__subtotal">LKR {Number(item.price * item.quantity).toLocaleString()}</div>
+                <button className="cart-item__remove" onClick={() => removeItem(item.productId)} title="Remove">✕</button>
               </div>
             ))}
 
@@ -129,42 +92,28 @@ const CartPage = () => {
             </div>
           </div>
 
-          {/* Order Summary */}
           <div className="cart-summary">
             <div className="cart-summary__title">Order Summary</div>
-
             <div className="cart-summary__rows">
               <div className="cart-summary__row">
                 <span>Subtotal ({itemCount} items)</span>
                 <span>LKR {Number(cartTotal).toLocaleString()}</span>
               </div>
-              <div className="cart-summary__row">
-                <span>Delivery</span>
-                <span className="cart-summary__free">FREE</span>
-              </div>
-              <div className="cart-summary__row">
-                <span>Gift Wrapping</span>
-                <span className="cart-summary__free">Included</span>
-              </div>
+              <div className="cart-summary__row"><span>Delivery</span><span className="cart-summary__free">FREE</span></div>
+              <div className="cart-summary__row"><span>Gift Wrapping</span><span className="cart-summary__free">Included</span></div>
             </div>
-
             <div className="cart-summary__divider" />
-
             <div className="cart-summary__total">
               <span>Total</span>
-              <span className="cart-summary__total-amt">
-                LKR {Number(cartTotal).toLocaleString()}
-              </span>
+              <span className="cart-summary__total-amt">LKR {Number(cartTotal).toLocaleString()}</span>
             </div>
-
+            {/* Public cart → redirect to login to checkout */}
             <button className="cart-checkout-btn" onClick={() => navigate('/login')}>
               Proceed to Checkout →
             </button>
           </div>
-
         </div>
       </main>
-
       <Footer />
     </div>
   );

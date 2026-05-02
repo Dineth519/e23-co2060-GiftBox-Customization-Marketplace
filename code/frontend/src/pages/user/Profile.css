@@ -1,513 +1,582 @@
-/* Profile.css
-   Light warm theme — cream/warm white background with gold accents.
-   Design inspired by Daraz and Temu profile pages:
-   - Clean white cards like Daraz
-   - Clear section separation like Temu
-   - Giftora's gold accent colour throughout
-   All classes use "pf-" prefix to avoid conflicts. */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Profile.css  —  Giftora Customer Profile
+   Theme: dark navy (#1A1A2E / #16213E) + gold (#C9A961) + accent blue (#5DADE2)
+   Renders inside CustomerLayout — header is fixed at 64px, so padding-top: 64px
+───────────────────────────────────────────────────────────────────────────── */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@300;400;500&display=swap');
-
-/* ── Colour Tokens ────────────────────────────────────────────────────────── */
 :root {
-  --pf-bg:         #FAF7F2;   /* warm cream — main page background         */
-  --pf-surface:    #FFFFFF;   /* pure white — card backgrounds             */
-  --pf-surface2:   #F5F0E8;   /* light warm — hover / input fill           */
-  --pf-border:     #E8E0D0;   /* soft warm border                          */
-  --pf-gold:       #D4A843;   /* Giftora primary gold                      */
-  --pf-gold-dark:  #B8922E;   /* darker gold for hover states              */
-  --pf-gold-bg:    #FDF4E0;   /* very light gold — stat box background     */
-  --pf-text:       #2C2415;   /* dark warm brown — primary text            */
-  --pf-muted:      #8A7A60;   /* muted warm — secondary text               */
-  --pf-green:      #1D9E75;   /* success green                             */
-  --pf-green-bg:   #E8F7F2;   /* light green background                    */
-  --pf-blue:       #378ADD;   /* blue for in-progress stat                 */
-  --pf-blue-bg:    #EAF3FC;   /* light blue background                     */
-  --pf-red:        #E24B4A;   /* danger — remove button                    */
-  --pf-red-bg:     #FEF0EF;   /* light red background                      */
-  --pf-shadow:     0 2px 12px rgba(44, 36, 21, 0.07);
-  --pf-radius:     14px;
-  --pf-radius-sm:  8px;
+  --navy-deep:   #1A1A2E;
+  --navy-mid:    #16213E;
+  --navy-light:  #1e2a45;
+  --gold:        #C9A961;
+  --gold-bright: #D4AF37;
+  --blue:        #5DADE2;
+  --blue-dim:    rgba(93, 173, 226, 0.15);
+  --gold-dim:    rgba(201, 169, 97, 0.15);
+  --text-primary:   #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-muted:     rgba(255, 255, 255, 0.35);
+  --border:      rgba(201, 169, 97, 0.18);
+  --border-blue: rgba(93, 173, 226, 0.2);
+  --card-bg:     rgba(255, 255, 255, 0.04);
+  --card-hover:  rgba(255, 255, 255, 0.07);
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --transition:  0.25s ease;
 }
 
-/* ── Page Wrapper ─────────────────────────────────────────────────────────── */
-.pf-page {
-  min-height: 100vh;
-  background: var(--pf-bg);
-  color: var(--pf-text);
-  font-family: 'DM Sans', sans-serif;
-  padding: 2rem 1.5rem 4rem;
-  max-width: 780px;
-  margin: 0 auto;
-}
-
-/* ── Loading State ────────────────────────────────────────────────────────── */
+/* ── Loading ─────────────────────────────────────────────────────────────── */
 .pf-loading {
   min-height: 100vh;
-  background: var(--pf-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  color: var(--pf-muted);
-  font-family: 'DM Sans', sans-serif;
+  background: var(--navy-deep);
+  color: var(--text-secondary);
+  font-size: 15px;
+  gap: 16px;
+  padding-top: 64px;
 }
 
 .pf-spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid var(--pf-border);
-  border-top-color: var(--pf-gold);
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
   border-radius: 50%;
-  animation: pf-spin 0.8s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
-@keyframes pf-spin {
+@keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* ══ PROFILE HEADER ══════════════════════════════════════════════════════════ */
-/* Like Daraz — avatar on left, name + info on right, clean white card */
-.pf-header {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  background: var(--pf-surface);
-  border: 1px solid var(--pf-border);
-  border-radius: var(--pf-radius);
-  padding: 1.5rem;
-  margin-bottom: 1.25rem;
-  box-shadow: var(--pf-shadow);
+/* ── Page Shell ──────────────────────────────────────────────────────────── */
+/* padding-top: 64px offsets the fixed topbar-container header */
+.pf-page {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #1A1A2E 0%, #0f1729 60%, #16213E 100%);
+  padding-top: 64px;   /* ← matches topbar-container height */
+  padding-bottom: 60px;
 }
 
-/* Gold circle with customer initials — like Daraz avatar */
+/* ── Hero Header ─────────────────────────────────────────────────────────── */
+.pf-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 48px 40px 40px;
+}
+
+.pf-hero-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(201,169,97,0.08) 0%, rgba(93,173,226,0.05) 100%);
+  border-bottom: 1px solid var(--border);
+}
+
+/* subtle radial glow behind avatar */
+.pf-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(201,169,97,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.pf-hero-inner {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
 .pf-avatar {
-  width: 70px;
-  height: 70px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--pf-gold), #B8922E);
-  color: #fff;
-  font-size: 24px;
-  font-weight: 500;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+  color: var(--navy-deep);
+  font-size: 28px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   letter-spacing: 1px;
-  box-shadow: 0 4px 12px rgba(212, 168, 67, 0.3);
+  flex-shrink: 0;
+  box-shadow:
+    0 0 0 4px rgba(201,169,97,0.2),
+    0 8px 32px rgba(201,169,97,0.25);
 }
 
-.pf-header-info { flex: 1; }
+.pf-hero-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-/* Customer name */
 .pf-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--pf-text);
-  margin-bottom: 4px;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: 0.3px;
 }
 
-/* Email / member since */
 .pf-meta {
   font-size: 13px;
-  color: var(--pf-muted);
-  margin-bottom: 2px;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
-/* ══ STATS ROW ═══════════════════════════════════════════════════════════════ */
-/* Like Temu — 4 stats in a row, each with coloured number + label below */
+.pf-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 12px;
+  background: linear-gradient(135deg, rgba(201,169,97,0.2) 0%, rgba(201,169,97,0.1) 100%);
+  border: 1px solid rgba(201,169,97,0.35);
+  border-radius: 20px;
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+/* ── Stats Row ───────────────────────────────────────────────────────────── */
 .pf-stats-row {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 40px 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 1.5rem;
+  gap: 16px;
 }
 
 .pf-stat-box {
-  background: var(--pf-surface);
-  border: 1px solid var(--pf-border);
-  border-radius: var(--pf-radius-sm);
-  padding: 1rem 0.75rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 16px;
   text-align: center;
-  box-shadow: var(--pf-shadow);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  transition: transform 0.15s;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
 }
 
 .pf-stat-box:hover {
+  background: var(--card-hover);
+  border-color: rgba(201,169,97,0.35);
   transform: translateY(-2px);
 }
 
-/* Big number */
 .pf-stat-num {
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--pf-text);
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
 }
 
-.pf-stat-num.green { color: var(--pf-green); }
-.pf-stat-num.blue  { color: var(--pf-blue);  }
-.pf-stat-num.gold  { color: var(--pf-gold);  font-size: 15px; }
+.pf-stat-num.green { color: #4ade80; }
+.pf-stat-num.blue  { color: var(--blue); }
+.pf-stat-num.gold  { color: var(--gold); font-size: 18px; }
 
-/* Label below number */
 .pf-stat-label {
+  display: block;
   font-size: 11px;
-  color: var(--pf-muted);
+  color: var(--text-muted);
+  margin-top: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.8px;
+  font-weight: 500;
 }
 
-/* ══ TAB NAVIGATION ══════════════════════════════════════════════════════════ */
-/* Like Daraz profile tabs — underline style, gold active indicator */
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
 .pf-tabs {
+  max-width: 900px;
+  margin: 32px auto 0;
+  padding: 0 40px;
   display: flex;
-  gap: 0;
-  margin-bottom: 1.25rem;
-  border-bottom: 2px solid var(--pf-border);
-  background: var(--pf-surface);
-  border-radius: var(--pf-radius) var(--pf-radius) 0 0;
-  padding: 0 1rem;
-  box-shadow: var(--pf-shadow);
-  overflow-x: auto;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
 }
 
 .pf-tab {
-  padding: 14px 18px;
-  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  color: var(--pf-muted);
-  font-size: 13px;
+  margin-bottom: -1px;
+  color: var(--text-secondary);
+  font-size: 14px;
   font-weight: 500;
-  font-family: 'DM Sans', sans-serif;
   cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+  letter-spacing: 0.2px;
 }
 
 .pf-tab:hover {
-  color: var(--pf-text);
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.04);
 }
 
-/* Gold underline on active tab */
 .pf-tab.active {
-  color: var(--pf-gold-dark);
-  border-bottom-color: var(--pf-gold);
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+  background: rgba(201,169,97,0.06);
 }
 
-/* ── Tab Content ──────────────────────────────────────────────────────────── */
+.pf-tab-icon {
+  font-size: 15px;
+}
+
+/* ── Tab Content ─────────────────────────────────────────────────────────── */
 .pf-tab-content {
-  animation: pf-fade 0.2s ease;
+  max-width: 900px;
+  margin: 28px auto 0;
+  padding: 0 40px;
 }
 
-@keyframes pf-fade {
-  from { opacity: 0; transform: translateY(6px); }
+/* ── Card ────────────────────────────────────────────────────────────────── */
+.pf-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  animation: fadeSlideIn 0.25s ease both;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ══ WHITE CARD ══════════════════════════════════════════════════════════════ */
-/* Every section content sits inside one of these clean white cards */
-.pf-card {
-  background: var(--pf-surface);
-  border: 1px solid var(--pf-border);
-  border-radius: 0 0 var(--pf-radius) var(--pf-radius);
-  padding: 1.75rem;
-  box-shadow: var(--pf-shadow);
-  margin-bottom: 1rem;
+.pf-card-header {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
 }
 
 .pf-card-title {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--pf-text);
-  margin-bottom: 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 6px;
 }
 
 .pf-card-desc {
   font-size: 13px;
-  color: var(--pf-muted);
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--pf-border);
+  color: var(--text-secondary);
+  margin: 0;
 }
 
-/* ══ FORM ELEMENTS ═══════════════════════════════════════════════════════════ */
-/* Like Daraz — clean inputs with light border, gold focus ring */
-
-/* Two column form row */
+/* ── Form ────────────────────────────────────────────────────────────────── */
 .pf-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-/* Single form field group: label on top, input below */
 .pf-form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
-/* When inside form-row, group has no bottom margin (row handles it) */
+/* When pf-form-group is inside pf-form-row, remove bottom margin */
 .pf-form-row .pf-form-group {
   margin-bottom: 0;
 }
 
-/* Label text */
 .pf-label {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--pf-muted);
+  font-weight: 600;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.8px;
 }
 
-/* Input field */
 .pf-input {
-  background: var(--pf-surface2);
-  border: 1.5px solid var(--pf-border);
-  border-radius: var(--pf-radius-sm);
-  padding: 10px 14px;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--pf-text);
-  outline: none;
-  transition: border-color 0.15s, background 0.15s;
   width: 100%;
-}
-
-.pf-input:focus {
-  border-color: var(--pf-gold);
-  background: #FFFDF5;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+  box-sizing: border-box;
 }
 
 .pf-input::placeholder {
-  color: #C4B89A;
+  color: var(--text-muted);
 }
 
-/* ── Error message ────────────────────────────────────────────────────────── */
+.pf-input:hover {
+  border-color: rgba(201,169,97,0.35);
+  background: rgba(255,255,255,0.07);
+}
+
+.pf-input:focus {
+  border-color: var(--gold);
+  background: rgba(255,255,255,0.07);
+  box-shadow: 0 0 0 3px rgba(201,169,97,0.12);
+}
+
+/* ── Error ───────────────────────────────────────────────────────────────── */
 .pf-error {
   font-size: 13px;
-  color: var(--pf-red);
-  background: var(--pf-red-bg);
-  padding: 8px 12px;
-  border-radius: var(--pf-radius-sm);
-  margin-bottom: 14px;
+  color: #f87171;
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 16px;
 }
 
-/* ══ BUTTONS ═════════════════════════════════════════════════════════════════ */
-
-/* Primary gold button — Save / Update */
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
 .pf-btn-primary {
-  padding: 11px 28px;
-  background: var(--pf-gold);
-  color: #12122A;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+  color: var(--navy-deep);
   border: none;
-  border-radius: var(--pf-radius-sm);
+  border-radius: var(--radius-sm);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  transition: background 0.15s;
+  letter-spacing: 0.3px;
+  transition: all var(--transition);
+  box-shadow: 0 4px 16px rgba(201,169,97,0.25);
 }
 
 .pf-btn-primary:hover {
-  background: var(--pf-gold-dark);
-  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(201,169,97,0.35);
+  filter: brightness(1.05);
 }
 
-/* Green state when saved successfully */
+.pf-btn-primary:active {
+  transform: translateY(0);
+}
+
 .pf-btn-primary.saved {
-  background: var(--pf-green);
-  color: #fff;
-  cursor: default;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  box-shadow: 0 4px 16px rgba(74,222,128,0.25);
+  color: #052e16;
 }
 
-/* Outline button — Cancel */
 .pf-btn-outline {
-  padding: 11px 28px;
+  padding: 12px 24px;
   background: transparent;
-  color: var(--pf-muted);
-  border: 1.5px solid var(--pf-border);
-  border-radius: var(--pf-radius-sm);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.15s;
+  transition: all var(--transition);
 }
 
 .pf-btn-outline:hover {
-  border-color: var(--pf-gold);
-  color: var(--pf-gold-dark);
+  background: var(--card-hover);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.2);
 }
 
-/* ══ ADDRESSES ═══════════════════════════════════════════════════════════════ */
-/* Like Daraz saved addresses — each address is a card with label + actions */
-
+/* ── Address Cards ───────────────────────────────────────────────────────── */
 .pf-addresses-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-/* Each saved address card */
 .pf-addr-card {
-  background: var(--pf-surface);
-  border: 1.5px solid var(--pf-border);
-  border-radius: var(--pf-radius-sm);
-  padding: 1rem 1.25rem;
-  transition: border-color 0.15s;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  transition: border-color var(--transition), background var(--transition);
+  animation: fadeSlideIn 0.2s ease both;
 }
 
-/* Default address gets a gold left border — like Daraz */
+.pf-addr-card:hover {
+  background: var(--card-hover);
+  border-color: rgba(201,169,97,0.3);
+}
+
 .pf-addr-card.default {
-  border-left: 4px solid var(--pf-gold);
-  background: var(--pf-gold-bg);
+  border-color: rgba(93,173,226,0.4);
+  background: rgba(93,173,226,0.04);
 }
 
-/* Top row: label + badges on left, action buttons on right */
 .pf-addr-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
-  gap: 10px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .pf-addr-label-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* Address label e.g. "Home", "Office" */
 .pf-addr-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--pf-text);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-/* Green "Default" badge */
 .pf-addr-default-badge {
   font-size: 11px;
-  font-weight: 500;
-  color: var(--pf-green);
-  background: var(--pf-green-bg);
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-weight: 600;
+  color: var(--blue);
+  background: rgba(93,173,226,0.15);
+  border: 1px solid rgba(93,173,226,0.3);
+  border-radius: 20px;
+  padding: 2px 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-/* Action buttons: "Set Default" and "Remove" */
 .pf-addr-actions {
   display: flex;
   gap: 8px;
 }
 
 .pf-addr-btn {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border-blue);
+  border-radius: var(--radius-sm);
+  color: var(--blue);
   font-size: 12px;
   font-weight: 500;
-  padding: 4px 12px;
-  border-radius: 6px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  border: 1.5px solid var(--pf-border);
-  background: var(--pf-surface);
-  color: var(--pf-muted);
-  transition: all 0.15s;
+  transition: all var(--transition);
 }
 
 .pf-addr-btn:hover {
-  border-color: var(--pf-gold);
-  color: var(--pf-gold-dark);
+  background: var(--blue-dim);
+  border-color: var(--blue);
 }
 
-/* Red "Remove" button */
 .pf-addr-btn.danger {
-  color: var(--pf-red);
-  border-color: var(--pf-border);
+  color: #f87171;
+  border-color: rgba(248,113,113,0.25);
 }
 
 .pf-addr-btn.danger:hover {
-  background: var(--pf-red-bg);
-  border-color: var(--pf-red);
+  background: rgba(248,113,113,0.1);
+  border-color: #f87171;
 }
 
-/* Address text lines */
 .pf-addr-text {
-  font-size: 13px;
-  color: var(--pf-text);
-  margin-bottom: 2px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 2px;
 }
 
 .pf-addr-text.muted {
-  color: var(--pf-muted);
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
-/* "+ Add New Address" dashed button — like Daraz */
+/* ── Add Address Button ───────────────────────────────────────────────────── */
 .pf-add-addr-btn {
   width: 100%;
   padding: 14px;
-  background: var(--pf-surface);
-  border: 1.5px dashed var(--pf-gold);
-  border-radius: var(--pf-radius-sm);
-  color: var(--pf-gold-dark);
+  background: transparent;
+  border: 1px dashed rgba(201,169,97,0.35);
+  border-radius: var(--radius-md);
+  color: var(--gold);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.15s;
-  margin-top: 4px;
+  transition: all var(--transition);
+  letter-spacing: 0.3px;
 }
 
 .pf-add-addr-btn:hover {
-  background: var(--pf-gold-bg);
+  background: var(--gold-dim);
+  border-color: var(--gold);
+  border-style: solid;
 }
 
-/* ── Address form card ────────────────────────────────────────────────────── */
-/* Reuse pf-card but without the tab border-radius */
-.pf-addresses-list + .pf-card,
-.pf-add-addr-btn + .pf-card {
-  border-radius: var(--pf-radius);
-}
-
-/* ══ RESPONSIVE ══════════════════════════════════════════════════════════════ */
-@media (max-width: 600px) {
-  /* Stack form rows on mobile */
-  .pf-form-row {
-    grid-template-columns: 1fr;
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pf-hero {
+    padding: 32px 20px 28px;
   }
 
-  /* Stack stats 2x2 on mobile */
+  .pf-hero-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .pf-avatar {
+    width: 72px;
+    height: 72px;
+    font-size: 22px;
+  }
+
   .pf-stats-row {
+    padding: 24px 20px 0;
     grid-template-columns: repeat(2, 1fr);
   }
 
-  /* Stack header vertically */
-  .pf-header {
-    flex-direction: column;
-    text-align: center;
+  .pf-tabs {
+    padding: 0 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .pf-tabs::-webkit-scrollbar { display: none; }
+
+  .pf-tab {
+    white-space: nowrap;
+    padding: 10px 14px;
+    font-size: 13px;
   }
 
-  .pf-addr-top {
-    flex-direction: column;
-    align-items: flex-start;
+  .pf-tab-content {
+    padding: 0 20px;
   }
 
-  /* Smaller avatar on mobile */
-  .pf-avatar {
-    width: 56px;
-    height: 56px;
-    font-size: 18px;
+  .pf-card {
+    padding: 24px 20px;
+  }
+
+  .pf-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .pf-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .pf-stat-num {
+    font-size: 20px;
+  }
+
+  .pf-stat-num.gold {
+    font-size: 15px;
   }
 }

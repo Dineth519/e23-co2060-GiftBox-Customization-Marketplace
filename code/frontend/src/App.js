@@ -14,7 +14,12 @@ import VendorLanding from './pages/homepage/VendorLanding.jsx';
 import GiftCustomizer from './pages/user/GiftCustomizer.jsx';
 import CustomerOrders from './pages/user/Orders.jsx';
 import OrderDetail from './pages/user/OrderDetail.jsx';
-import Profile from './pages/user/Profile.jsx';
+import CustomerLayout from './layouts/CustomerLayout.jsx';  
+import CustomerCart from './pages/user/CustomerCart.jsx';
+import CustomerProfile from './pages/user/Profile.jsx'
+import AboutUs from './pages/user/AboutUsPage.jsx';
+import HowItWorks from './pages/user/HowItWorksPage.jsx';
+import BoxBuilder from './pages/user/BoxBuilderPage.jsx'
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
@@ -87,14 +92,23 @@ function App() {
           <Route path="/vendor-register" element={<VendorRegistration />} />
           <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/build-box" element={<BoxBuilderPage />} />
           <Route path="/test-address" element={<LayoutWrapper><AddressForm /></LayoutWrapper>} />
 
           {/* Customer routes */}
-          <Route path="/customize" element={<LayoutWrapper><GiftCustomizer /></LayoutWrapper>} />
-          <Route path="/orders" element={<LayoutWrapper><Orders /></LayoutWrapper>} />
-          <Route path="/orders/:orderId" element={<LayoutWrapper><OrderDetail /></LayoutWrapper>} />
-          <Route path="/profile" element={<LayoutWrapper><Profile /></LayoutWrapper>} />
-          <Route path="/build-box" element={<BoxBuilderPage />} />
+          <Route path="/customer" element={<CustomerLayout />}>
+            <Route index element={<Navigate to="home" replace />} />
+            <Route path="home" element={<CustomerHome />} />
+            <Route path="customize" element={<GiftCustomizer />} />
+            <Route path="orders" element={<CustomerOrders />} />
+            <Route path="orders/:orderId" element={<OrderDetail />} />
+            <Route path="profile" element={<CustomerProfile />} />
+            <Route path="cart" element={<CustomerCart />} />
+            <Route path="about-us" element={<AboutUs />} />
+            <Route path="how-it-works" element={<HowItWorks />} />
+            <Route path="build-box" element={<BoxBuilder />} />
+
+          </Route>
 
           {/* Seller routes */}
           <Route path="/seller/*" element={
