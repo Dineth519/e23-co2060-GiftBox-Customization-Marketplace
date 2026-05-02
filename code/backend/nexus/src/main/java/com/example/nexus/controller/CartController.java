@@ -1,12 +1,13 @@
 package com.example.nexus.controller;
 
 // ═══════════════════════════════════════════════════════
-//  GET    /api/cart                  → retrieve cart
-//  POST   /api/cart/add              → add item
-//  DELETE /api/cart/remove/{id}      → remove item
-//  PUT    /api/cart/update           → update quantity
-//  DELETE /api/cart/clear            → clear cart
-//  GET    /api/cart/total            → Issue #41 total only
+//  GET    /api/cart                       → retrieve cart
+//  POST   /api/cart/add                   → add product or gift box
+//  DELETE /api/cart/remove/{productId}    → remove product
+//  DELETE /api/cart/remove/giftbox/{id}   → [NEW] remove gift box
+//  PUT    /api/cart/update                → update quantity
+//  DELETE /api/cart/clear                 → clear cart
+//  GET    /api/cart/total                 → total only
 // ═══════════════════════════════════════════════════════
 
 import com.example.nexus.dto.AddToCart;
@@ -25,16 +26,17 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/cart")
 @CrossOrigin(
-    origins        = "http://localhost:3000",  // React dev server
-    allowCredentials = "true"                   // allow session cookie
+    origins          = "http://localhost:3000",
+    allowCredentials = "true"
 )
 public class CartController {
 
     @Autowired
     private CartService cartService;
 
-    // ── GET /api/cart ─────────────────────────────────────
-    // Load current cart when React cart page opens
+    // ── GET /api/cart ──────────────────────────────────────
+    // Logged in  → DB load + session sync
+    // Guest      → session only
     @GetMapping
     public ResponseEntity<CartResponse> getCart(HttpSession session) {
         List<CartItem> items     = cartService.getCartItems(session);
@@ -47,8 +49,8 @@ public class CartController {
     }
 
     // ── POST /api/cart/add ────────────────────────────────
-    // "Add to Cart" / "+" button click
-    // Body: { productId, name, price, imageUrl }
+    // Body: { productId?, giftBoxId?, name, price, imageUrl }
+    // productId OR giftBoxId — one must be set
     @PostMapping("/add")
     public ResponseEntity<CartResponse> addToCart(
             @RequestBody AddToCart dto,
@@ -59,7 +61,7 @@ public class CartController {
     }
 
     // ── DELETE /api/cart/remove/{productId} ───────────────
-    // Cart item remove button click
+    // Product remove button click
     @DeleteMapping("/remove/{productId}")
     public ResponseEntity<CartResponse> removeFromCart(
             @PathVariable int productId,
@@ -69,8 +71,19 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
+    // ── DELETE /api/cart/remove/giftbox/{giftBoxId} ───────
+    // [NEW] Gift box remove button click
+    @DeleteMapping("/remove/giftbox/{giftBoxId}")
+    public ResponseEntity<CartResponse> removeGiftBoxFromCart(
+            @PathVariable int giftBoxId,
+            HttpSession session) {
+
+        CartResponse response = cartService.removeGiftBoxItem(session, giftBoxId);
+        return ResponseEntity.ok(response);
+    }
+
     // ── PUT /api/cart/update ──────────────────────────────
-    // Quantity + / - button click
+    // Quantity + / - buttons
     // Body: { productId, quantity }
     @PutMapping("/update")
     public ResponseEntity<CartResponse> updateQuantity(
@@ -86,16 +99,17 @@ public class CartController {
     }
 
     // ── DELETE /api/cart/clear ────────────────────────────
-    // Clear cart after checkout or "Clear Cart" button click
+    // "Clear Cart" button / after checkout
+    // Logged in → DB clear + session clear
+    // Guest     → session clear only
     @DeleteMapping("/clear")
     public ResponseEntity<CartResponse> clearCart(HttpSession session) {
         CartResponse response = cartService.clearCart(session);
         return ResponseEntity.ok(response);
     }
 
-
     // ── GET /api/cart/total ───────────────────────────────
-    // Total only — used by checkout summary page
+    // Checkout summary page — total + count only
     @GetMapping("/total")
     public ResponseEntity<Map<String, Object>> getCartTotal(
             HttpSession session) {
@@ -104,7 +118,6 @@ public class CartController {
         double         total     = cartService.calculateTotal(items);
         int            itemCount = cartService.calculateItemCount(items);
 
-        // { "total": 15800.00, "itemCount": 3 }
         return ResponseEntity.ok(Map.of(
             "total",     total,
             "itemCount", itemCount

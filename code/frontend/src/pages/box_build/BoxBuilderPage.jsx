@@ -5,7 +5,7 @@ import Footer from '../../components/homepage/Footer';
 import './BoxBuilderPage.css';
 
 // Cart Context එකෙන් දත්ත ගැනීම සඳහා
-import { useCart } from '../../context/CartContext'; 
+import { useCart } from '../../context/CartContextHeader'; 
 
 const OCCASIONS = [
   { id: 'Birthday', icon: '🎂', label: 'Birthday' },

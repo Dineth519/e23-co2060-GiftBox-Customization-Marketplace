@@ -4,6 +4,7 @@ import com.example.nexus.dto.*;
 import com.example.nexus.model.Role;
 import com.example.nexus.model.User;
 import com.example.nexus.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,16 +16,12 @@ import java.util.Random;
 @Service
 public class AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository  userRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private EmailService    emailService;
+    @Autowired private CartService     cartService;   // [NEW] cart merge සඳහා
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private EmailService emailService;
-
-    // ── Register ───────────────────────────────
+    // ── Register ───────────────────────────────────────────
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -35,10 +32,8 @@ public class AuthService {
             return new AuthResponse(false, "Email already registered");
         }
 
-        // Generate 6-digit OTP
         String code = String.format("%06d", new Random().nextInt(999999));
 
-        // Build user — not verified yet
         User user = new User();
         user.setName(request.getName());
         user.setUsername(request.getUsername());
@@ -47,91 +42,102 @@ public class AuthService {
         user.setRole(Role.CUSTOMER);
         user.setVerified(false);
         user.setVerificationCode(code);
-        user.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10)); // 10 min expiry
+        user.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10));
 
         userRepository.save(user);
-
-        // Send email
         emailService.sendVerificationCode(request.getEmail(), code);
 
-        return new AuthResponse(true, "Registration successful! Check your email for the verification code.");
+        return new AuthResponse(true,
+            "Registration successful! Check your email for the verification code.");
     }
 
-    // ── Verify Email ───────────────────────────
+    // ── Verify Email ───────────────────────────────────────
     public AuthResponse verifyEmail(VerifyRequest request) {
 
         Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
 
-        if (userOpt.isEmpty()) {
-            return new AuthResponse(false, "User not found");
-        }
+        if (userOpt.isEmpty()) return new AuthResponse(false, "User not found");
 
         User user = userOpt.get();
 
-        // Already verified?
-        if (user.isVerified()) {
+        if (user.isVerified())
             return new AuthResponse(false, "Email already verified");
-        }
 
-        // Code expired?
-        if (LocalDateTime.now().isAfter(user.getCodeExpiresAt())) {
-            return new AuthResponse(false, "Verification code expired. Please register again.");
-        }
+        if (LocalDateTime.now().isAfter(user.getCodeExpiresAt()))
+            return new AuthResponse(false,
+                "Verification code expired. Please register again.");
 
-        // Wrong code?
-        if (!user.getVerificationCode().equals(request.getCode())) {
+        if (!user.getVerificationCode().equals(request.getCode()))
             return new AuthResponse(false, "Invalid verification code");
-        }
 
-        // All good — mark as verified
         user.setVerified(true);
-        user.setVerificationCode(null);  // clear code after use
+        user.setVerificationCode(null);
         user.setCodeExpiresAt(null);
         userRepository.save(user);
 
-        return new AuthResponse(true, "Email verified successfully! You can now login.");
+        return new AuthResponse(true,
+            "Email verified successfully! You can now login.");
     }
 
-    // ── Login ──────────────────────────────────
-    public AuthResponse login(LoginRequest request) {
+    // ── Login ──────────────────────────────────────────────
+    // [MODIFIED] HttpSession parameter add කළා
+    //  1. session එකේ user info set කරනවා
+    //  2. guest cart → DB cart merge කරනවා
+    public AuthResponse login(LoginRequest request, HttpSession session) {
 
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
 
-        if (userOpt.isEmpty()) {
+        if (userOpt.isEmpty())
             return new AuthResponse(false, "User not found");
-        }
 
         User user = userOpt.get();
 
-        // Block login if not verified
-        if (!user.isVerified()) {
-            return new AuthResponse(false, "Please verify your email before logging in");
-        }
+        if (!user.isVerified())
+            return new AuthResponse(false,
+                "Please verify your email before logging in");
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
             return new AuthResponse(false, "Incorrect password");
+
+        // ── [NEW] Session set ──────────────────────────────
+        // CartService.getCustomerId(session) මේකෙන් ගන්නවා
+        session.setAttribute("user_id",     user.getId());
+        session.setAttribute("username",    user.getUsername());
+        session.setAttribute("role",        user.getRole().name());
+
+        // CUSTOMER role නම් customer_id set කරනවා
+        // (users table user_id = customers table customer_id — same value)
+        if (user.getRole() == Role.CUSTOMER) {
+            session.setAttribute("customer_id", user.getId());
+
+            // ── [NEW] Guest cart → DB merge ────────────────
+            // Login කලින් guest session cart DB cart එකට merge
+            cartService.mergeGuestCartOnLogin(session, user.getId().intValue());
         }
 
-        // 👈 වෙනස් කරපු තැන: Role එක යවනවා
         return new AuthResponse(true, "Login Successful", user.getRole().name());
     }
 
-    // ── Resend Code ────────────────────────────
+    // ── Logout ─────────────────────────────────────────────
+    // [NEW] Session invalidate — cart session ද clear වෙනවා
+    // (DB cart safe — next login වෙද්දි reload වෙනවා)
+    public AuthResponse logout(HttpSession session) {
+        session.invalidate();
+        return new AuthResponse(true, "Logged out successfully.");
+    }
+
+    // ── Resend Code ────────────────────────────────────────
     public AuthResponse resendCode(String email) {
 
         Optional<User> userOpt = userRepository.findByEmail(email);
 
-        if (userOpt.isEmpty()) {
-            return new AuthResponse(false, "User not found");
-        }
+        if (userOpt.isEmpty()) return new AuthResponse(false, "User not found");
 
         User user = userOpt.get();
 
-        if (user.isVerified()) {
+        if (user.isVerified())
             return new AuthResponse(false, "Email already verified");
-        }
 
-        // Generate new code
         String newCode = String.format("%06d", new Random().nextInt(999999));
         user.setVerificationCode(newCode);
         user.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10));

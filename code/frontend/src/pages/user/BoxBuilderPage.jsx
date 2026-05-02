@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './BoxBuilderPage.css';
 
-import { useCart } from '../../context/CartContext'; 
+import { useCart } from '../../context/CartContextHeader'; 
 
 const OCCASIONS = [
   { id: 'Birthday', icon: '🎂', label: 'Birthday' },

@@ -1,4 +1,4 @@
-package com.example.nexus.model;
+package com.example.nexus.dto;
 
 // ── Session CartItem ─────────────────────────────────────
 // React ට response දෙද්දි use කරනවා (CartResponse ඇතුලේ)

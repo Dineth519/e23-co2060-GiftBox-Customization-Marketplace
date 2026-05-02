@@ -46,18 +46,23 @@ import SellerSettings from './pages/seller/Settings.jsx';
 // Homepage
 import ProductsPage from './pages/homepage/ProductsPage.jsx';
 import AddressForm from './components/user/AddressForm.jsx';
-import { CartProvider } from './context/CartContext.jsx';
+
+// ── TWO CartProviders ──────────────────────────────────────────────────────
+// CartContextHeader  → homepage/public cart (guest + logged-in landing page)
+// CartContext        → customer portal cart (logged-in customer routes)
+import { CartProvider as HomepageCartProvider } from './context/CartContextHeader.jsx';
+import { CartProvider as CustomerCartProvider  } from './context/CartContext.jsx';
+
 import CartPage from './pages/homepage/CartPage.jsx';
 
 // Box Builder
 import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
 
-// Layout wrapper component for general and user routes
+// ── Layout wrapper ─────────────────────────────────────────────────────────
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
 
-  // Log current path and admin status for debugging
   useEffect(() => {
     console.log("Current Path:", location.pathname);
     console.log("Is Admin View:", isAdminPath);
@@ -65,7 +70,6 @@ const LayoutWrapper = ({ children }) => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Display sidebar on admin paths */}
       {isAdminPath && <Sidebar />} 
       <div style={{ flex: 1, background: isAdminPath ? '#deebf7' : '#ffffff' }}>
         {children}
@@ -74,75 +78,75 @@ const LayoutWrapper = ({ children }) => {
   );
 };
 
-// Main application component that sets up routing for admin, user, and seller sections
-
+// ── App ────────────────────────────────────────────────────────────────────
 function App() {
   return (
-    <CartProvider>                                      
-      <Router>
-        <Routes>
-          {/* Public and user routes */}
-          <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/how-it-works" element={<LayoutWrapper><HowItWorksPage /></LayoutWrapper>} />
-          <Route path="/about-us" element={<LayoutWrapper><AboutUsPage /></LayoutWrapper>} />
-          <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
-          <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
-          <Route path="/vendor-landing" element={<VendorLanding />} />
-          <Route path="/vendor-register" element={<VendorRegistration />} />
-          <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/build-box" element={<BoxBuilderPage />} />
-          <Route path="/test-address" element={<LayoutWrapper><AddressForm /></LayoutWrapper>} />
+    // HomepageCartProvider  — outermost, covers all public/homepage routes
+    // CustomerCartProvider  — wraps ONLY customer portal routes (nested inside)
+    <HomepageCartProvider>
+      <CustomerCartProvider>
+        <Router>
+          <Routes>
+            {/* ── Public / homepage routes ── */}
+            <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/how-it-works" element={<LayoutWrapper><HowItWorksPage /></LayoutWrapper>} />
+            <Route path="/about-us" element={<LayoutWrapper><AboutUsPage /></LayoutWrapper>} />
+            <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
+            <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
+            <Route path="/vendor-landing" element={<VendorLanding />} />
+            <Route path="/vendor-register" element={<VendorRegistration />} />
+            <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/build-box" element={<BoxBuilderPage />} />
+            <Route path="/test-address" element={<LayoutWrapper><AddressForm /></LayoutWrapper>} />
 
-          {/* Customer routes */}
-          <Route path="/customer" element={<CustomerLayout />}>
-            <Route index element={<Navigate to="home" replace />} />
-            <Route path="home" element={<CustomerHome />} />
-            <Route path="customize" element={<GiftCustomizer />} />
-            <Route path="orders" element={<CustomerOrders />} />
-            <Route path="orders/:orderId" element={<OrderDetail />} />
-            <Route path="profile" element={<CustomerProfile />} />
-            <Route path="cart" element={<CustomerCart />} />
-            <Route path="about-us" element={<AboutUs />} />
-            <Route path="how-it-works" element={<HowItWorks />} />
-            <Route path="build-box" element={<BoxBuilder />} />
+            {/* ── Customer portal routes ── */}
+            <Route path="/customer" element={<CustomerLayout />}>
+              <Route index element={<Navigate to="home" replace />} />
+              <Route path="home"            element={<CustomerHome />} />
+              <Route path="customize"       element={<GiftCustomizer />} />
+              <Route path="orders"          element={<CustomerOrders />} />
+              <Route path="orders/:orderId" element={<OrderDetail />} />
+              <Route path="profile"         element={<CustomerProfile />} />
+              <Route path="cart"            element={<CustomerCart />} />
+              <Route path="about-us"        element={<AboutUs />} />
+              <Route path="how-it-works"    element={<HowItWorks />} />
+              <Route path="build-box"       element={<BoxBuilder />} />
+            </Route>
 
-          </Route>
+            {/* ── Seller routes ── */}
+            <Route path="/seller/*" element={
+              <SellerLayout>
+                <Routes>
+                  <Route path="/"          element={<SellerDashboard />} />
+                  <Route path="my-items"   element={<MyItems />} />
+                  <Route path="add-items"  element={<AddItems />} />
+                  <Route path="orders"     element={<Orders />} />
+                  <Route path="settings"   element={<SellerSettings />} />
+                </Routes>
+              </SellerLayout>
+            } />
 
-          {/* Seller routes */}
-          <Route path="/seller/*" element={
-            <SellerLayout>
-              <Routes>
-                <Route path="/" element={<SellerDashboard />} />
-                <Route path="my-items" element={<MyItems />} />
-                <Route path="add-items" element={<AddItems />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="settings" element={<SellerSettings />} />
-              </Routes>
-            </SellerLayout>
-          } />
+            {/* ── Admin routes ── */}
+            <Route path="/admin/*" element={
+              <AdminLayout>
+                <Routes>
+                  <Route path="/"                element={<Dashboard />} />
+                  <Route path="partners"         element={<Partners />} />
+                  <Route path="partners/pending" element={<PendingPartners />} />
+                  <Route path="customers"        element={<Customers />} />
+                  <Route path="settings"         element={<Settings />} />
+                  <Route path="staff-management" element={<StaffManagement />} />
+                </Routes>
+              </AdminLayout>
+            } />
 
-          {/* Admin routes using AdminLayout for sidebar and styling */}
-          <Route path="/admin/*" element={
-            <AdminLayout>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="partners" element={<Partners />} />
-                <Route path="partners/pending" element={<PendingPartners />} />
-                <Route path="customers" element={<Customers />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="staff-management" element={<StaffManagement />} />
-              </Routes>
-            </AdminLayout>
-          } />
-
-          {/* Catch-all route that redirects to home page */}
-          <Route path="*" element={<Navigate to="/" />} />
-
-        </Routes>
-      </Router>
-    </CartProvider>                                     
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Router>
+      </CustomerCartProvider>
+    </HomepageCartProvider>
   );
 }
 

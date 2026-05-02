@@ -7,7 +7,7 @@ import Footer from '../../components/homepage/Footer';
 import './ProductsPage.css';
 
 // ── #43 Add to Cart — CartContext import ──────────────────────
-import { useCart } from '../../context/CartContext';
+import { useCart } from '../../context/CartContextHeader';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const CATEGORY_MAP = { 1:'Wine', 2:'Watches', 3:'Perfume', 4:'Teddy Bears', 5:'Bangles', 6:'Chocolates' };

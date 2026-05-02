@@ -33,17 +33,37 @@ function useReveal(threshold = 0.1) {
 
 const CustomerHome = () => {
   const navigate = useNavigate();
-  const { addToCart, addedId } = useCart();
+
+  // ── FIX: addToCart → addProduct (CartContext new API)
+  // addedId removed — context එකේ නෑ; local state use කරනවා
+  const { addProduct } = useCart();
   const [ref, heroVisible] = useReveal(0.05);
 
   // ─── States ─────────────────────────────────────────────────────────────
-  const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading]         = useState(true);
-  const [error, setError]             = useState(null);
+  const [allProducts, setAllProducts]       = useState([]);
+  const [loading, setLoading]               = useState(true);
+  const [error, setError]                   = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy]           = useState('default');
-  const [quickView, setQuickView]     = useState(null);
+  const [searchQuery, setSearchQuery]       = useState('');
+  const [sortBy, setSortBy]                 = useState('default');
+  const [quickView, setQuickView]           = useState(null);
+
+  // Local "added" feedback — productId set for 1.5s after add
+  const [addedId, setAddedId] = useState(null);
+
+  // ── Add to Cart handler ──────────────────────────────────────────────────
+  // product object from API: { id, productId, name, price, imageUrl, categoryId, ... }
+  // Backend addProduct needs productId — use p.productId ?? p.id (handles both shapes)
+  const handleAddToCart = async (product) => {
+    const pid = product.productId ?? product.id;
+    try {
+      await addProduct(pid, 1);
+      setAddedId(pid);
+      setTimeout(() => setAddedId(null), 1500);
+    } catch (err) {
+      console.error('Add to cart failed:', err);
+    }
+  };
 
   // Fetch Products
   useEffect(() => {
@@ -129,31 +149,46 @@ const CustomerHome = () => {
           {loading && <div className="home-state">Loading your collections...</div>}
           {error && <div className="home-state error">⚠️ {error}</div>}
           
-          {!loading && !error && displayProducts.map((p, i) => (
-            <div key={p.id} className="featured-card" style={{ animationDelay: `${Math.min(i, 8) * 0.1}s` }}>
-              <div className="featured-image">
-                <img src={p.imageUrl} alt={p.name} />
-                <div className="card-overlay">
-                  <button className="overlay-btn primary" onClick={() => addToCart(p)}>
-                    {addedId === p.id ? '✓ Added' : '🛒 Add to Cart'}
-                  </button>
-                  <button className="overlay-btn ghost" onClick={() => setQuickView(p)}>Quick View</button>
+          {!loading && !error && displayProducts.map((p, i) => {
+            // FIX: support both p.productId and p.id shapes from API
+            const pid = p.productId ?? p.id;
+            const isAdded = addedId === pid;
+
+            return (
+              <div key={pid} className="featured-card" style={{ animationDelay: `${Math.min(i, 8) * 0.1}s` }}>
+                <div className="featured-image">
+                  <img src={p.imageUrl} alt={p.name} />
+                  <div className="card-overlay">
+                    {/* FIX: handleAddToCart instead of addToCart(p) */}
+                    <button
+                      className={`overlay-btn primary ${isAdded ? 'added' : ''}`}
+                      onClick={() => handleAddToCart(p)}
+                      disabled={isAdded}
+                    >
+                      {isAdded ? '✓ Added!' : '🛒 Add to Cart'}
+                    </button>
+                    <button className="overlay-btn ghost" onClick={() => setQuickView(p)}>Quick View</button>
+                  </div>
+                </div>
+                <div className="featured-content">
+                  <h3 className="featured-name">{p.name}</h3>
+                  <div className="featured-rating">
+                    <FaStar className="star-icon" /> <span>5.0</span>
+                  </div>
+                  <div className="featured-footer">
+                    <div className="price-tag">LKR {Number(p.price).toLocaleString()}</div>
+                    {/* Heart = wishlist feel; also adds to cart */}
+                    <button
+                      className={`wish-btn ${isAdded ? 'active' : ''}`}
+                      onClick={() => handleAddToCart(p)}
+                    >
+                      <FaHeart />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="featured-content">
-                <h3 className="featured-name">{p.name}</h3>
-                <div className="featured-rating">
-                  <FaStar className="star-icon" /> <span>5.0</span>
-                </div>
-                <div className="featured-footer">
-                  <div className="price-tag">LKR {Number(p.price).toLocaleString()}</div>
-                  <button className={`wish-btn ${addedId === p.id ? 'active' : ''}`} onClick={() => addToCart(p)}>
-                    <FaHeart />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -196,7 +231,8 @@ const CustomerHome = () => {
                 <h2 className="qv-title">{quickView.name}</h2>
                 <div className="qv-price">LKR {Number(quickView.price).toLocaleString()}</div>
                 <p className="qv-desc">Premium curated gift from Giftora's exclusive collection. Hand-packed with love and ready to create a lasting memory.</p>
-                <button className="btn-primary" onClick={() => { addToCart(quickView); setQuickView(null); }}>
+                {/* FIX: handleAddToCart instead of addToCart */}
+                <button className="btn-primary" onClick={() => { handleAddToCart(quickView); setQuickView(null); }}>
                   🛒 Add to Cart
                 </button>
               </div>
