@@ -17,7 +17,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className={`giftora-header ${scrolled ? 'scrolled' : ''}`}>
+    <header className={`giftora-header header-dynamic ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-inner">
 
         {/* ── Logo ── */}
