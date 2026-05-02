@@ -57,6 +57,7 @@
 /* ── Top bar ─────────────────────────────────────────────────────────────── */
 .cc-top {
   margin-bottom: 28px;
+  padding: 50px;
 }
 .cc-top__inner {
   display      : flex;

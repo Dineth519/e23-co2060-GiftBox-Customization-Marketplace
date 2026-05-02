@@ -532,7 +532,7 @@ const FeaturedProducts = () => {
 
   return (
     <section className={`f ${visible ? 'visible' : ''}`} ref={ref}>
-      <div className="section-inner"eatured section-reveal>
+      <div className="section-inner" data-featured="true" data-section-reveal="true">
         <div className="featured__header">
           <div>
             <div className="section-label">Curated Picks</div>

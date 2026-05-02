@@ -38,6 +38,13 @@ public class OrderService {
     @Transactional
     public List<Integer> checkout(HttpSession session, CheckoutRequest request) {
 
+        // Debug logging
+        System.out.println("--- Checkout Debug ---");
+        System.out.println("FullName: " + request.getFullName());
+        System.out.println("Phone: " + request.getPhone());
+        System.out.println("Address1: " + request.getAddressLine1());
+        System.out.println("City: " + request.getCity());
+
         // Session ෙකෙ customer_id ගන්නවා
         Integer customerId = (Integer) session.getAttribute("customer_id");
         if (customerId == null) {
@@ -69,6 +76,10 @@ public class OrderService {
             byVendor.computeIfAbsent(partnerId, k -> new ArrayList<>()).add(cartItem);
         }
 
+        if (byVendor.isEmpty()) {
+            throw new RuntimeException("No valid items in cart");
+        }
+
         // ── Step 2: Vendor per Order create ─────────────
         List<Integer> createdOrderIds = new ArrayList<>();
 
@@ -87,12 +98,14 @@ public class OrderService {
             order.setCustomerId(customerId);
             order.setPartnerId(partnerId);
             order.setStatus("PENDING");
-            order.setDeliveryAddress(request.getDeliveryAddress());
+            order.setDeliveryAddress(request.getDeliveryAddress());  // Uses helper method
             order.setSpecialNotes(request.getSpecialNotes());
             order.setTotalAmount(vendorTotal);
 
             Order savedOrder = orderRepository.save(order);
             createdOrderIds.add(savedOrder.getOrderId());
+
+            System.out.println("Order created: ID=" + savedOrder.getOrderId() + ", Partner=" + partnerId);
 
             // OrderItems save
             for (CartItemEntity cartItem : vendorItems) {
@@ -115,6 +128,8 @@ public class OrderService {
         // ── Step 3: Cart clear ───────────────────────────
         // DB cart_items delete + session clear
         cartService.clearCart(session);
+
+        System.out.println("Checkout complete. Orders created: " + createdOrderIds);
 
         return createdOrderIds;
     }

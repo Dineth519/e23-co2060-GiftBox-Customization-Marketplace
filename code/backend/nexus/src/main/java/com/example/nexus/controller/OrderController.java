@@ -14,21 +14,19 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class OrderController {
 
     @Autowired private OrderRepository orderRepository;
-    @Autowired private OrderService    orderService;   // [NEW]
+    @Autowired private OrderService    orderService;
 
     // ── GET /api/sellers/{sellerId}/orders ────────────────
-    // Vendor dashboard — seller ගේ orders list
     @GetMapping("/sellers/{sellerId}/orders")
     public List<Order> getOrdersBySeller(@PathVariable Integer sellerId) {
         return orderRepository.findByPartnerIdOrderByCreatedAtDesc(sellerId);
     }
 
     // ── PUT /api/orders/{orderId}/status ──────────────────
-    // Vendor — PENDING → CONFIRMED or CANCELLED only
     @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<?> updateOrderStatus(
             @PathVariable Integer orderId,
@@ -49,35 +47,51 @@ public class OrderController {
     }
 
     // ── POST /api/orders/checkout ─────────────────────────
-    // [NEW] Customer checkout
-    // Body: { deliveryAddress, specialNotes }
-    // 1. Cart items vendor අනුව split කරනවා
-    // 2. Vendor per Order create (status = PENDING)
-    // 3. Cart clear කරනවා
-    // Returns: { orderIds: [1, 2, ...] }
     @PostMapping("/orders/checkout")
     public ResponseEntity<?> checkout(
             @RequestBody CheckoutRequest request,
             HttpSession session) {
 
         try {
+            System.out.println("=== CHECKOUT REQUEST RECEIVED ===");
+            System.out.println("Full Name: " + request.getFullName());
+            System.out.println("Phone: " + request.getPhone());
+            System.out.println("Address Line 1: " + request.getAddressLine1());
+            System.out.println("Address Line 2: " + request.getAddressLine2());
+            System.out.println("City: " + request.getCity());
+            System.out.println("Special Notes: " + request.getSpecialNotes());
+            System.out.println("Session ID: " + session.getId());
+            System.out.println("Customer ID from session: " + session.getAttribute("customer_id"));
+            System.out.println("================================");
+
             List<Integer> orderIds = orderService.checkout(session, request);
+            
             return ResponseEntity.ok(Map.of(
                 "success",  true,
                 "orderIds", orderIds,
                 "message",  "Order placed successfully!"
             ));
+
         } catch (RuntimeException e) {
+            System.err.println("❌ CHECKOUT FAILED: " + e.getMessage());
+            e.printStackTrace();
+            
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            System.err.println("❌ UNEXPECTED ERROR: " + e.getMessage());
+            e.printStackTrace();
+            
+            return ResponseEntity.status(500).body(Map.of(
+                "success", false,
+                "message", "Server error: " + e.getMessage()
             ));
         }
     }
 
     // ── GET /api/orders/customer ──────────────────────────
-    // [NEW] Customer "My Orders" page
-    // Session ෙකෙ customer_id ගෙන orders return කරනවා
     @GetMapping("/orders/customer")
     public ResponseEntity<?> getCustomerOrders(HttpSession session) {
         Integer customerId = (Integer) session.getAttribute("customer_id");
@@ -88,9 +102,7 @@ public class OrderController {
             ));
         }
 
-        List<Order> orders =
-            orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
-
+        List<Order> orders = orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
         return ResponseEntity.ok(orders);
     }
 }

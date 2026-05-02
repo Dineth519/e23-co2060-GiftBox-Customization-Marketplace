@@ -1,17 +1,22 @@
 package com.example.nexus.dto;
 
-// ── Checkout POST request body ───────────────────────────
-// React checkout page ෙකෙ ඉදන් එනවා
-// Body: { deliveryAddress, specialNotes }
+import lombok.Data;
 
+@Data
 public class CheckoutRequest {
-
-    private String deliveryAddress;
+    private String fullName;
+    private String phone;
+    private String addressLine1;
+    private String addressLine2;
+    private String city;
     private String specialNotes;
-
-    public String getDeliveryAddress() { return deliveryAddress; }
-    public String getSpecialNotes()    { return specialNotes;    }
-
-    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
-    public void setSpecialNotes(String specialNotes)       { this.specialNotes    = specialNotes;    }
+    
+    // Helper method to build full address
+    public String getDeliveryAddress() {
+        return String.join(", ",
+            addressLine1,
+            addressLine2 != null ? addressLine2 : "",
+            city
+        ).replaceAll(", +", ", ").replaceAll(", $", "").trim();
+    }
 }
