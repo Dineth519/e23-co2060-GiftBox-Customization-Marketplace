@@ -209,7 +209,7 @@ const BoxBuilderPage = () => {
               <div className="bb-empty-cart">
                 <div className="bb-empty-icon">🛒</div>
                 <p>Your cart is currently empty.</p>
-                <button className="bb-btn-primary" onClick={() => navigate('/products')}>
+                <button className="bb-btn-primary" onClick={() => navigate('/home')}>
                   Browse Premium Items
                 </button>
               </div>
