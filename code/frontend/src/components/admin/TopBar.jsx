@@ -1,9 +1,18 @@
 import React from 'react';
-import { Bell, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, User, LogOut } from 'lucide-react';
 import './TopBar.css';
-import logo from '../../assets/logo-removebg-preview.png'; // Adjust path to your logo
+import logo from '../../assets/logo-removebg-preview.png';
 
 const TopBar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear authentication tokens if applicable
+    // localStorage.removeItem('token');
+    navigate('/');
+  };
+
   return (
     <header className="topbar-container">
 
@@ -16,7 +25,7 @@ const TopBar = () => {
         </div>
       </div>
 
-      {/* Right Section: Notifications & Profile */}
+      {/* Right Section: Notifications, Profile & Logout */}
       <div className="topbar-actions">
         
         {/* Notification Button */}
@@ -35,6 +44,30 @@ const TopBar = () => {
             <User size={18} />
           </div>
         </div>
+
+        {/* Logout Button */}
+        <button 
+          className="logout-btn" 
+          onClick={handleLogout}
+          title="Logout"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(231, 76, 60, 0.1)',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px',
+            cursor: 'pointer',
+            color: '#E74C3C',
+            marginLeft: '12px',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.2)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.1)'}
+        >
+          <LogOut size={20} />
+        </button>
         
       </div>
 

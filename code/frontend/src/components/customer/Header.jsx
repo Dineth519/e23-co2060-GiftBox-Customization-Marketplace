@@ -1,15 +1,21 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, User, ChevronDown } from 'lucide-react';
+import { Bell, User, ChevronDown, LogOut } from 'lucide-react'; // Added LogOut icon
 import CartBadge from './CartBadge.jsx';
 import './Header.css';
 
 const Header = () => {
   const navigate = useNavigate();
 
-  return (
-    <header className="topbar-container">   {/* ← was "giftora-header customer-header" */}
+  // Handle logout logic
+  const handleExit = () => {
+    // Add any session clearing logic here (e.g., localStorage.clear())
+    console.log("User logged out");
+    navigate('/'); // Redirect to landing page or login
+  };
 
+  return (
+    <header className="topbar-container">
       {/* Left — Logo & Brand */}
       <div className="topbar-brand" onClick={() => navigate('/customer/home')} style={{ cursor: 'pointer' }}>
         <div className="brand-text-wrapper">
@@ -28,6 +34,7 @@ const Header = () => {
           <button
             key={item.label}
             onClick={() => navigate(item.route)}
+            className="nav-link-btn" // Recommended: move inline styles to CSS
             style={{
               background: 'none',
               border: 'none',
@@ -54,9 +61,10 @@ const Header = () => {
         ))}
       </nav>
 
-      {/* Right — Notifications & Profile */}
+      {/* Right — Notifications, Profile & Exit */}
       <div className="topbar-actions">
         <CartBadge />
+        
         <button className="notification-btn">
           <Bell className="notification-icon" size={20} />
           <span className="notification-badge"></span>
@@ -72,6 +80,30 @@ const Header = () => {
           </div>
           <ChevronDown size={14} style={{ color: '#5DADE2' }} />
         </div>
+
+        {/* Exit Button */}
+        <button 
+          className="exit-btn" 
+          onClick={handleExit}
+          title="Exit"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(231, 76, 60, 0.1)', // Subtle red background
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px',
+            cursor: 'pointer',
+            color: '#E74C3C',
+            marginLeft: '8px',
+            transition: 'background 0.2s'
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.2)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.1)'}
+        >
+          <LogOut size={20} />
+        </button>
 
       </div>
     </header>

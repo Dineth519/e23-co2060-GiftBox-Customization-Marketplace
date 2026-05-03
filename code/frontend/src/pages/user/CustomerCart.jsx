@@ -115,7 +115,7 @@ const CustomerCart = () => {
           {/* Footer actions */}
           <div className="cc-items__footer">
             <button className="cc-clear-btn" onClick={clearCart}>🗑️ Clear Cart</button>
-            <button className="cc-continue-btn" onClick={() => navigate('/products')}>
+            <button className="cc-continue-btn" onClick={() => navigate('/home')}>
               ← Continue Shopping
             </button>
           </div>
@@ -152,14 +152,14 @@ const CustomerCart = () => {
           {/* Logged-in → go straight to checkout (no login redirect) */}
           <button
             className="cc-checkout-btn"
-            onClick={() => navigate('/customer/checkout')}
+            onClick={() => navigate('/customer/cart')}
           >
             Proceed to Checkout →
           </button>
 
           <button
             className="cc-build-btn"
-            onClick={() => navigate('/customer/customize')}
+            onClick={() => navigate('/customer/build-box')}
           >
             + Build a Gift Box
           </button>
