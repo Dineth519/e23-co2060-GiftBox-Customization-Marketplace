@@ -63,7 +63,7 @@ const BoxBuilderPage = () => {
   
   const subtotal = useMemo(() => {
     return Object.entries(selectedItems).reduce((sum, [id, qty]) => {
-      const product = availableItems.find(p => p.id === parseInt(id));
+      const product = availableItems.find(p => p.productId === parseInt(id));
       return sum + (product ? product.price * qty : 0);
     }, 0);
   }, [selectedItems, availableItems]);
@@ -84,7 +84,7 @@ const BoxBuilderPage = () => {
       return;
     }
 
-    setSelectedItems(prev => ({ ...prev, [product.id]: (prev[product.id] || 0) + 1 }));
+    setSelectedItems(prev => ({ ...prev, [product.productId]: (prev[product.productId] || 0) + 1 }));
   };
 
   const handleRemoveItem = (productId) => {
@@ -223,12 +223,12 @@ const BoxBuilderPage = () => {
               <>
                 <div className="bb-grid-products">
                   {availableItems.map(p => {
-                    const qty = selectedItems[p.id] || 0;
+                    const qty = selectedItems[p.productId] || 0;
                     const currentLimit = boxSize ? boxSize.limit : MAX_ITEMS_GLOBAL;
                     const isMaxedOut = totalItemsCount >= currentLimit && qty === 0;
 
                     return (
-                      <div key={p.id} className="bb-product-card">
+                      <div key={p.productId} className="bb-product-card">
                         <img src={p.imageUrl} alt={p.name} className="bb-product-img" loading="lazy" />
                         <div className="bb-product-body">
                           <h4 className="bb-product-title">{p.name}</h4>
@@ -236,7 +236,7 @@ const BoxBuilderPage = () => {
                           
                           {qty > 0 ? (
                             <div className="bb-qty-controls">
-                              <button onClick={() => handleRemoveItem(p.id)}>−</button>
+                              <button onClick={() => handleRemoveItem(p.productId)}>−</button>
                               <span>{qty}</span>
                               <button onClick={() => handleAddItem(p)} disabled={isMaxedOut}>+</button>
                             </div>

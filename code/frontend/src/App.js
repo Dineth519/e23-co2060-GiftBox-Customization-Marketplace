@@ -20,6 +20,7 @@ import CustomerProfile from './pages/user/Profile.jsx'
 import AboutUs from './pages/user/AboutUsPage.jsx';
 import HowItWorks from './pages/user/HowItWorksPage.jsx';
 import BoxBuilder from './pages/user/BoxBuilderPage.jsx'
+import Checkout from './pages/user/Checkout.jsx';
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
@@ -104,6 +105,7 @@ function App() {
             <Route path="orders/:orderId" element={<OrderDetail />} />
             <Route path="profile" element={<CustomerProfile />} />
             <Route path="cart" element={<CustomerCart />} />
+            <Route path="checkout" element={<Checkout />} />
             <Route path="about-us" element={<AboutUs />} />
             <Route path="how-it-works" element={<HowItWorks />} />
             <Route path="build-box" element={<BoxBuilder />} />

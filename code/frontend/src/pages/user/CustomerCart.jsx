@@ -152,7 +152,7 @@ const CustomerCart = () => {
           {/* Logged-in → go straight to checkout (no login redirect) */}
           <button
             className="cc-checkout-btn"
-            onClick={() => navigate('/customer/cart')}
+            onClick={() => navigate('/customer/checkout')}
           >
             Proceed to Checkout →
           </button>

@@ -112,8 +112,8 @@ public class AuthService {
             return new AuthResponse(false, "Incorrect password");
         }
 
-        // 👈 වෙනස් කරපු තැන: Role එක යවනවා
-        return new AuthResponse(true, "Login Successful", user.getRole().name());
+        // 👈 වෙනස් කරපු තැන: Role එක සහ User ID එක යවනවා
+        return new AuthResponse(true, "Login Successful", user.getRole().name(), user.getId().intValue());
     }
 
     // ── Resend Code ────────────────────────────
