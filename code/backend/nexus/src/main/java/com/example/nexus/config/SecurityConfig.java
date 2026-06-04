@@ -36,9 +36,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of(
+        config.setAllowedOriginPatterns(List.of(
             "http://localhost:3000",   // Windows members React
-            "http://localhost:5173"    // Vite React
+            "http://localhost:5173",   // Vite React
+            "https://*.vercel.app"     // Vercel deployments
         ));
 
         config.setAllowedMethods(List.of(
