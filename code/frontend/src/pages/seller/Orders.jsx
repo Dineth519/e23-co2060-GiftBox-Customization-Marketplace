@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import './Orders.css';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
 const SELLER_ID = 2; // ඔයාගේ Vendor ID එක
 
 // Database එකේ තියෙන Status පිළිවෙළ

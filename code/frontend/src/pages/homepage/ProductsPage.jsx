@@ -53,7 +53,7 @@ const ProductsPage = () => {
   useEffect(() => { setActiveCategory(urlCategory); }, [urlCategory]);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/products')
+    fetch(`${process.env.REACT_APP_API_URL}/api/products`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
       .then(data => { setAllProducts(data); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });

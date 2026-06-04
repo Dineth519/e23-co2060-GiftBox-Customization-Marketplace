@@ -130,7 +130,7 @@ export default function GiftCustomizer() {
  
     try {
       // TODO: replace with your actual Spring Boot base URL if different
-      const response = await fetch("http://localhost:8080/api/cart/add", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // If your backend uses JWT auth, add:

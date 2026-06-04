@@ -102,7 +102,7 @@ export default function Orders() {
         // TODO: replace with your real Spring Boot URL
         // Also add Authorization header if you use JWT tokens:
         // headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        const response = await fetch('http://localhost:8080/api/orders/customer', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/customer`, {
           headers: {
             'Content-Type': 'application/json',
           },
