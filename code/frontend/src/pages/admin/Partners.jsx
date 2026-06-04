@@ -20,7 +20,7 @@ const Partners = () => {
 
   // Fetch active and pending partners from backend API on mount
   useEffect(() => {
-    fetch('http://localhost:8080/api/partners')
+    fetch(`${process.env.REACT_APP_API_URL}/api/partners`)
       .then(res => res.json())
       .then(data => {
         // Count pending partners

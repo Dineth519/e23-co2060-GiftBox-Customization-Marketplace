@@ -1,21 +1,11 @@
 // Profile.jsx
-// This is the customer Profile page.
-// It has 4 sections:
-// 1. Personal Info — name, email, phone
-// 2. Change Password — current + new password fields
-// 3. Delivery Addresses — saved addresses list
-// 4. Order Statistics — quick summary of customer's order history
+// Renders inside CustomerLayout via <Outlet />.
+// No full-page reload — React Router handles navigation.
 
 import React, { useState, useEffect } from 'react';
 import './Profile.css';
 
-// ─── SAMPLE DATA ──────────────────────────────────────────────────────────────
-// Used as fallback when Spring Boot backend is not running.
-// Replace with real API calls later:
-// GET  /api/customer/profile
-// GET  /api/customer/addresses
-// GET  /api/customer/stats
-
+// ─── SAMPLE DATA (replace with real API calls) ────────────────────────────────
 const sampleProfile = {
   firstName: 'Nimasha',
   lastName:  'Perera',
@@ -44,42 +34,38 @@ const sampleAddresses = [
 ];
 
 const sampleStats = {
-  totalOrders:    4,
-  delivered:      1,
-  inProgress:     3,
-  totalSpent:     11840,
+  totalOrders: 4,
+  delivered:   1,
+  inProgress:  3,
+  totalSpent:  11840,
 };
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function Profile() {
 
-  // ── State ─────────────────────────────────────────────────────────────────
-  const [profile,       setProfile]       = useState(null);
-  const [addresses,     setAddresses]     = useState([]);
-  const [stats,         setStats]         = useState(null);
-  const [loading,       setLoading]       = useState(true);
-  const [activeTab,     setActiveTab]     = useState('info');  // which tab is open
+  const [profile,      setProfile]      = useState(null);
+  const [addresses,    setAddresses]    = useState([]);
+  const [stats,        setStats]        = useState(null);
+  const [loading,      setLoading]      = useState(true);
+  const [activeTab,    setActiveTab]    = useState('info');
 
-  // Form fields for personal info section
-  const [infoForm,      setInfoForm]      = useState({ firstName:'', lastName:'', email:'', phone:'' });
-  const [infoSaved,     setInfoSaved]     = useState(false);   // shows "Saved!" message
-  const [infoError,     setInfoError]     = useState('');      // shows error if fields empty
+  const [infoForm,     setInfoForm]     = useState({ firstName:'', lastName:'', email:'', phone:'' });
+  const [infoSaved,    setInfoSaved]    = useState(false);
+  const [infoError,    setInfoError]    = useState('');
 
-  // Form fields for change password section
-  const [passForm,      setPassForm]      = useState({ current:'', newPass:'', confirm:'' });
-  const [passSaved,     setPassSaved]     = useState(false);
-  const [passError,     setPassError]     = useState('');
+  const [passForm,     setPassForm]     = useState({ current:'', newPass:'', confirm:'' });
+  const [passSaved,    setPassSaved]    = useState(false);
+  const [passError,    setPassError]    = useState('');
 
-  // Controls the "Add new address" form visibility
-  const [showAddrForm,  setShowAddrForm]  = useState(false);
-  const [newAddr,       setNewAddr]       = useState({ label:'', line1:'', city:'', province:'' });
-  const [addrError,     setAddrError]     = useState('');
+  const [showAddrForm, setShowAddrForm] = useState(false);
+  const [newAddr,      setNewAddr]      = useState({ label:'', line1:'', city:'', province:'' });
+  const [addrError,    setAddrError]    = useState('');
 
-  // ── Fetch profile data on page load ───────────────────────────────────────
+  // ── Fetch on mount ────────────────────────────────────────────────────────
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch('http://localhost:8080/api/customer/profile', {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/customer/profile`, {
           headers: { 'Content-Type': 'application/json' },
         });
         if (res.ok) {
@@ -93,11 +79,8 @@ export default function Profile() {
             email:     data.profile.email,
             phone:     data.profile.phone,
           });
-        } else {
-          throw new Error('API not ready');
-        }
+        } else throw new Error();
       } catch {
-        // Fall back to sample data if backend not running
         setProfile(sampleProfile);
         setAddresses(sampleAddresses);
         setStats(sampleStats);
@@ -114,30 +97,25 @@ export default function Profile() {
     fetchData();
   }, []);
 
-  // ── Save personal info ────────────────────────────────────────────────────
+  // ── Handlers ──────────────────────────────────────────────────────────────
   async function handleSaveInfo() {
-    // Basic validation — all fields must be filled
     if (!infoForm.firstName || !infoForm.lastName || !infoForm.email || !infoForm.phone) {
       setInfoError('Please fill in all fields.');
       return;
     }
     setInfoError('');
     try {
-      await fetch('http://localhost:8080/api/customer/profile', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/customer/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(infoForm),
       });
-    } catch {
-      // Backend not ready — just show success for demo
-    }
-    // Update local profile state and show "Saved!" for 2 seconds
+    } catch { /* backend not ready */ }
     setProfile((prev) => ({ ...prev, ...infoForm }));
     setInfoSaved(true);
     setTimeout(() => setInfoSaved(false), 2000);
   }
 
-  // ── Change password ───────────────────────────────────────────────────────
   async function handleChangePassword() {
     if (!passForm.current || !passForm.newPass || !passForm.confirm) {
       setPassError('Please fill in all fields.');
@@ -153,20 +131,17 @@ export default function Profile() {
     }
     setPassError('');
     try {
-      await fetch('http://localhost:8080/api/customer/password', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/customer/password`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword: passForm.current, newPassword: passForm.newPass }),
       });
-    } catch {
-      // Backend not ready — show success for demo
-    }
+    } catch { /* backend not ready */ }
     setPassSaved(true);
     setPassForm({ current: '', newPass: '', confirm: '' });
     setTimeout(() => setPassSaved(false), 2000);
   }
 
-  // ── Add new address ───────────────────────────────────────────────────────
   async function handleAddAddress() {
     if (!newAddr.label || !newAddr.line1 || !newAddr.city || !newAddr.province) {
       setAddrError('Please fill in all address fields.');
@@ -175,39 +150,30 @@ export default function Profile() {
     setAddrError('');
     const address = { ...newAddr, id: Date.now(), isDefault: addresses.length === 0 };
     try {
-      await fetch('http://localhost:8080/api/customer/addresses', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/customer/addresses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(address),
       });
-    } catch {
-      // Backend not ready — add locally
-    }
+    } catch { /* backend not ready */ }
     setAddresses((prev) => [...prev, address]);
-    setNewAddr({ label: '', line1: '', city: '', province: '' });
+    setNewAddr({ label:'', line1:'', city:'', province:'' });
     setShowAddrForm(false);
   }
 
-  // ── Remove address ────────────────────────────────────────────────────────
   function handleRemoveAddress(id) {
     setAddresses((prev) => prev.filter((a) => a.id !== id));
   }
 
-  // ── Set default address ───────────────────────────────────────────────────
   function handleSetDefault(id) {
-    setAddresses((prev) =>
-      prev.map((a) => ({ ...a, isDefault: a.id === id }))
-    );
+    setAddresses((prev) => prev.map((a) => ({ ...a, isDefault: a.id === id })));
   }
 
-  // ── Format join date ──────────────────────────────────────────────────────
   function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric', month: 'long',
-    });
+    return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
   }
 
-  // ─── RENDER ───────────────────────────────────────────────────────────────
+  // ── Loading state ─────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="pf-loading">
@@ -217,25 +183,27 @@ export default function Profile() {
     );
   }
 
+  // ─── RENDER ───────────────────────────────────────────────────────────────
   return (
     <div className="pf-page">
 
-      {/* ══ PROFILE HEADER ══ */}
-      {/* Avatar circle with initials + name + member since */}
-      <div className="pf-header">
-        <div className="pf-avatar">
-          {/* Shows first letter of first and last name */}
-          {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
-        </div>
-        <div className="pf-header-info">
-          <h1 className="pf-name">{profile.firstName} {profile.lastName}</h1>
-          <p className="pf-meta">{profile.email}</p>
-          <p className="pf-meta">Member since {formatDate(profile.joinDate)}</p>
+      {/* ── HERO HEADER ── */}
+      <div className="pf-hero">
+        <div className="pf-hero-bg" />
+        <div className="pf-hero-inner">
+          <div className="pf-avatar">
+            {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
+          </div>
+          <div className="pf-hero-info">
+            <h1 className="pf-name">{profile.firstName} {profile.lastName}</h1>
+            <p className="pf-meta">{profile.email}</p>
+            <p className="pf-meta">Member since {formatDate(profile.joinDate)}</p>
+            <span className="pf-badge">Premium Member</span>
+          </div>
         </div>
       </div>
 
-      {/* ══ ORDER STATS ROW ══ */}
-      {/* 4 quick-stat boxes shown at the top */}
+      {/* ── STATS ROW ── */}
       <div className="pf-stats-row">
         <div className="pf-stat-box">
           <span className="pf-stat-num">{stats.totalOrders}</span>
@@ -255,34 +223,35 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ══ TAB NAVIGATION ══ */}
-      {/* Switches between the 3 main sections */}
+      {/* ── TABS ── */}
       <div className="pf-tabs">
         {[
-          { key: 'info',      label: '👤 Personal Info'    },
-          { key: 'password',  label: '🔒 Password'         },
-          { key: 'addresses', label: '📍 Addresses'        },
+          { key: 'info',      label: 'Personal Info',     icon: '👤' },
+          { key: 'password',  label: 'Password',          icon: '🔒' },
+          { key: 'addresses', label: 'Addresses',         icon: '📍' },
         ].map((tab) => (
           <button
             key={tab.key}
             className={`pf-tab ${activeTab === tab.key ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.key)}
           >
+            <span className="pf-tab-icon">{tab.icon}</span>
             {tab.label}
           </button>
         ))}
       </div>
 
-      {/* ══ TAB CONTENT ══ */}
+      {/* ── TAB CONTENT ── */}
       <div className="pf-tab-content">
 
-        {/* ── TAB 1: Personal Info ── */}
+        {/* ─ Personal Info ─ */}
         {activeTab === 'info' && (
           <div className="pf-card">
-            <h3 className="pf-card-title">Personal Information</h3>
-            <p className="pf-card-desc">Update your name, email and phone number.</p>
+            <div className="pf-card-header">
+              <h3 className="pf-card-title">Personal Information</h3>
+              <p className="pf-card-desc">Update your name, email and phone number.</p>
+            </div>
 
-            {/* Two column: first name + last name */}
             <div className="pf-form-row">
               <div className="pf-form-group">
                 <label className="pf-label">First Name</label>
@@ -306,7 +275,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Email */}
             <div className="pf-form-group">
               <label className="pf-label">Email Address</label>
               <input
@@ -318,7 +286,6 @@ export default function Profile() {
               />
             </div>
 
-            {/* Phone */}
             <div className="pf-form-group">
               <label className="pf-label">Phone Number</label>
               <input
@@ -330,10 +297,8 @@ export default function Profile() {
               />
             </div>
 
-            {/* Error message */}
             {infoError && <p className="pf-error">{infoError}</p>}
 
-            {/* Save button */}
             <button
               className={`pf-btn-primary ${infoSaved ? 'saved' : ''}`}
               onClick={handleSaveInfo}
@@ -343,11 +308,13 @@ export default function Profile() {
           </div>
         )}
 
-        {/* ── TAB 2: Change Password ── */}
+        {/* ─ Change Password ─ */}
         {activeTab === 'password' && (
           <div className="pf-card">
-            <h3 className="pf-card-title">Change Password</h3>
-            <p className="pf-card-desc">Choose a strong password with at least 6 characters.</p>
+            <div className="pf-card-header">
+              <h3 className="pf-card-title">Change Password</h3>
+              <p className="pf-card-desc">Choose a strong password with at least 6 characters.</p>
+            </div>
 
             <div className="pf-form-group">
               <label className="pf-label">Current Password</label>
@@ -382,10 +349,8 @@ export default function Profile() {
               />
             </div>
 
-            {/* Error message */}
             {passError && <p className="pf-error">{passError}</p>}
 
-            {/* Save button */}
             <button
               className={`pf-btn-primary ${passSaved ? 'saved' : ''}`}
               onClick={handleChangePassword}
@@ -395,23 +360,20 @@ export default function Profile() {
           </div>
         )}
 
-        {/* ── TAB 3: Delivery Addresses ── */}
+        {/* ─ Delivery Addresses ─ */}
         {activeTab === 'addresses' && (
           <div>
-            {/* Saved address cards */}
             <div className="pf-addresses-list">
               {addresses.map((addr) => (
                 <div key={addr.id} className={`pf-addr-card ${addr.isDefault ? 'default' : ''}`}>
                   <div className="pf-addr-top">
                     <div className="pf-addr-label-row">
                       <span className="pf-addr-label">{addr.label}</span>
-                      {/* Green "Default" badge for the default address */}
                       {addr.isDefault && (
                         <span className="pf-addr-default-badge">Default</span>
                       )}
                     </div>
                     <div className="pf-addr-actions">
-                      {/* Only show "Set Default" if not already default */}
                       {!addr.isDefault && (
                         <button
                           className="pf-addr-btn"
@@ -434,17 +396,15 @@ export default function Profile() {
               ))}
             </div>
 
-            {/* Add New Address button / form */}
             {!showAddrForm ? (
-              <button
-                className="pf-add-addr-btn"
-                onClick={() => setShowAddrForm(true)}
-              >
+              <button className="pf-add-addr-btn" onClick={() => setShowAddrForm(true)}>
                 + Add New Address
               </button>
             ) : (
               <div className="pf-card">
-                <h3 className="pf-card-title">New Address</h3>
+                <div className="pf-card-header">
+                  <h3 className="pf-card-title">New Address</h3>
+                </div>
 
                 <div className="pf-form-row">
                   <div className="pf-form-group">
@@ -494,7 +454,7 @@ export default function Profile() {
 
                 {addrError && <p className="pf-error">{addrError}</p>}
 
-                <div className="pf-form-row">
+                <div className="pf-form-row" style={{ marginTop: '8px' }}>
                   <button className="pf-btn-primary" onClick={handleAddAddress}>
                     Save Address
                   </button>
@@ -510,7 +470,7 @@ export default function Profile() {
           </div>
         )}
 
-      </div>{/* end pf-tab-content */}
+      </div>
     </div>
   );
 }

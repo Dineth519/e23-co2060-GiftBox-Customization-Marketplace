@@ -28,7 +28,7 @@ export const CartProvider = ({ children }) => {
   // ── Add to Cart (#43) ────────────────────────────────────────
   const addToCart = useCallback(async (product) => {
     try {
-      const res = await fetch('http://localhost:8080/api/cart/add', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/add`, {
         method:      'POST',
         credentials: 'include',           // session cookie
         headers:     { 'Content-Type': 'application/json' },
@@ -56,7 +56,7 @@ export const CartProvider = ({ children }) => {
   const removeItem = useCallback(async (productId) => {
     try {
       const res = await fetch(
-        `http://localhost:8080/api/cart/remove/${productId}`,
+        `${process.env.REACT_APP_API_URL}/api/cart/remove/${productId}`,
         { method: 'DELETE', credentials: 'include' }
       );
       const data = await res.json();
@@ -70,7 +70,7 @@ export const CartProvider = ({ children }) => {
   // ── Update quantity ──────────────────────────────────────────
   const updateQty = useCallback(async (productId, quantity) => {
     try {
-      const res = await fetch('http://localhost:8080/api/cart/update', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/update`, {
         method:      'PUT',
         credentials: 'include',
         headers:     { 'Content-Type': 'application/json' },
@@ -87,7 +87,7 @@ export const CartProvider = ({ children }) => {
   // ── Clear cart ───────────────────────────────────────────────
   const clearCart = useCallback(async () => {
     try {
-      await fetch('http://localhost:8080/api/cart/clear',
+      await fetch(`${process.env.REACT_APP_API_URL}/api/cart/clear`,
         { method: 'DELETE', credentials: 'include' }
       );
       setCartItems([]);
@@ -101,7 +101,7 @@ export const CartProvider = ({ children }) => {
   // ── Load cart on mount ───────────────────────────────────────
   const loadCart = useCallback(async () => {
     try {
-      const res  = await fetch('http://localhost:8080/api/cart',
+      const res  = await fetch(`${process.env.REACT_APP_API_URL}/api/cart`,
         { credentials: 'include' }
       );
       const data = await res.json();

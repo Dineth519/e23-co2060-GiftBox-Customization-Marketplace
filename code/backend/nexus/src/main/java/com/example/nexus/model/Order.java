@@ -44,6 +44,25 @@ public class Order {
     @JsonProperty("total_amount")
     private BigDecimal totalAmount;
 
+    @Column(name = "occasion")
+    private String occasion;
+
+    @Column(name = "box_size")
+    @JsonProperty("box_size")
+    private String boxSize;
+
+    @Column(name = "gift_message")
+    @JsonProperty("gift_message")
+    private String giftMessage;
+
+    @Column(name = "recipient_name")
+    @JsonProperty("recipient_name")
+    private String recipientName;
+
+    @Column(name = "wrapping_style")
+    @JsonProperty("wrapping_style")
+    private String wrappingStyle;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     @JsonProperty("created_at")
     private LocalDateTime createdAt;

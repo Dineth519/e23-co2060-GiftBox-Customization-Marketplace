@@ -24,10 +24,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cart")
-@CrossOrigin(
-    origins        = "http://localhost:3000",  // React dev server
-    allowCredentials = "true"                   // allow session cookie
-)
 public class CartController {
 
     @Autowired

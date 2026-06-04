@@ -10,7 +10,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/seller")
-@CrossOrigin(origins = "http://localhost:3000")
 public class SellerDashboardController {
 
     @Autowired private OrderRepository orderRepository;

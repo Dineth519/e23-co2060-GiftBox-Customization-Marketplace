@@ -11,15 +11,6 @@ import './HomePage.css';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const CATEGORIES = [
-  { icon: '📦', label: 'Build Your Box',  gradient: 'linear-gradient(135deg,#C9A961,#D4AF37)', route: '/build'                       },
-  { icon: '🎀', label: 'Gift Bundles',    gradient: 'linear-gradient(135deg,#5DADE2,#2E86C1)', route: '/products'                    },
-  { icon: '👔', label: 'For Him',         gradient: 'linear-gradient(135deg,#1A1A2E,#16213E)', route: '/products?category=Watches'   },
-  { icon: '👑', label: 'For Her',         gradient: 'linear-gradient(135deg,#C9A961,#E8C97A)', route: '/products?category=Bangles'   },
-  { icon: '🏢', label: 'Corporate',       gradient: 'linear-gradient(135deg,#16213E,#1A1A2E)', route: '/products?category=Wine'      },
-  { icon: '🌸', label: 'Seasonal',        gradient: 'linear-gradient(135deg,#5DADE2,#C9A961)', route: '/products?category=Chocolates'},
-];
-
 const FEATURES = [
   { icon: '🎨', title: 'Fully Custom',   desc: 'Build your own box from scratch' },
   { icon: '🚀', title: 'Fast Delivery',  desc: 'Same day delivery available'     },
@@ -290,7 +281,7 @@ const HeroSection = () => {
           </p>
 
           <div className="hero__cta-group">
-            <button className="btn-hero-primary" onClick={() => navigate('/build')}>
+            <button className="btn-hero-primary" onClick={() => navigate('/build-box')}>
               <span className="btn-icon">🎁</span>
               <span>Start Customizing</span>
               <span className="btn-arrow">→</span>
@@ -413,38 +404,7 @@ const PromoBanner = () => {
   );
 };
 
-// ─── Categories ───────────────────────────────────────────────────────────────
-
-const CategoriesStrip = () => {
-  const navigate = useNavigate();
-  const [ref, visible] = useReveal();
-  return (
-    <section className={`categories-strip section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
-      <div className="section-inner">
-        <div className="categories-strip__header">
-          <div className="section-label center">Explore</div>
-          <h2 className="section-title center">Shop by Category</h2>
-        </div>
-      </div>
-      <div className="categories-strip__grid">
-        {CATEGORIES.map((cat, i) => (
-          <button
-            key={i}
-            className="category-tile"
-            style={{ '--cat-gradient': cat.gradient, animationDelay: `${i * 0.08}s` }}
-            onClick={() => navigate(cat.route)}
-          >
-            <div className="category-tile__orb" />
-            <span className="category-tile__icon">{cat.icon}</span>
-            <span className="category-tile__label">{cat.label}</span>
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-};
-
-// ─── NEW: Featured Gift Boxes Showcase (Epic Games Launcher Style) ────────────
+// ─── Featured Gift Boxes Showcase ────────────
 
 const GiftBoxShowcase = () => {
   const navigate = useNavigate();
@@ -558,7 +518,7 @@ const FeaturedProducts = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/products')
+    fetch(`${process.env.REACT_APP_API_URL}/api/products`)
       .then(response => response.json())
       .then(data => {
         setDbProducts(data.slice(0, 6));
@@ -643,7 +603,7 @@ const TrendingGrid = () => {
   const [quickView, setQuickView] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/products')
+    fetch(`${process.env.REACT_APP_API_URL}/api/products`)
       .then(r => r.json())
       .then(data => {
         setProducts(data.slice(0, 8));
@@ -884,7 +844,6 @@ const HomePage = () => (
       <HeroSection />
       <TrustBar />
       <PromoBanner />
-      <CategoriesStrip />
       <GiftBoxShowcase />
       <FeaturedProducts />
       <TrendingGrid />

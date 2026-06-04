@@ -28,7 +28,7 @@ const StaffManagement = () => {
 
   // Fetch assemblers from backend
   useEffect(() => {
-    fetch('http://localhost:8080/api/assemblers')
+    fetch(`${process.env.REACT_APP_API_URL}/api/assemblers`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
@@ -52,7 +52,7 @@ const StaffManagement = () => {
   // Toggle assembler active/inactive status
   const toggleStatus = (id, currentStatus) => {
     const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-    fetch(`http://localhost:8080/api/assemblers/${id}/status?status=${newStatus}`, {
+    fetch(`${process.env.REACT_APP_API_URL}/api/assemblers/${id}/status?status=${newStatus}`, {
       method: 'PUT'
     })
       .then(res => res.json())
@@ -71,7 +71,7 @@ const StaffManagement = () => {
 
   // Add new assembler account
   const handleAddAssembler = () => {
-    fetch('http://localhost:8080/api/assemblers', {
+    fetch(`${process.env.REACT_APP_API_URL}/api/assemblers`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...newAssembler, status: 'ACTIVE' })

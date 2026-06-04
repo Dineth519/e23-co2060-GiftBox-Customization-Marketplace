@@ -27,7 +27,7 @@ const AddressForm = ({ onAddressSaved, compact = false }) => {
   useEffect(() => {
     const fetchAddress = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/api/users/${username}/address`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${username}/address`);
         const data = await res.json();
         if (data.success && data.address) {
           setFormData({
@@ -83,7 +83,7 @@ const AddressForm = ({ onAddressSaved, compact = false }) => {
     setSuccessMsg('');
 
     try {
-      const res = await fetch(`http://localhost:8080/api/users/${username}/address`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${username}/address`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

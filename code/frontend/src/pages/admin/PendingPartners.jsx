@@ -17,7 +17,7 @@ const PendingPartners = () => {
 
   // Fetch pending partners from backend API on component mount
   useEffect(() => {
-    fetch('http://localhost:8080/api/partners')
+    fetch(`${process.env.REACT_APP_API_URL}/api/partners`)
       .then(res => res.json())
       .then(data => {
         // Filter for pending partners and map to local state structure
@@ -44,7 +44,7 @@ const PendingPartners = () => {
    * @param {string} newStatus - New status (ACTIVE or REJECTED)
    */
   const handleStatusUpdate = (id, newStatus) => {
-    fetch(`http://localhost:8080/api/partners/${id}/status?status=${newStatus}`, {
+    fetch(`${process.env.REACT_APP_API_URL}/api/partners/${id}/status?status=${newStatus}`, {
       method: 'PUT',
     })
     .then(response => {

@@ -10,7 +10,7 @@ import {
 import './SellerDashboard.css';
 
 // ── Config ────────────────────────────────────────────────────
-const API_BASE  = 'http://localhost:8080/api';
+const API_BASE  = `${process.env.REACT_APP_API_URL}/api`;
 const SELLER_ID = 2;
 
 // ── Fallback mock data (API fail වුණොත් මේවා පෙන්වේ) ──────────
