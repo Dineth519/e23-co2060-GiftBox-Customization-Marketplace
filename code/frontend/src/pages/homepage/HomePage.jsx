@@ -518,7 +518,7 @@ const FeaturedProducts = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/products')
+    fetch(`${process.env.REACT_APP_API_URL}/api/products`)
       .then(response => response.json())
       .then(data => {
         setDbProducts(data.slice(0, 6));
@@ -603,7 +603,7 @@ const TrendingGrid = () => {
   const [quickView, setQuickView] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/products')
+    fetch(`${process.env.REACT_APP_API_URL}/api/products`)
       .then(r => r.json())
       .then(data => {
         setProducts(data.slice(0, 8));

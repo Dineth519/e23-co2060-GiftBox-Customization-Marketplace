@@ -113,7 +113,7 @@ const AddItems = () => {
       const SELLER_ID = 2; // දැනට Gift World ගේ ID එක 
 
       // 3. Spring Boot API එකට POST Request එක යැවීම
-      await axios.post(`http://localhost:8080/api/sellers/${SELLER_ID}/products`, payload);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/sellers/${SELLER_ID}/products`, payload);
 
       // සාර්ථක වුණාම My Items පිටුවට යැවීම
       setTimeout(() => {

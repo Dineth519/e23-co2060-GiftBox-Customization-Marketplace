@@ -133,7 +133,7 @@ export default function OrderDetail() {
       try {
         // TODO: replace with your real Spring Boot URL
         // This calls: GET /api/orders/ORD-1001
-        const response = await fetch(`http://localhost:8080/api/orders/${orderId}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/${orderId}`, {
           headers: {
             'Content-Type': 'application/json',
             // If using JWT: 'Authorization': `Bearer ${localStorage.getItem('token')}`

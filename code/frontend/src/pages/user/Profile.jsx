@@ -65,7 +65,7 @@ export default function Profile() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch('http://localhost:8080/api/customer/profile', {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/customer/profile`, {
           headers: { 'Content-Type': 'application/json' },
         });
         if (res.ok) {
@@ -105,7 +105,7 @@ export default function Profile() {
     }
     setInfoError('');
     try {
-      await fetch('http://localhost:8080/api/customer/profile', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/customer/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(infoForm),
@@ -131,7 +131,7 @@ export default function Profile() {
     }
     setPassError('');
     try {
-      await fetch('http://localhost:8080/api/customer/password', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/customer/password`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword: passForm.current, newPassword: passForm.newPass }),
@@ -150,7 +150,7 @@ export default function Profile() {
     setAddrError('');
     const address = { ...newAddr, id: Date.now(), isDefault: addresses.length === 0 };
     try {
-      await fetch('http://localhost:8080/api/customer/addresses', {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/customer/addresses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(address),
