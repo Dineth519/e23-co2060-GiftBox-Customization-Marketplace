@@ -47,7 +47,7 @@ CREATE TABLE customers (
 );
 
 -- Partner (Vendor) table
---   is_trusted  = Admin විසින් mark කරනු ලබන trusted vendors
+--   is_trusted  = Flag set by Admin to mark trusted vendors
 CREATE TABLE partners (
     partner_id      INT PRIMARY KEY,
     shop_name       VARCHAR(100) NOT NULL,

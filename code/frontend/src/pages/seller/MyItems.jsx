@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaThLarge, FaList, FaSearch, FaEdit, FaTrash, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
-import './MyItems.css'; // ඔයාගේ පරණ CSS එකමයි, කිසිම වෙනසක් නෑ
+import './MyItems.css'; // Uses the existing MyItems CSS file
 
 // ── Constants ──────────────────────────────────────────────────
 const CATEGORIES = ['All', 'Gift Boxes', 'Hampers', 'Floral', 'Special'];
@@ -23,7 +23,7 @@ const stockColor = (stock) => {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const ProductCard = ({ product, isEditing, editForm, onEditChange, onStartEdit, onSaveEdit, onCancelEdit, onDelete }) => {
   
-  // Edit කරන අවස්ථාවේ පෙනෙන කොටස (CSS වෙනස් නොකර Inline Styles භාවිතා කර ඇත)
+  // Inline edit form view — rendered when editing mode is active (uses inline styles to preserve original CSS)
   if (isEditing) {
     return (
       <div className="product-card" style={{ padding: '15px', background: '#FDFBF7', border: '1px solid #E0D8C8', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -50,7 +50,7 @@ const ProductCard = ({ product, isEditing, editForm, onEditChange, onStartEdit, 
     );
   }
 
-  // සාමාන්‍ය අවස්ථාව (ඔයාගේ මුල් Design එක කිසිම වෙනසක් නොකර)
+  // Normal view — displays the product card with its original design unchanged
   return (
     <div className="product-card">
       <div className="card-image-area">
@@ -163,11 +163,17 @@ const MyItems = () => {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ name: '', price: '', stock: '', status: '' });
 
-  const SELLER_ID = 2; 
-  const API_BASE  = `${process.env.REACT_APP_API_URL}/api`;          
+  // Get seller ID from session/context instead of hardcoding
+  const SELLER_ID = localStorage.getItem('userId');
+  const API_BASE  = `${process.env.REACT_APP_API_URL}/api`;
 
   useEffect(() => {
-    fetchProducts();
+    if (SELLER_ID) {
+      fetchProducts();
+    } else {
+      setError('Seller ID not found');
+      setLoading(false);
+    }
   }, [SELLER_ID]);
 
   const fetchProducts = async () => {
@@ -213,20 +219,20 @@ const MyItems = () => {
 // ── Save Edit to Backend ──
   const handleSaveEdit = async (id) => {
     try {
-      // 1. අලුත් තොග ප්‍රමාණය (Stock) අංකයක් බවට පත් කරගැනීම
+      // Step 1: Parse the new stock value as an integer
       const newStock = parseInt(editForm.stock, 10);
       const isActiveSelected = editForm.status === 'Active';
 
-      // 2. තොගය අනුව නිවැරදි Status එක ස්වයංක්‍රීයව තීරණය කිරීම (Backend Logic එකමයි)
+      // Step 2: Automatically determine the correct status based on stock quantity (mirrors backend logic)
       let newCalculatedStatus = 'Active';
       
       if (!isActiveSelected || newStock <= 0) {
-        newCalculatedStatus = 'Out of Stock'; // Active නැත්නම් හෝ බඩු 0 නම්
+        newCalculatedStatus = 'Out of Stock'; // Mark as Out of Stock if inactive or stock is 0
       } else if (newStock <= 10) {
-        newCalculatedStatus = 'Low Stock';    // බඩු 10ට අඩු නම්
+        newCalculatedStatus = 'Low Stock';    // Mark as Low Stock if stock is 10 or fewer
       }
 
-      // Backend එකට යවන Payload එක
+      // Backend payload
       const payload = {
         name: editForm.name,
         price: parseFloat(editForm.price),
@@ -242,18 +248,18 @@ const MyItems = () => {
 
       if (!res.ok) throw new Error('Update failed');
       
-      // 3. React State එක අලුත් Status එකත් එක්කම එසැණින් Update කිරීම
+      // Step 3: Immediately update local React state with the new status (optimistic UI update)
       setProducts(prev => prev.map(p => 
         p.id === id ? { 
           ...p, 
           name: editForm.name, 
           price: editForm.price, 
           stock: newStock, 
-          status: newCalculatedStatus // ගණනය කළ අලුත් status එක (Low Stock/Out of Stock)
+          status: newCalculatedStatus // Updated status: Active / Low Stock / Out of Stock
         } : p
       ));
       
-      setEditingId(null); // Edit Mode එකෙන් ඉවත් වීම
+      setEditingId(null); // Exit edit mode after saving
     } catch (err) {
       alert(`Error saving: ${err.message}`);
     }
