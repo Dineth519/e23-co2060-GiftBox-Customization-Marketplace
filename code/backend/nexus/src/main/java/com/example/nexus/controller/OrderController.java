@@ -35,6 +35,12 @@ public class OrderController {
         return orderRepository.findByPartnerIdOrderByCreatedAtDesc(sellerId);
     }
 
+    // 1b. Customer-specific orders retrieval — each customer sees ONLY their own orders
+    @GetMapping("/customers/{customerId}/orders")
+    public List<Order> getOrdersByCustomer(@PathVariable Integer customerId) {
+        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
+    }
+
     // 2. Vendor order status update (only from PENDING to CONFIRMED or CANCELLED)
     @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Integer orderId, @RequestBody Map<String, String> request) {

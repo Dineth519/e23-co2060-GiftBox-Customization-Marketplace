@@ -3,9 +3,8 @@ import './Orders.css';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
-const SELLER_ID = 2; // ඔයාගේ Vendor ID එක
 
-// Database එකේ තියෙන Status පිළිවෙළ
+// Status progression order as defined in the database
 const STATUS_ORDER = ['PENDING', 'CONFIRMED', 'RECEIVED', 'ASSEMBLING', 'READY', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -46,7 +45,7 @@ function Avatar({ name, index }) {
 function OrderModal({ order, onClose, onStatusChange }) {
   if (!order) return null;
 
-  // Timeline පෙන්වීමට status index එක ගනී
+  // Get the current step index to highlight the timeline correctly
   const step = STATUS_ORDER.indexOf(order.status);
   const timelineSteps = ['Order Placed', 'Confirmed', 'Ready', 'Shipped', 'Delivered'];
 
@@ -88,7 +87,6 @@ function OrderModal({ order, onClose, onStatusChange }) {
               <div className="orders-timeline">
                 {timelineSteps.map((s, j) => (
                   <div className="orders-tl-step" key={j}>
-                    {/* Status එක අනුව dot එකේ පාට වෙනස් වීම */}
                     <div className={`orders-tl-dot ${j <= step ? 'done' : 'todo'}`} />
                     <div className="orders-tl-label">{s}</div>
                   </div>
@@ -97,7 +95,7 @@ function OrderModal({ order, onClose, onStatusChange }) {
             )}
           </div>
 
-          {/* Vendor Actions: පෙන්වන්නේ PENDING ඒවාට විතරයි */}
+          {/* Vendor Actions: only shown for PENDING orders */}
           {order.status === 'PENDING' && (
             <div className="orders-modal-section">
               <div className="orders-modal-section-title">Update Status</div>
@@ -129,11 +127,20 @@ const Orders = () => {
 
   const PER_PAGE = 8;
 
-  // 1. Fetch Orders from Backend
+  // 1. Fetch orders from backend using the logged-in seller's userId from localStorage
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/sellers/${SELLER_ID}/orders`);
+      // Read the logged-in vendor's userId from localStorage
+      const sellerId = localStorage.getItem('userId');
+
+      if (!sellerId) {
+        console.warn('No userId found in localStorage. Please login again.');
+        setLoading(false);
+        return;
+      }
+
+      const res = await fetch(`${API_BASE}/sellers/${sellerId}/orders`);
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setOrders(data);

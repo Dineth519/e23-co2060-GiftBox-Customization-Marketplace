@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class CartService {
 
-    // Session cart ගන්නවා (නැත්නම් initialize කරනවා)
+    // Retrieve the session cart, or initialize a new one if it doesn't exist
     public List<CartItem> getCartItems(HttpSession session) {
         return SessionCartManager.getOrCreateCart(session);
     }
@@ -21,17 +21,17 @@ public class CartService {
     public CartResponse addItem(HttpSession session, AddToCart dto) {
         List<CartItem> cart = getCartItems(session);
 
-        // Already cart එකේ තියෙනවාද?
+        // Check if the product already exists in the cart
         for (CartItem existing : cart) {
             if (existing.getProductId() == dto.getProductId()) {
-                // තියෙනවා නම් quantity++ කරනවා
+                // Product already in cart — increment quantity by 1
                 existing.setQuantity(existing.getQuantity() + 1);
                 SessionCartManager.saveCart(session, cart);
                 return buildResponse(cart, "Item quantity updated!");
             }
         }
 
-        // නැත්නම් අලුතෙන් add කරනවා
+        // Product not in cart — add as a new item with quantity 1
         cart.add(new CartItem(
             dto.getProductId(),
             dto.getName(),
@@ -60,7 +60,7 @@ public class CartService {
                                           int newQty) {
         List<CartItem> cart = getCartItems(session);
 
-        // Quantity 0 or less නම් remove කරනවා
+        // If quantity is 0 or less, remove the item from the cart entirely
         if (newQty <= 0) {
             return removeItem(session, productId);
         }
@@ -82,8 +82,8 @@ public class CartService {
         return buildResponse(List.of(), "Cart cleared.");
     }
 
-    // සම්පූර්ණ cart total calculate කරනවා
-    // හැම item: price × quantity → sum කරනවා
+    // Calculate the total price of all items in the cart
+    // Each item contributes: price × quantity
     public double calculateTotal(List<CartItem> cart) {
         double total = 0.0;
 
@@ -95,8 +95,7 @@ public class CartService {
         return Math.round(total * 100.0) / 100.0;
     }
 
-    // Item count — header badge number
-    // හැම item quantity sum කරනවා
+    // Calculate total item count across all cart entries (used for navbar badge)
     public int calculateItemCount(List<CartItem> cart) {
         int count = 0;
         for (CartItem item : cart) {
@@ -106,8 +105,8 @@ public class CartService {
     }
 
     // ── Build response helper ────────────────────────────
-    // හැම operation කෙනෙකෙන් පස්සේ React ට
-    // updated cart + total + badge count එකක් දෙනවා
+    // After every cart operation, return the updated cart state
+    // including the updated items list, total price, and item count badge
     private CartResponse buildResponse(List<CartItem> cart,
                                           String message) {
         double total     = calculateTotal(cart);
