@@ -14,4 +14,4 @@ jobs:
       - name: Sync 'host' branch with upstream
         run: gh repo sync $GITHUB_REPOSITORY --branch host --source cepdnaclk/e23-co2060-GiftBox-Customization-Marketplace
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SYNC_PAT }}
