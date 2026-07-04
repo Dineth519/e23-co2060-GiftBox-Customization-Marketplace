@@ -53,6 +53,15 @@ import CartPage from './pages/landingpage/CartPage.jsx';
 // Box Builder
 import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
 
+// Scroll to top helper on route navigation
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
 // Layout wrapper component for general and user routes
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
@@ -81,6 +90,7 @@ function App() {
   return (
     <CartProvider>                                      
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Public and user routes */}
           <Route path="/" element={<LayoutWrapper><LandingPage /></LayoutWrapper>} />

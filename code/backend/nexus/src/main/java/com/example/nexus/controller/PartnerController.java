@@ -1,12 +1,18 @@
 package com.example.nexus.controller;
 
 import com.example.nexus.model.Partner;
+import com.example.nexus.model.User;
+import com.example.nexus.model.Role;
+import com.example.nexus.dto.VendorRegisterRequest;
 import com.example.nexus.repository.PartnerRepository;
+import com.example.nexus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/partners")
@@ -15,6 +21,13 @@ public class PartnerController {
 
     @Autowired
     private PartnerRepository partnerRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     /**
      * Fetches all partners from the database.
@@ -47,5 +60,47 @@ public class PartnerController {
         
         // 4. Return the updated object with a 200 OK response
         return ResponseEntity.ok(updatedPartner);
+    }
+
+    /**
+     * Registers a new vendor (Partner) application.
+     */
+    @PostMapping("/register")
+    public ResponseEntity<?> registerVendor(@RequestBody VendorRegisterRequest request) {
+        if (userRepository.existsByUsername(request.getEmail())) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email/Username already exists"));
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email already registered"));
+        }
+
+        // 1. Create User
+        User user = new User();
+        user.setName(request.getOwnerName());
+        user.setUsername(request.getEmail()); // Use email as username for vendor login
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.PARTNER);
+        user.setVerified(true); // Auto-verify email for vendor registration convenience
+
+        userRepository.save(user);
+
+        // 2. Create Partner
+        Partner partner = new Partner();
+        partner.setPartnerId(user.getId().intValue());
+        partner.setShopName(request.getShopName());
+        partner.setFullName(request.getOwnerName());
+        partner.setPhoneNumber(request.getPhone());
+        partner.setShopAddress(request.getAddress() + ", " + request.getCity());
+        partner.setBrNo(request.getBusinessRegNumber());
+        partner.setCategories(request.getCategory());
+        partner.setStatus("PENDING"); // Defaults to PENDING until approved by admin
+
+        partnerRepository.save(partner);
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "message", "Application submitted successfully! Your shop registration is pending admin approval."
+        ));
     }
 }

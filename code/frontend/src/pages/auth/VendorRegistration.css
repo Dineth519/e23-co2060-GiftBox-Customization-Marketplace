@@ -208,3 +208,60 @@
   color: #F8F9FA;
   padding: 10px;
 }
+
+/* Success Card styles */
+.vendor-success-view {
+  text-align: center;
+  animation: fadeInSlideUp 0.6s ease-out forwards;
+}
+
+.success-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.vendor-success-view h2 {
+  font-size: 32px;
+  color: #F8F9FA;
+  margin-bottom: 12px;
+}
+
+.success-desc {
+  font-size: 16px;
+  color: #E5B85C;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.success-sub {
+  font-size: 14px;
+  color: #9CA3AF;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.giftora-btn-secondary {
+  width: 100%;
+  padding: 14px 0;
+  border-radius: 9999px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #F8F9FA;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.giftora-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.4);
+}
