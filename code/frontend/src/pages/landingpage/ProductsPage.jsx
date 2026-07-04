@@ -38,6 +38,23 @@ const CAT_ICONS = {
   "Gift Boxes & Packaging": '📦', "Wooden Keepsake Boxes": '📦', "Magnetic Cardboard Boxes": '📦', "Velvet Gift Boxes": '🎁',
   "Flowers & Botanicals": '💐', "Fresh Flowers": '💐', "Preserved & Dried Flowers": '🥀', "Mini Succulents": '🌵'
 };
+
+const SUBCATEGORY_TO_PARENT = {
+  1: 'Drinks & Beverages', 2: 'Watches', 3: 'Perfume & Fragrance',
+  4: 'Teddy Bears & Plushes', 5: 'Jewelry & Accessories', 6: 'Chocolates & Sweets',
+  22: 'Self-Care & Wellness', 26: 'Gift Boxes & Packaging', 30: 'Flowers & Botanicals',
+  
+  7: 'Watches', 8: 'Watches', 9: 'Watches',
+  10: 'Chocolates & Sweets', 11: 'Chocolates & Sweets', 12: 'Chocolates & Sweets',
+  13: 'Perfume & Fragrance', 14: 'Perfume & Fragrance',
+  15: 'Teddy Bears & Plushes', 16: 'Teddy Bears & Plushes',
+  17: 'Jewelry & Accessories', 18: 'Jewelry & Accessories', 19: 'Jewelry & Accessories',
+  20: 'Drinks & Beverages', 21: 'Drinks & Beverages',
+  23: 'Self-Care & Wellness', 24: 'Self-Care & Wellness', 25: 'Self-Care & Wellness',
+  27: 'Gift Boxes & Packaging', 28: 'Gift Boxes & Packaging', 29: 'Gift Boxes & Packaging',
+  31: 'Flowers & Botanicals', 32: 'Flowers & Botanicals', 33: 'Flowers & Botanicals'
+};
+
 const SORT_OPTIONS = [
   { value:'default',    label:'Featured',          icon:'✦' },
   { value:'price-asc',  label:'Price: Low → High', icon:'↑' },
@@ -91,16 +108,22 @@ const ProductsPage = () => {
   }, []);
 
   const categories = useMemo(() => {
-    const names = allProducts.map(p => CATEGORY_MAP[p.categoryId] || 'Other');
+    const names = allProducts.map(p => SUBCATEGORY_TO_PARENT[p.categoryId] || 'Other');
     return ['All', ...new Set(names)];
   }, [allProducts]);
 
   const displayProducts = useMemo(() => {
     let f = [...allProducts];
-    if (activeCategory !== 'All') f = f.filter(p => CATEGORY_MAP[p.categoryId] === activeCategory);
+    if (activeCategory !== 'All') {
+      f = f.filter(p => (SUBCATEGORY_TO_PARENT[p.categoryId] || 'Other') === activeCategory);
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      f = f.filter(p => p.name.toLowerCase().includes(q) || (CATEGORY_MAP[p.categoryId]||'').toLowerCase().includes(q));
+      f = f.filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        (CATEGORY_MAP[p.categoryId] || '').toLowerCase().includes(q) ||
+        (SUBCATEGORY_TO_PARENT[p.categoryId] || '').toLowerCase().includes(q)
+      );
     }
     switch (sortBy) {
       case 'price-asc':  f.sort((a,b) => a.price - b.price); break;

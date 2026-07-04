@@ -3,9 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { FaThLarge, FaList, FaSearch, FaEdit, FaTrash, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
 import './MyItems.css'; // Uses the existing MyItems CSS file
 
-// ── Constants ──────────────────────────────────────────────────
-const CATEGORIES = ['All', 'Gift Boxes', 'Hampers', 'Floral', 'Special'];
-
 const getBadgeClass = (status) => ({
   'Active':        'badge-active',
   'Low Stock':     'badge-low-stock',
@@ -167,6 +164,11 @@ const MyItems = () => {
   const SELLER_ID = localStorage.getItem('userId');
   const API_BASE  = `${process.env.REACT_APP_API_URL}/api`;
 
+  const CATEGORIES = useMemo(() => {
+    const names = products.map(p => p.category || 'Uncategorized');
+    return ['All', ...new Set(names)];
+  }, [products]);
+
   useEffect(() => {
     if (SELLER_ID) {
       fetchProducts();
@@ -286,7 +288,7 @@ const MyItems = () => {
           <h1 className="page-title">My Items</h1>
           <p className="page-subtitle">Manage your product listings</p>
         </div>
-        <button className="btn-add" onClick={() => navigate('/seller/add-items')}>
+        <button className="btn-add" onClick={() => navigate('/vendor/add-items')}>
           <FaPlus size={12} /> Add New Item
         </button>
       </div>

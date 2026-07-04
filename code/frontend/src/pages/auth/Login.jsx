@@ -160,7 +160,7 @@ const Login = () => {
           if (userRole === 'ADMIN') {
             navigate('/admin');
           } else if (userRole === 'SELLER' || userRole === 'PARTNER') {
-            navigate('/seller');
+            navigate('/vendor');
           } else if (userRole === 'CUSTOMER') {
             navigate('/home');
           } else if (userRole === 'ASSEMBLER') {

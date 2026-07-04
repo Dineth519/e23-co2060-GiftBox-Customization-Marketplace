@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaArrowLeft, FaPlus, FaUpload, FaBoxOpen, FaDollarSign, FaImage } from 'react-icons/fa';
 import './AddItems.css';
-
-const CATEGORIES = ['Gift Boxes', 'Hampers', 'Floral', 'Special', 'Cakes & Sweets', 'Electronics', 'Clothing'];
 
 // ── Reusable field components ──────────────────────────────────
 const Label = ({ children, required }) => (
@@ -44,6 +42,15 @@ const AddItems = () => {
   const [dragOver, setDragOver]   = useState(false);
   const [images, setImages]       = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const [categoriesTree, setCategoriesTree] = useState([]);
+
+  useEffect(() => {
+    const apiBase = process.env.REACT_APP_API_URL || 'https://nexus-backend-axbdfzd2g4c0fwbf.austriaeast-01.azurewebsites.net';
+    axios.get(`${apiBase}/api/categories`)
+      .then(res => setCategoriesTree(res.data))
+      .catch(err => console.error("Error fetching categories:", err));
+  }, []);
+
   const [form, setForm] = useState({
     name: '', category: '', price: '', discountPrice: '',
     stock: '', sku: '', description: '',
@@ -107,7 +114,7 @@ const AddItems = () => {
         sku: form.sku ? form.sku : null,
         isActive: form.is_active ? 1 : 0, // Convert boolean to 1 (active) or 0 (inactive)
         imageUrl: uploadedImageUrl || 'https://via.placeholder.com/220x150?text=No+Image', // Use default image if none uploaded
-        categoryId: 1 // TODO: connect this to the selected category dropdown ID
+        categoryId: Number(form.category)
       };
 
       // Read the logged-in seller's userId from localStorage
@@ -119,7 +126,7 @@ const AddItems = () => {
       // On success, navigate back to My Items page
       setTimeout(() => {
         setSubmitted(false);
-        navigate('/seller/my-items');
+        navigate('/vendor/my-items');
       }, 1000);
 
     } catch (error) {
@@ -135,7 +142,7 @@ const AddItems = () => {
       {/* ── Page Header ── */}
       <div className="ai-header">
         <div className="ai-header-left">
-          <button className="ai-back-btn" onClick={() => navigate('/seller/my-items')}>
+          <button className="ai-back-btn" onClick={() => navigate('/vendor/my-items')}>
             <FaArrowLeft />
           </button>
           <div>
@@ -144,7 +151,7 @@ const AddItems = () => {
           </div>
         </div>
         <div className="ai-header-actions">
-          <button className="btn-cancel" onClick={() => navigate('/seller/my-items')}>Cancel</button>
+          <button className="btn-cancel" onClick={() => navigate('/vendor/my-items')}>Cancel</button>
           <button className={`btn-save${submitted ? ' saved' : ''}`} onClick={handleSubmit}>
             <FaPlus size={12} /> {submitted ? 'Saving…' : 'Save Item'}
           </button>
@@ -171,7 +178,13 @@ const AddItems = () => {
                 <Label required>Category</Label>
                 <Select name="category" value={form.category} onChange={handleChange}>
                   <option value="">Select category</option>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  {categoriesTree.map(parent => (
+                    <optgroup key={parent.id} label={parent.name}>
+                      {parent.subcategories?.map(sub => (
+                        <option key={sub.id} value={sub.id}>{sub.name}</option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </Select>
               </div>
               <div>

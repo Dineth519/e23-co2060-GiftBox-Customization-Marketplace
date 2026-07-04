@@ -10,7 +10,7 @@ const VendorRegistration = () => {
     email: '',
     phone: '',
     businessRegNumber: '', 
-    category: '',          
+    category: 'General',          
     address: '',           
     city: '',              
     password: '',
@@ -165,24 +165,6 @@ const VendorRegistration = () => {
                   />
                 </div>
 
-                <div className="auth-input-row">
-                  <select 
-                    name="category" 
-                    value={formData.category} 
-                    onChange={handleChange}
-                    disabled={loading}
-                    required
-                    className={formData.category === '' ? 'placeholder-active' : ''}
-                  >
-                    <option value="" disabled hidden>Select Business Category</option>
-                    <option value="flowers">Flowers & Plants</option>
-                    <option value="sweets">Sweets & Bakery</option>
-                    <option value="jewelry">Jewelry & Accessories</option>
-                    <option value="clothing">Clothing & Apparel</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="custom_gifts">Custom / Handcrafted Gifts</option>
-                  </select>
-                </div>
 
                 <div className="auth-input-row">
                   <input

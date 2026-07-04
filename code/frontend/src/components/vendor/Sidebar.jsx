@@ -12,7 +12,7 @@ const Sidebar = () => {
       <nav className="sidebar-nav">
         
         <NavLink 
-          to="/seller" 
+          to="/vendor" 
           end
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
@@ -21,7 +21,7 @@ const Sidebar = () => {
         </NavLink>
 
         <NavLink 
-          to="/seller/orders" 
+          to="/vendor/orders" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
           <FaClipboardList size={18} /> 
@@ -29,7 +29,7 @@ const Sidebar = () => {
         </NavLink>
         
         <NavLink 
-          to="/seller/my-items" 
+          to="/vendor/my-items" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
           <FaBoxes size={18} /> 
@@ -37,7 +37,7 @@ const Sidebar = () => {
         </NavLink>
       
         <NavLink 
-          to="/seller/add-items" 
+          to="/vendor/add-items" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
           <FaGift size={18} /> 
@@ -45,7 +45,7 @@ const Sidebar = () => {
         </NavLink>
 
         <NavLink 
-          to="/seller/settings" 
+          to="/vendor/settings" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
           <FaCog size={18} /> 

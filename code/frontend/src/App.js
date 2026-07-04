@@ -36,13 +36,13 @@ import Dashboard from './pages/admin/Dashboard.jsx';
 import Settings from './pages/admin/Settings.jsx';
 import StaffManagement from './pages/admin/StaffManagement.jsx';
 
-// Seller components and pages
-import SellerDashboard from './pages/seller/SellerDashboard.jsx';
-import SellerLayout from './layouts/SellerLayout.jsx';
-import MyItems from './pages/seller/MyItems.jsx';
-import AddItems from './pages/seller/AddItems.jsx';
-import Orders from './pages/seller/Orders.jsx';
-import SellerSettings from './pages/seller/Settings.jsx';
+// Vendor components and pages
+import VendorDashboard from './pages/vendor/VendorDashboard.jsx';
+import VendorLayout from './layouts/VendorLayout.jsx';
+import MyItems from './pages/vendor/MyItems.jsx';
+import AddItems from './pages/vendor/AddItems.jsx';
+import Orders from './pages/vendor/Orders.jsx';
+import VendorSettings from './pages/vendor/Settings.jsx';
 
 // Landingpage
 import ProductsPage from './pages/landingpage/ProductsPage.jsx';
@@ -122,17 +122,17 @@ function App() {
 
           </Route>
 
-          {/* Seller routes */}
-          <Route path="/seller/*" element={
-            <SellerLayout>
+          {/* Vendor routes */}
+          <Route path="/vendor/*" element={
+            <VendorLayout>
               <Routes>
-                <Route path="/" element={<SellerDashboard />} />
+                <Route path="/" element={<VendorDashboard />} />
                 <Route path="my-items" element={<MyItems />} />
                 <Route path="add-items" element={<AddItems />} />
                 <Route path="orders" element={<Orders />} />
-                <Route path="settings" element={<SellerSettings />} />
+                <Route path="settings" element={<VendorSettings />} />
               </Routes>
-            </SellerLayout>
+            </VendorLayout>
           } />
 
           {/* Admin routes using AdminLayout for sidebar and styling */}

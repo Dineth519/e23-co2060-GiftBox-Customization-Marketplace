@@ -7,7 +7,7 @@ import {
   FaShoppingCart, FaDollarSign, FaBoxOpen, FaStar,
   FaArrowUp, FaArrowDown,
 } from 'react-icons/fa';
-import './SellerDashboard.css';
+import './VendorDashboard.css';
 
 // ── Config ────────────────────────────────────────────────────
 const API_BASE  = `${process.env.REACT_APP_API_URL}/api`;
@@ -127,7 +127,7 @@ const StatusPill = ({ status }) => {
 };
 
 // ── Main Component ────────────────────────────────────────────
-const SellerDashboard = () => {
+const VendorDashboard = () => {
   const [stats,    setStats]    = useState(null);
   const [weekly,   setWeekly]   = useState(MOCK_WEEKLY);
   const [monthly,  setMonthly]  = useState(MOCK_MONTHLY);
@@ -361,4 +361,4 @@ const SellerDashboard = () => {
   );
 };
 
-export default SellerDashboard;
+export default VendorDashboard;

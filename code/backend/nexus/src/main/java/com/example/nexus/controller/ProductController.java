@@ -2,7 +2,9 @@ package com.example.nexus.controller;
 
 import com.example.nexus.dto.ProductDTO;
 import com.example.nexus.model.Product;
+import com.example.nexus.model.Category;
 import com.example.nexus.repository.ProductRepository;
+import com.example.nexus.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,6 +20,9 @@ public class ProductController {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     // GET /api/products — Fetch all products for the customer-facing Products Page
     @GetMapping("/products")
@@ -58,7 +63,9 @@ public class ProductController {
                 dto.setName(product.getName());
                 dto.setCategory(product.getCategoryId() == null
                     ? "Uncategorized"
-                    : "Category ID: " + product.getCategoryId());
+                    : categoryRepository.findById(product.getCategoryId())
+                        .map(Category::getName)
+                        .orElse("Category ID: " + product.getCategoryId()));
                 dto.setPrice(product.getPrice());
                 dto.setStock(product.getStockQuantity() != null ? product.getStockQuantity() : 0);
                 dto.setSold(0);

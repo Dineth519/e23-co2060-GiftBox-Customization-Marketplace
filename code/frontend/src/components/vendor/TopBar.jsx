@@ -38,7 +38,7 @@ const TopBar = () => {
         {/* Profile Section — click to go to Settings */}
         <div
           className="profile-section"
-          onClick={() => navigate('/seller/settings')}
+          onClick={() => navigate('/vendor/settings')}
           style={{ cursor: 'pointer' }}
         >
           <div className="profile-info">

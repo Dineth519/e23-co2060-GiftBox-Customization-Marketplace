@@ -1,15 +1,15 @@
 // Core library
 import React from 'react';
 
-// Admin components
-import Sidebar from '../components/seller/Sidebar';
-import TopBar from '../components/seller/TopBar';
+// Vendor components
+import Sidebar from '../components/vendor/Sidebar';
+import TopBar from '../components/vendor/TopBar';
 
 // Stylesheet
 import './AdminLayout.css';
 
-// Admin layout wrapper component providing sidebar and top navigation
-const SellerLayout = ({ children }) => {
+// Vendor layout wrapper component providing sidebar and top navigation
+const VendorLayout = ({ children }) => {
   return (
     <div className="admin-layout">
       {/* Top navigation bar */}
@@ -30,4 +30,4 @@ const SellerLayout = ({ children }) => {
   );
 };
 
-export default SellerLayout;
+export default VendorLayout;
