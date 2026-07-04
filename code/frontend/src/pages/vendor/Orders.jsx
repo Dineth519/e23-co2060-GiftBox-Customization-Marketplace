@@ -140,7 +140,7 @@ const Orders = () => {
         return;
       }
 
-      const res = await fetch(`${API_BASE}/sellers/${sellerId}/orders`);
+      const res = await fetch(`${API_BASE}/vendors/${sellerId}/orders`);
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setOrders(data);

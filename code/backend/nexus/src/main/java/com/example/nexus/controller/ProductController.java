@@ -52,10 +52,10 @@ public class ProductController {
           .collect(Collectors.toList());
     }
 
-    // ── GET /api/sellers/{sellerId}/products — Seller dashboard ──
-    @GetMapping("/sellers/{sellerId}/products")
-    public List<ProductDTO> getProductsBySeller(@PathVariable Integer sellerId) {
-        return productRepository.findByPartnerId(sellerId)
+    // ── GET /api/vendors/{vendorId}/products — Vendor dashboard ──
+    @GetMapping("/vendors/{vendorId}/products")
+    public List<ProductDTO> getProductsByVendor(@PathVariable Integer vendorId) {
+        return productRepository.findByVendorId(vendorId)
             .stream()
             .map(product -> {
                 ProductDTO dto = new ProductDTO();
@@ -87,12 +87,12 @@ public class ProductController {
             .collect(Collectors.toList());
     }
 
-    // ── POST /api/sellers/{sellerId}/products — product creation ──
-    @PostMapping("/sellers/{sellerId}/products")
+    // ── POST /api/vendors/{vendorId}/products — product creation ──
+    @PostMapping("/vendors/{vendorId}/products")
     public ResponseEntity<Product> addProduct(
-            @PathVariable Integer sellerId,
+            @PathVariable Integer vendorId,
             @RequestBody Product product) {
-        product.setPartnerId(sellerId);
+        product.setVendorId(vendorId);
         Product saved = productRepository.save(product);
         return ResponseEntity.ok(saved);
     }

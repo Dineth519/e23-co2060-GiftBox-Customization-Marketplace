@@ -4,27 +4,27 @@ import {
   FaArrowLeft, FaCheck, FaTimes, FaMapMarkerAlt, 
   FaUser, FaPhone, FaStore, FaClock 
 } from 'react-icons/fa';
-import './PendingPartners.css';
+import './PendingVendors.css';
 
 /**
- * PendingPartners Component
- * Displays a list of pending partner/seller applications
- * Allows admin to approve or reject partnership requests
+ * PendingVendors Component
+ * Displays a list of pending vendor applications
+ * Allows admin to approve or reject vendor requests
  */
-const PendingPartners = () => {
+const PendingVendors = () => {
   const navigate = useNavigate();
   const [pendingSellers, setPendingSellers] = useState([]);
 
-  // Fetch pending partners from backend API on component mount
+  // Fetch pending vendors from backend API on component mount
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/partners`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/vendors`)
       .then(res => res.json())
       .then(data => {
-        // Filter for pending partners and map to local state structure
+        // Filter for pending vendors and map to local state structure
         const pending = data
           .filter(p => p.status === 'PENDING')
           .map(p => ({
-            id: p.partnerId,        
+            id: p.vendorId,        
             shop: p.shopName,       
             name: p.fullName,       
             address: p.shopAddress, 
@@ -37,14 +37,14 @@ const PendingPartners = () => {
   }, []);
 
   /**
-   * Update partner status via API call
+   * Update vendor status via API call
    * Sends approval/rejection request to backend
    * Removes processed request from list on success
-   * @param {number} id - Partner ID
+   * @param {number} id - Vendor ID
    * @param {string} newStatus - New status (ACTIVE or REJECTED)
    */
   const handleStatusUpdate = (id, newStatus) => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/partners/${id}/status?status=${newStatus}`, {
+    fetch(`${process.env.REACT_APP_API_URL}/api/vendors/${id}/status?status=${newStatus}`, {
       method: 'PUT',
     })
     .then(response => {
@@ -67,10 +67,10 @@ const PendingPartners = () => {
       {/* Page header with navigation and title */}
       <div className="pending-header">
         <button onClick={() => navigate(-1)} className="back-btn">
-          <FaArrowLeft /> Back to Partners
+          <FaArrowLeft /> Back to Vendors
         </button>
         <h1 className="page-title">Pending Requests</h1>
-        <p className="page-subtitle">Review and approve new partner applications</p>
+        <p className="page-subtitle">Review and approve new vendor applications</p>
       </div>
 
       {/* Statistics card showing pending request count */}
@@ -86,7 +86,7 @@ const PendingPartners = () => {
         </div>
       </div>
 
-      {/* List of pending partner requests */}
+      {/* List of pending vendor requests */}
       <div className="pending-list">
         {pendingSellers.length === 0 ? (
           <div className="empty-state">
@@ -149,4 +149,4 @@ const PendingPartners = () => {
   );
 };
 
-export default PendingPartners;
+export default PendingVendors;

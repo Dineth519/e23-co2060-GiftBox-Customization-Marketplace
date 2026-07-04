@@ -38,7 +38,7 @@ const VendorRegistration = () => {
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/partners/register`, {
+      const response = await fetch(`${apiUrl}/api/vendors/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

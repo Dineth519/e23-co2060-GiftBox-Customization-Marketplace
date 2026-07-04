@@ -3,12 +3,12 @@ package com.example.nexus.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "partners") // Matches your database table name exactly
-public class Partner {
+@Table(name = "vendors") // Renamed database table
+public class Vendor {
 
     @Id
-    @Column(name = "partner_id")
-    private int partnerId;
+    @Column(name = "vendor_id")
+    private int vendorId;
 
     @Column(name = "shop_name")
     private String shopName;
@@ -33,12 +33,12 @@ public class Partner {
     private String categories;
 
     // Default Constructor
-    public Partner() {
+    public Vendor() {
     }
 
     // Getters and Setters (Required for Spring Boot to work with the data)
-    public int getPartnerId() { return partnerId; }
-    public void setPartnerId(int partnerId) { this.partnerId = partnerId; }
+    public int getVendorId() { return vendorId; }
+    public void setVendorId(int vendorId) { this.vendorId = vendorId; }
 
     public String getShopName() { return shopName; }
     public void setShopName(String shopName) { this.shopName = shopName; }

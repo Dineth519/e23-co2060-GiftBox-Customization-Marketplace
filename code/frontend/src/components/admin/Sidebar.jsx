@@ -29,11 +29,11 @@ const Sidebar = () => {
         </NavLink>
 
         <NavLink 
-          to="/admin/partners" 
+          to="/admin/vendors" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
         >
           <FaStore size={18} /> 
-          <span>Partners</span>
+          <span>Vendors</span>
         </NavLink>
         
         <NavLink 

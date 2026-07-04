@@ -121,7 +121,7 @@ const AddItems = () => {
       const SELLER_ID = localStorage.getItem('userId');
 
       // Step 3: Send POST request to Spring Boot API to save the product
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/sellers/${SELLER_ID}/products`, payload);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/vendors/${SELLER_ID}/products`, payload);
 
       // On success, navigate back to My Items page
       setTimeout(() => {

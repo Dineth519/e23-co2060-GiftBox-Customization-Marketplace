@@ -29,8 +29,8 @@ import VendorRegistration from './pages/auth/VendorRegistration.jsx';
 // Admin components and pages
 import Sidebar from './components/admin/Sidebar.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
-import Partners from './pages/admin/Partners.jsx';
-import PendingPartners from './pages/admin/PendingPartners.jsx';
+import Vendors from './pages/admin/Vendors.jsx';
+import PendingVendors from './pages/admin/PendingVendors.jsx';
 import Customers from './pages/admin/Customers.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
 import Settings from './pages/admin/Settings.jsx';
@@ -140,8 +140,8 @@ function App() {
             <AdminLayout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="partners" element={<Partners />} />
-                <Route path="partners/pending" element={<PendingPartners />} />
+                <Route path="vendors" element={<Vendors />} />
+                <Route path="vendors/pending" element={<PendingVendors />} />
                 <Route path="customers" element={<Customers />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="staff-management" element={<StaffManagement />} />

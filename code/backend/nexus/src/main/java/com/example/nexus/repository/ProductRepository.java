@@ -8,9 +8,9 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
-    // Seller's product list page
-    List<Product> findByPartnerId(Integer partnerId);
+    // Vendor's product list page
+    List<Product> findByVendorId(Integer vendorId);
 
-    // Dashboard — total products count for a seller
-    long countByPartnerId(Integer partnerId);
+    // Dashboard — total products count for a vendor
+    long countByVendorId(Integer vendorId);
 }

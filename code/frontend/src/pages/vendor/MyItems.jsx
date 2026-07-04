@@ -181,7 +181,7 @@ const MyItems = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/sellers/${SELLER_ID}/products`);
+      const res = await fetch(`${API_BASE}/vendors/${SELLER_ID}/products`);
       if (!res.ok) throw new Error('Failed to load products');
       const data = await res.json();
       setProducts(data);
@@ -196,7 +196,7 @@ const MyItems = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product?')) return;
     try {
-      const res = await fetch(`${API_BASE}/sellers/products/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/products/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Delete failed');
       setProducts(prev => prev.filter(p => p.id !== id));
     } catch (err) {
@@ -242,7 +242,7 @@ const MyItems = () => {
         isActive: isActiveSelected ? 1 : 0
       };
 
-      const res = await fetch(`${API_BASE}/sellers/products/${id}`, {
+      const res = await fetch(`${API_BASE}/products/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

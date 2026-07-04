@@ -159,7 +159,7 @@ const Login = () => {
           // Route user to appropriate dashboard based on role
           if (userRole === 'ADMIN') {
             navigate('/admin');
-          } else if (userRole === 'SELLER' || userRole === 'PARTNER') {
+          } else if (userRole === 'VENDOR' || userRole === 'SELLER' || userRole === 'PARTNER') {
             navigate('/vendor');
           } else if (userRole === 'CUSTOMER') {
             navigate('/home');

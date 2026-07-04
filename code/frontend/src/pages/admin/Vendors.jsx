@@ -5,33 +5,33 @@ import {
   FaEnvelope, FaPhone, FaCalendarCheck, FaChevronDown, 
   FaChevronUp, FaStore, FaBell 
 } from 'react-icons/fa';
-import './Partners.css';
+import './Vendors.css';
 
 /**
- * Partners Component
- * Displays active partners/sellers with expandable details
+ * Vendors Component
+ * Displays active vendors/sellers with expandable details
  * Shows pending requests count and allows navigation to pending page
  */
-const Partners = () => {
+const Vendors = () => {
   const navigate = useNavigate();
   const [expandedId, setExpandedId] = useState(null);
   const [activeSellers, setActiveSellers] = useState([]); 
   const [pendingCount, setPendingCount] = useState(0);
 
-  // Fetch active and pending partners from backend API on mount
+  // Fetch active and pending vendors from backend API on mount
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/partners`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/vendors`)
       .then(res => res.json())
       .then(data => {
-        // Count pending partners
+        // Count pending vendors
         const pending = data.filter(p => p.status === 'PENDING').length;
         setPendingCount(pending);
 
-        // Filter and map active partners to local state structure
+        // Filter and map active vendors to local state structure
         const active = data
           .filter(p => p.status === 'ACTIVE')
           .map(p => ({
-            id: p.partnerId,
+            id: p.vendorId,
             shop: p.shopName,
             name: p.fullName,
             address: p.shopAddress,
@@ -43,13 +43,13 @@ const Partners = () => {
         
         setActiveSellers(active);
       })
-      .catch(err => console.error("Error fetching partners:", err));
+      .catch(err => console.error("Error fetching vendors:", err));
   }, []);
 
   /**
-   * Toggle expanded state for partner card
+   * Toggle expanded state for vendor card
    * Shows/hides detailed information section
-   * @param {number} id - Partner ID to toggle
+   * @param {number} id - Vendor ID to toggle
    */
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
@@ -61,15 +61,15 @@ const Partners = () => {
       {/* Page header with title and pending alert notification */}
       <div className="partners-header">
         <div className="header-text">
-          <h1 className="page-title">Partners Management</h1>
-          <p className="page-subtitle">Manage your business partners and monitor pending requests</p>
+          <h1 className="page-title">Vendors Management</h1>
+          <p className="page-subtitle">Manage your business vendors and monitor pending requests</p>
         </div>
 
         {/* Pending request alert button with notification badge */}
         {pendingCount > 0 && (
           <div className="pending-alert-wrapper">
             <button 
-              onClick={() => navigate('/admin/partners/pending')} 
+              onClick={() => navigate('/admin/vendors/pending')} 
               className="pending-alert-btn"
             >
               <div className="alert-icon-wrapper">
@@ -91,7 +91,7 @@ const Partners = () => {
         )}
       </div>
 
-      {/* Statistics cards showing partner overview */}
+      {/* Statistics cards showing vendor overview */}
       <div className="stats-grid">
         <div className="stat-card active-card">
           <div className="stat-icon active">
@@ -99,7 +99,7 @@ const Partners = () => {
           </div>
           <div className="stat-content">
             <h3 className="stat-number">{activeSellers.length}</h3>
-            <p className="stat-label">Active Partners</p>
+            <p className="stat-label">Active Vendors</p>
             <div className="stat-trend positive">
               <span>●</span> All systems operational
             </div>
@@ -122,24 +122,24 @@ const Partners = () => {
 
       {/* Section header with filter actions */}
       <div className="section-header">
-        <h3 className="section-title">Active Partners</h3>
+        <h3 className="section-title">Active Vendors</h3>
         <div className="section-actions">
           <button className="filter-btn">
-            <span>All Partners</span>
+            <span>All Vendors</span>
             <FaChevronDown size={12} />
           </button>
         </div>
       </div>
 
-      {/* List of active partners with expandable details */}
+      {/* List of active vendors with expandable details */}
       <div className="partners-list">
         {activeSellers.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon-wrapper">
               <FaStore size={56} className="empty-icon" />
             </div>
-            <h3 className="empty-title">No Active Partners</h3>
-            <p className="empty-text">There are currently no active partners in the system.</p>
+            <h3 className="empty-title">No Active Vendors</h3>
+            <p className="empty-text">There are currently no active vendors in the system.</p>
           </div>
         ) : (
           activeSellers.map((seller) => (
@@ -148,7 +148,7 @@ const Partners = () => {
               className={`partner-card ${expandedId === seller.id ? 'expanded' : ''}`}
             >
               
-              {/* Partner card header with shop info and expand toggle */}
+              {/* Vendor card header with shop info and expand toggle */}
               <div 
                 onClick={() => toggleExpand(seller.id)} 
                 className="card-header"
@@ -230,4 +230,4 @@ const Partners = () => {
   );
 };
 
-export default Partners;
+export default Vendors;

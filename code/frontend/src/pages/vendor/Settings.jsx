@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const gold = "#C9A84C";
 const goldLight = "#E8C96A";
@@ -251,21 +251,56 @@ const Settings = () => {
   const [saved, setSaved] = useState(false);
   const [password, setPassword] = useState("");
   const [profile, setProfile] = useState({
-    firstName: "Mathew",
-    lastName: "Anderson",
-    email: "mathew@giftora.com",
-    phone: "+94 77 123 4567",
-    shopName: "Mathew's Gift Shop",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    shopName: "",
     shopCategory: "premium-gifts",
     bio: "We specialize in handcrafted premium gift boxes for all occasions.",
-    address: "42 Lake Drive, Kandy",
-    city: "Kandy",
+    address: "",
+    city: "",
     district: "Central",
     bankName: "Commercial Bank",
     accountNo: "1234567890",
-    accountName: "Mathew Anderson",
+    accountName: "",
     branch: "Kandy",
   });
+
+  const VENDOR_ID = localStorage.getItem('userId');
+  const API_BASE = `${process.env.REACT_APP_API_URL || 'https://nexus-backend-axbdfzd2g4c0fwbf.austriaeast-01.azurewebsites.net'}/api`;
+
+  useEffect(() => {
+    if (VENDOR_ID) {
+      fetch(`${API_BASE}/vendors/${VENDOR_ID}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch profile");
+          return res.json();
+        })
+        .then(data => {
+          const parts = (data.fullName || "").split(" ");
+          const firstName = parts[0] || "";
+          const lastName = parts.slice(1).join(" ") || "";
+
+          const addrParts = (data.shopAddress || "").split(",");
+          const address = addrParts[0]?.trim() || "";
+          const city = addrParts[1]?.trim() || "";
+
+          setProfile(p => ({
+            ...p,
+            firstName,
+            lastName,
+            shopName: data.shopName || "",
+            phone: data.phoneNumber || "",
+            address,
+            city,
+            accountName: data.fullName || "",
+            shopCategory: data.categories || "premium-gifts"
+          }));
+        })
+        .catch(err => console.error("Error loading settings:", err));
+    }
+  }, [VENDOR_ID, API_BASE]);
 
   const strength =
     password.length === 0 ? 0 :
@@ -276,8 +311,31 @@ const Settings = () => {
     setProfile((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    const fullName = `${profile.firstName} ${profile.lastName}`.trim();
+    const shopAddress = `${profile.address}, ${profile.city}`;
+
+    const payload = {
+      shopName: profile.shopName,
+      fullName: fullName,
+      phoneNumber: profile.phone,
+      shopAddress: shopAddress,
+      categories: profile.shopCategory
+    };
+
+    fetch(`${API_BASE}/vendors/${VENDOR_ID}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to save changes");
+        return res.json();
+      })
+      .then(() => {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      })
+      .catch(err => alert("Error saving profile changes: " + err.message));
   };
 
   const tabs = [

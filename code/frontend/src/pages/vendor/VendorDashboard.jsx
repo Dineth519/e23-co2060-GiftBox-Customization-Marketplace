@@ -143,7 +143,7 @@ const VendorDashboard = () => {
       setLoading(true);
       try {
         // 1. Dashboard stats
-        const dashRes = await fetch(`${API_BASE}/seller/${SELLER_ID}/dashboard`);
+        const dashRes = await fetch(`${API_BASE}/vendor/${SELLER_ID}/dashboard`);
         if (dashRes.ok) {
           const dash = await dashRes.json();
           setStats(dash);
@@ -170,7 +170,7 @@ const VendorDashboard = () => {
         }
 
         // 2. Recent orders
-        const ordersRes = await fetch(`${API_BASE}/sellers/${SELLER_ID}/orders`);
+        const ordersRes = await fetch(`${API_BASE}/vendors/${SELLER_ID}/orders`);
         if (ordersRes.ok) {
           const orders = await ordersRes.json();
           setRecent(orders.slice(0, 5)); // latest 5 only
