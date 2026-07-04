@@ -1,13 +1,13 @@
-// pages/homepage/CartPage.jsx
+// pages/landingpage/CartPage.jsx
 // Public cart — used by landing page visitors (not logged in)
-// Uses homepage Header (transparent → solid on scroll) + Footer
+// Uses landingpage Header (transparent → solid on scroll) + Footer
 // Route: /cart
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import Header from '../../components/homepage/Header';
-import Footer from '../../components/homepage/Footer';
+import Header from '../../components/landingpage/Header';
+import Footer from '../../components/landingpage/Footer';
 import './CartPage.css';
 
 const CartPage = () => {

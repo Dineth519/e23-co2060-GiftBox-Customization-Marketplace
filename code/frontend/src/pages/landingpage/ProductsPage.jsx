@@ -2,8 +2,8 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import Header from '../../components/homepage/Header';
-import Footer from '../../components/homepage/Footer';
+import Header from '../../components/landingpage/Header';
+import Footer from '../../components/landingpage/Footer';
 import './ProductsPage.css';
 
 // ── #43 Add to Cart — CartContext import ──────────────────────

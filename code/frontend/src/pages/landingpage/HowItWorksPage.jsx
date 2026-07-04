@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/homepage/Header';
-import Footer from '../../components/homepage/Footer';
+import Header from '../../components/landingpage/Header';
+import Footer from '../../components/landingpage/Footer';
 import './HowItWorksPage.css';
 
 const STEPS = [

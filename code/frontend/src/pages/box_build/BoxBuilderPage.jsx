@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/homepage/Header';
-import Footer from '../../components/homepage/Footer';
+import Header from '../../components/landingpage/Header';
+import Footer from '../../components/landingpage/Footer';
 import './BoxBuilderPage.css';
 
 // Import CartContext to read cart items for the box builder

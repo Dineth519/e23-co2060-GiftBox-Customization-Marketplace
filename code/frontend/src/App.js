@@ -3,12 +3,12 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 
 // Public and user pages
-import HomePage from './pages/homepage/HomePage.jsx';
-import HowItWorksPage from './pages/homepage/HowItWorksPage.jsx';
-import AboutUsPage from './pages/homepage/AboutUsPage.jsx';
+import LandingPage from './pages/landingpage/LandingPage.jsx';
+import HowItWorksPage from './pages/landingpage/HowItWorksPage.jsx';
+import AboutUsPage from './pages/landingpage/AboutUsPage.jsx';
 import CustomerHome from './pages/user/CustomerHome.jsx';
 import Verify from './pages/user/Verify.jsx';
-import VendorLanding from './pages/homepage/VendorLanding.jsx';
+import VendorLanding from './pages/landingpage/VendorLanding.jsx';
 
 //Customer
 import GiftCustomizer from './pages/user/GiftCustomizer.jsx';
@@ -44,11 +44,11 @@ import AddItems from './pages/seller/AddItems.jsx';
 import Orders from './pages/seller/Orders.jsx';
 import SellerSettings from './pages/seller/Settings.jsx';
 
-// Homepage
-import ProductsPage from './pages/homepage/ProductsPage.jsx';
+// Landingpage
+import ProductsPage from './pages/landingpage/ProductsPage.jsx';
 import AddressForm from './components/user/AddressForm.jsx';
 import { CartProvider } from './context/CartContext.jsx';
-import CartPage from './pages/homepage/CartPage.jsx';
+import CartPage from './pages/landingpage/CartPage.jsx';
 
 // Box Builder
 import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
@@ -83,7 +83,7 @@ function App() {
       <Router>
         <Routes>
           {/* Public and user routes */}
-          <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
+          <Route path="/" element={<LayoutWrapper><LandingPage /></LayoutWrapper>} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/how-it-works" element={<LayoutWrapper><HowItWorksPage /></LayoutWrapper>} />
           <Route path="/about-us" element={<LayoutWrapper><AboutUsPage /></LayoutWrapper>} />
