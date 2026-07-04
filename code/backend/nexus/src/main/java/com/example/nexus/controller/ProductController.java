@@ -4,6 +4,8 @@ import com.example.nexus.dto.ProductDTO;
 import com.example.nexus.model.Product;
 import com.example.nexus.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,28 @@ public class ProductController {
     @GetMapping("/products")
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    // GET /api/products/new-arrivals — Latest 8 active products (landing page)
+    @GetMapping("/products/new-arrivals")
+    public List<Product> getNewArrivals() {
+        return productRepository.findAll(
+            PageRequest.of(0, 8, Sort.by(Sort.Direction.DESC, "id"))
+        ).getContent()
+          .stream()
+          .filter(p -> p.getIsActive() == null || p.getIsActive() == 1)
+          .collect(Collectors.toList());
+    }
+
+    // GET /api/products/hot-sellers — Top 8 by rating (landing page)
+    @GetMapping("/products/hot-sellers")
+    public List<Product> getHotSellers() {
+        return productRepository.findAll(
+            PageRequest.of(0, 8, Sort.by(Sort.Direction.DESC, "rating"))
+        ).getContent()
+          .stream()
+          .filter(p -> p.getIsActive() == null || p.getIsActive() == 1)
+          .collect(Collectors.toList());
     }
 
     // ── GET /api/sellers/{sellerId}/products — Seller dashboard ──

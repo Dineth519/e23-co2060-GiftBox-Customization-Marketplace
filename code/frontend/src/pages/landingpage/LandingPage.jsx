@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/landingpage/Header';
 import Footer from '../../components/landingpage/Footer';
 
+// Cart context
+import { useCart } from '../../context/CartContext';
+
 // Stylesheet
 import './LandingPage.css';
 
@@ -158,6 +161,73 @@ const VALUE_STATS = [
   { num: 2800, suffix: '+', label: 'Happy Customers',  desc: 'Smiles delivered island-wide',       icon: '😊' },
   { num: 150,  suffix: '+', label: 'Local Vendors',    desc: 'Trusted Sri Lankan makers & brands', icon: '🏪' },
   { num: 10000,suffix: '+', label: 'Gifts Delivered',  desc: 'Memories created, one box at a time',icon: '📦' },
+];
+
+// ─── Occasion Selector Data ───────────────────────────────────────────────────
+const OCCASIONS = [
+  {
+    id: 'avurudu',
+    label: 'Avurudu',
+    icon: '🌺',
+    accentColor: 'cyan',
+    starterBoxId: 'avurudu-box',
+    popularityTag: 'Seasonal Special',
+    featured: true,
+  },
+  {
+    id: 'birthday',
+    label: 'Birthday',
+    icon: '🎂',
+    accentColor: 'gold',
+    starterBoxId: 'birthday-box',
+    popularityTag: 'Most Picked',
+    featured: false,
+  },
+  {
+    id: 'anniversary',
+    label: 'Anniversary',
+    icon: '💑',
+    accentColor: 'gold',
+    starterBoxId: 'romantic-box',
+    popularityTag: null,
+    featured: false,
+  },
+  {
+    id: 'corporate',
+    label: 'Corporate',
+    icon: '💼',
+    accentColor: 'cyan',
+    starterBoxId: 'corporate-box',
+    popularityTag: null,
+    featured: false,
+  },
+  {
+    id: 'wedding',
+    label: 'Wedding',
+    icon: '💍',
+    accentColor: 'gold',
+    starterBoxId: 'wedding-box',
+    popularityTag: null,
+    featured: false,
+  },
+  {
+    id: 'get-well',
+    label: 'Get Well',
+    icon: '🌸',
+    accentColor: 'cyan',
+    starterBoxId: 'wellness-box',
+    popularityTag: null,
+    featured: false,
+  },
+  {
+    id: 'just-because',
+    label: 'Just Because',
+    icon: '🎁',
+    accentColor: 'gold',
+    starterBoxId: null,
+    popularityTag: null,
+    featured: false,
+  },
 ];
 
 // ─── Scroll-reveal hook ───────────────────────────────────────────────────────
@@ -425,6 +495,117 @@ const PromoBanner = () => {
   );
 };
 
+// ─── Occasion Selector ────────────────────────────────────────────────────────
+
+const OccasionTile = ({ occasion, onSelect, isLoading }) => {
+  const accent = occasion.accentColor === 'cyan' ? 'var(--cyan)' : 'var(--gold)';
+  return (
+    <button
+      className={[
+        'occasion-tile',
+        occasion.featured      ? 'occasion-tile--featured' : '',
+        isLoading              ? 'occasion-tile--loading'  : '',
+      ].join(' ')}
+      onClick={() => onSelect(occasion)}
+      aria-label={`${occasion.label}, starter box`}
+      style={{ '--ot-accent': accent }}
+    >
+      {/* Popularity / seasonal ribbon */}
+      {occasion.popularityTag && (
+        <span className="occasion-tile__tag">{occasion.popularityTag}</span>
+      )}
+
+      {/* Ambient orb (reuses category-tile pattern) */}
+      <div className="occasion-tile__orb" />
+
+      {/* Icon — shows spinner ring while loading */}
+      <div className="occasion-tile__icon-wrap">
+        <span className="occasion-tile__icon">{occasion.icon}</span>
+        {isLoading && <span className="occasion-tile__spinner" />}
+      </div>
+
+      <span className="occasion-tile__label">{occasion.label}</span>
+    </button>
+  );
+};
+
+const OccasionToast = ({ message, visible }) => (
+  <div
+    className={`occasion-toast ${visible ? 'occasion-toast--visible' : ''}`}
+    role="status"
+    aria-live="polite"
+  >
+    <span className="occasion-toast__check">✓</span>
+    <span className="occasion-toast__msg">{message}</span>
+  </div>
+);
+
+const OccasionSelector = () => {
+  const navigate = useNavigate();
+  const [ref, visible] = useReveal(0.1);
+  const [loadingId, setLoadingId]   = useState(null);
+  const [toast, setToast]           = useState({ visible: false, message: '' });
+  const toastTimer = useRef(null);
+
+  const handleSelect = useCallback((occasion) => {
+    if (loadingId) return;              // block double-tap
+    setLoadingId(occasion.id);
+
+    const msg = occasion.starterBoxId
+      ? `Added a ${occasion.label} starter box — customize anything below.`
+      : `Opening the builder for ${occasion.label}...`;
+
+    // Show toast immediately
+    setToast({ visible: true, message: msg });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() =>
+      setToast(t => ({ ...t, visible: false })), 4000);
+
+    // Navigate after brief confirmation pause
+    setTimeout(() => {
+      const params = new URLSearchParams();
+      params.set('occasion', occasion.id);
+      if (occasion.starterBoxId) params.set('starter', occasion.starterBoxId);
+      navigate(`/build-box?${params.toString()}`);
+      setLoadingId(null);
+    }, 600);
+  }, [loadingId, navigate]);
+
+  // Clean up timer on unmount
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  return (
+    <section
+      className={`occasion-strip section-reveal ${visible ? 'visible' : ''}`}
+      ref={ref}
+    >
+      <div className="section-inner">
+        <div className="occasion-strip__header">
+          <div className="section-label center">Start With a Moment</div>
+          <h2 className="occasion-strip__title">What's the Occasion?</h2>
+          <p className="occasion-strip__sub">
+            Pick an occasion and we'll pre-fill your builder with a curated starting point.
+          </p>
+        </div>
+
+        <div className="occasion-strip__grid" role="group" aria-label="Choose an occasion">
+          {OCCASIONS.map(occ => (
+            <OccasionTile
+              key={occ.id}
+              occasion={occ}
+              onSelect={handleSelect}
+              isLoading={loadingId === occ.id}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Toast — polite screen-reader announcement + visual confirmation */}
+      <OccasionToast message={toast.message} visible={toast.visible} />
+    </section>
+  );
+};
+
 // ─── Gift Box Showcase (chamacomputers.lk layout) ─────────────────────────────
 
 const GiftBoxShowcase = () => {
@@ -680,87 +861,189 @@ const CATEGORY_MAP = {
 
 const TrendingGrid = () => {
   const navigate = useNavigate();
-  const [ref, visible] = useReveal(0.1);
-  const [products, setProducts] = useState([]);
+  const { addToCart, addedId } = useCart();
+  const [ref, visible] = useReveal(0.08);
+  const [newProducts, setNewProducts] = useState([]);
+  const [hotProducts, setHotProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [wishlisted, setWishlisted] = useState({});
   const [quickView, setQuickView] = useState(null);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/products`)
-      .then(r => r.json())
-      .then(data => {
-        setProducts(data.slice(0, 8));
-        setLoading(false);
+    const fetchNew = fetch(`${process.env.REACT_APP_API_URL}/api/products/new-arrivals`).then(r => r.ok ? r.json() : Promise.reject());
+    const fetchHot = fetch(`${process.env.REACT_APP_API_URL}/api/products/hot-sellers`).then(r => r.ok ? r.json() : Promise.reject());
+
+    Promise.all([fetchNew, fetchHot])
+      .then(([newData, hotData]) => {
+        if (Array.isArray(newData) && Array.isArray(hotData)) {
+          setNewProducts(newData.slice(0, 8));
+          setHotProducts(hotData.slice(0, 8));
+          setLoading(false);
+        } else {
+          throw new Error('Not arrays');
+        }
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        // Fallback for Azure production database: fetch standard products and sort/slice manually
+        fetch(`${process.env.REACT_APP_API_URL}/api/products`)
+          .then(r => r.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              const activeOnly = data.filter(p => p.isActive === null || p.isActive === 1);
+              
+              // New Arrivals: sort by id desc, take 8
+              const sortedNew = [...activeOnly].sort((a, b) => b.id - a.id);
+              // Best Sellers: sort by rating desc, take 8
+              const sortedHot = [...activeOnly].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
+              setNewProducts(sortedNew.slice(0, 8));
+              setHotProducts(sortedHot.slice(0, 8));
+            } else {
+              setNewProducts([]);
+              setHotProducts([]);
+            }
+            setLoading(false);
+          })
+          .catch(() => {
+            setNewProducts([]);
+            setHotProducts([]);
+            setLoading(false);
+          });
+      });
   }, []);
 
-  const toggleWishlist = (id) => {
-    setWishlisted(w => ({ ...w, [id]: !w[id] }));
-  };
+  const renderGrid = (items, ribbonText) => (
+    <div className="trending-grid">
+      {items.map((p, i) => {
+        const rating = p.rating ? Number(p.rating).toFixed(1) : '5.0';
+        const stars = Math.round(Number(rating));
+        return (
+          <div
+            key={p.id}
+            className="t-card"
+            style={{ animationDelay: `${i * 0.05}s` }}
+          >
+            {/* Corner Ribbon */}
+            <div className="t-card__ribbon">{ribbonText}</div>
+
+            {/* Image */}
+            <div className="t-card__image">
+              <img src={p.imageUrl} alt={p.name} loading="lazy" />
+              {/* Quick View overlay */}
+              <div className="t-card__overlay" onClick={() => setQuickView(p)}>
+                <span className="t-card__qv-btn">Quick View</span>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="t-card__body">
+              <span className="t-card__category">
+                {CATEGORY_MAP[p.categoryId] || 'Gift Item'}
+              </span>
+              <div className="t-card__name">{p.name}</div>
+              
+              {/* Star rating */}
+              <div className="t-card__stars">
+                {Array.from({ length: 5 }, (_, idx) => (
+                  <span key={idx} style={{ color: idx < stars ? 'var(--gold)' : 'rgba(0,0,0,0.15)' }}>★</span>
+                ))}
+                <span>{rating}</span>
+              </div>
+
+              {/* Price & Add to Cart Row */}
+              <div className="t-card__footer-row">
+                <div className="t-card__price">LKR {Number(p.price).toLocaleString()}</div>
+                <button
+                  className="t-card__cart-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(p);
+                  }}
+                  style={{
+                    background: addedId === p.id ? 'var(--navy)' : 'transparent',
+                    color: addedId === p.id ? 'var(--gold)' : 'var(--navy)',
+                    borderColor: addedId === p.id ? 'var(--gold)' : 'rgba(0,0,0,0.12)'
+                  }}
+                  title="Add to cart"
+                >
+                  {addedId === p.id ? '✓' : '🛒'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 
   return (
     <section className={`trending section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
       <div className="section-inner">
-        <div className="trending__header">
-          <div>
-            <div className="section-label">Hot Right Now</div>
-            <h2 className="section-title left">Trending This Week 🔥</h2>
+        
+        {/* ── SECTION 1: New Arrivals ── */}
+        <div className="trending__section">
+          <div className="trending__section-header">
+            <div className="section-label center">Gifts & Items</div>
+            <h2 className="trending__section-title">New Arrivals</h2>
+            <p className="trending__section-sub">Newly landed products on our store right now. Be the first to get yours!</p>
           </div>
-          <button className="btn-view-all" onClick={() => navigate('/products')}>
-            View All →
+
+          {loading ? (
+            <div className="trending-skeleton">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="trending-skeleton__card">
+                  <div className="trending-skeleton__img" />
+                  <div className="trending-skeleton__line trending-skeleton__line--short" />
+                  <div className="trending-skeleton__line" />
+                </div>
+              ))}
+            </div>
+          ) : newProducts.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted)' }}>
+              No new arrivals available at the moment.
+            </div>
+          ) : (
+            renderGrid(newProducts, 'New Arrival')
+          )}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: '60px' }} />
+
+        {/* ── SECTION 2: Best Sellers ── */}
+        <div className="trending__section">
+          <div className="trending__section-header">
+            <div className="section-label center">Most Loved</div>
+            <h2 className="trending__section-title">Best Sellers</h2>
+            <p className="trending__section-sub">The best selling products on our store right now. Check out what is hot!</p>
+          </div>
+
+          {loading ? (
+            <div className="trending-skeleton">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="trending-skeleton__card">
+                  <div className="trending-skeleton__img" />
+                  <div className="trending-skeleton__line trending-skeleton__line--short" />
+                  <div className="trending-skeleton__line" />
+                </div>
+              ))}
+            </div>
+          ) : hotProducts.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted)' }}>
+              No best sellers available at the moment.
+            </div>
+          ) : (
+            renderGrid(hotProducts, 'Best Seller')
+          )}
+        </div>
+
+        {/* Explore All Products Button */}
+        <div style={{ textAlign: 'center', marginTop: '60px' }}>
+          <button className="btn-hero-primary large" onClick={() => navigate('/products')}>
+            <span>Explore All Products</span>
+            <span className="btn-arrow">→</span>
           </button>
         </div>
 
-        {loading ? (
-          <div className="trending-skeleton">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="trending-skeleton__card">
-                <div className="trending-skeleton__img" />
-                <div className="trending-skeleton__line trending-skeleton__line--short" />
-                <div className="trending-skeleton__line" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="trending-grid">
-            {products.map((p, i) => (
-              <div
-                key={p.id}
-                className="t-card"
-                style={{ animationDelay: `${i * 0.07}s` }}
-              >
-                {/* Wishlist heart */}
-                <button
-                  className={`t-card__heart ${wishlisted[p.id] ? 'active' : ''}`}
-                  onClick={() => toggleWishlist(p.id)}
-                >
-                  {wishlisted[p.id] ? '❤️' : '🤍'}
-                </button>
-
-                {/* Image */}
-                <div className="t-card__image">
-                  <img src={p.imageUrl} alt={p.name} loading="lazy" />
-                  {/* Quick View overlay */}
-                  <div className="t-card__overlay" onClick={() => setQuickView(p)}>
-                    <span className="t-card__qv-btn">Quick View</span>
-                  </div>
-                </div>
-
-                {/* Body */}
-                <div className="t-card__body">
-                  <span className="t-card__category">
-                    {CATEGORY_MAP[p.categoryId] || 'Gift'}
-                  </span>
-                  <div className="t-card__name">{p.name}</div>
-                  <div className="t-card__stars">★★★★★ <span>5.0</span></div>
-                  <div className="t-card__price">LKR {Number(p.price).toLocaleString()}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Quick View Modal */}
@@ -772,14 +1055,32 @@ const TrendingGrid = () => {
               <img src={quickView.imageUrl} alt={quickView.name} />
             </div>
             <div className="qv-body">
-              <span className="t-card__category">{CATEGORY_MAP[quickView.categoryId] || 'Gift'}</span>
+              <span className="t-card__category">{CATEGORY_MAP[quickView.categoryId] || 'Gift Item'}</span>
               <h3 className="qv-name">{quickView.name}</h3>
-              <div className="qv-stars">★★★★★ <span>5.0 rating</span></div>
-              <div className="qv-price">LKR {Number(quickView.price).toLocaleString()}</div>
-              <p className="qv-desc">A premium curated gift from Giftora's exclusive collection. Beautifully packaged and ready to delight.</p>
-              <button className="qv-view-btn" onClick={() => { setQuickView(null); navigate('/products'); }}>
-                View in Collection →
-              </button>
+              <div className="qv-stars">
+                {Array.from({ length: 5 }, (_, idx) => (
+                  <span key={idx} style={{ color: idx < Math.round(Number(quickView.rating || 5)) ? 'var(--gold)' : 'rgba(0,0,0,0.15)' }}>★</span>
+                ))}
+                <span> {quickView.rating ? Number(quickView.rating).toFixed(1) : '5.0'} rating</span>
+              </div>
+              <div className="qv-price" style={{ margin: '12px 0' }}>LKR {Number(quickView.price).toLocaleString()}</div>
+              <p className="qv-desc">{quickView.description || 'A premium curated gift item from Giftora\'s partners. Beautifully packaged and ready to delight.'}</p>
+              
+              <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+                <button
+                  className="qv-view-btn"
+                  onClick={() => {
+                    addToCart(quickView);
+                    setQuickView(null);
+                  }}
+                  style={{ flex: 1, background: 'linear-gradient(135deg, var(--gold), var(--gold-light))', color: '#fff' }}
+                >
+                  Add to Cart
+                </button>
+                <button className="qv-view-btn qv-view-btn--outline" onClick={() => { setQuickView(null); navigate('/products'); }} style={{ flex: 1 }}>
+                  View All Products →
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -926,8 +1227,14 @@ const LandingPage = () => (
     <Header />
     <main>
       <HeroSection />
+      <OccasionSelector />
       <PromoBanner />
       <GiftBoxShowcase />
+      <TrendingGrid />
+      <WhyGiftora />
+      <HowItWorks />
+      <Testimonials />
+      <BuilderCTA />
     </main>
     <Footer />
   </div>
