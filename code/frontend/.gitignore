@@ -1,21 +1,21 @@
-# Dependency directories (මූලිකවම අයින් කළ යුතු දේ)
+# Dependency directories 
 node_modules/
 jspm_packages/
 
-# Build outputs (Build කළාට පස්සේ හැදෙන දේවල්)
+# Build outputs 
 /build
 /dist
 /target
 /out
 
-# IDE specific files (Code Editor එකට අදාළ දේවල්)
+# IDE specific files 
 .vscode/
 .idea/
 *.swp
 *.swo
 .DS_Store
 
-# Environment variables (ආරක්ෂාව සඳහා - Passwords වැනි දෑ)
+# Environment variables 
 .env
 .env.local
 .env.development.local

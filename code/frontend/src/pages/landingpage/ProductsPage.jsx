@@ -10,8 +10,34 @@ import './ProductsPage.css';
 import { useCart } from '../../context/CartContext';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
-const CATEGORY_MAP = { 1:'Wine', 2:'Watches', 3:'Perfume', 4:'Teddy Bears', 5:'Bangles', 6:'Chocolates' };
-const CAT_ICONS    = { All:'🛍️', Wine:'🍷', Watches:'⌚', Perfume:'🌸', 'Teddy Bears':'🧸', Bangles:'💍', Chocolates:'🍫' };
+const CATEGORY_MAP = { 
+  1: 'Drinks & Beverages', 2: 'Watches', 3: 'Perfume & Fragrance', 
+  4: 'Teddy Bears & Plushes', 5: 'Jewelry & Accessories', 6: 'Chocolates & Sweets',
+  7: "Men's Watches", 8: "Ladies' Watches", 9: "Minimalist Watches",
+  10: "Premium Truffles", 11: "Bakery & Cookies", 12: "Macarons & Cupcakes",
+  13: "Men's Fragrances", 14: "Ladies' Perfumes",
+  15: "Plush Toys", 16: "Newborn Plushes",
+  17: "Bangles & Bracelets", 18: "Necklaces & Pendants", 19: "Earrings",
+  20: "Non-Alcoholic Wines", 21: "Gourmet Coffee & Teas",
+  22: "Self-Care & Wellness", 23: "Scented Candles", 24: "Organic Soaps & Bath", 25: "Lotions & Skincare",
+  26: "Gift Boxes & Packaging", 27: "Wooden Keepsake Boxes", 28: "Magnetic Cardboard Boxes", 29: "Velvet Gift Boxes",
+  30: "Flowers & Botanicals", 31: "Fresh Flowers", 32: "Preserved & Dried Flowers", 33: "Mini Succulents"
+};
+
+const CAT_ICONS = { 
+  All: '🛍️', 
+  'Drinks & Beverages': '🍷', Watches: '⌚', 'Perfume & Fragrance': '🌸', 
+  'Teddy Bears & Plushes': '🧸', 'Jewelry & Accessories': '💍', 'Chocolates & Sweets': '🍫',
+  "Men's Watches": '⌚', "Ladies' Watches": '⌚', "Minimalist Watches": '⌚',
+  "Premium Truffles": '🍫', "Bakery & Cookies": '🍪', "Macarons & Cupcakes": '🧁',
+  "Men's Fragrances": '🌸', "Ladies' Perfumes": '🌸',
+  "Plush Toys": '🧸', "Newborn Plushes": '🧸',
+  "Bangles & Bracelets": '💍', "Necklaces & Pendants": '💍', Earrings: '💍',
+  "Non-Alcoholic Wines": '🍷', "Gourmet Coffee & Teas": '☕',
+  "Self-Care & Wellness": '🧼', "Scented Candles": '🕯️', "Organic Soaps & Bath": '🧼', "Lotions & Skincare": '🧴',
+  "Gift Boxes & Packaging": '📦', "Wooden Keepsake Boxes": '📦', "Magnetic Cardboard Boxes": '📦', "Velvet Gift Boxes": '🎁',
+  "Flowers & Botanicals": '💐', "Fresh Flowers": '💐', "Preserved & Dried Flowers": '🥀', "Mini Succulents": '🌵'
+};
 const SORT_OPTIONS = [
   { value:'default',    label:'Featured',          icon:'✦' },
   { value:'price-asc',  label:'Price: Low → High', icon:'↑' },
@@ -53,10 +79,15 @@ const ProductsPage = () => {
   useEffect(() => { setActiveCategory(urlCategory); }, [urlCategory]);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/products`)
+    const apiBase = process.env.REACT_APP_API_URL || 'https://nexus-backend-axbdfzd2g4c0fwbf.austriaeast-01.azurewebsites.net';
+    fetch(`${apiBase}/api/products`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
       .then(data => { setAllProducts(data); setLoading(false); })
-      .catch(err => { setError(err.message); setLoading(false); });
+      .catch(err => { 
+        console.error("Failed to fetch products:", err);
+        setError(err.message); 
+        setLoading(false); 
+      });
   }, []);
 
   const categories = useMemo(() => {
