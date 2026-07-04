@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════════════════════════
 // CartBadge.jsx — Task #44: Show Live Cart Item Count in Navbar
 // ═══════════════════════════════════════════════════════════════
-// Header.jsx වල cart icon replace කරන්නේ මේකෙන්.
-// CartContext itemCount watch කරනවා — auto update වෙනවා.
+// Replaces the cart icon in Header.jsx with a live badge.
+// Watches CartContext itemCount and auto-updates on every change.
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +22,7 @@ const CartBadge = () => {
       {/* Cart icon */}
       <span className="cart-badge-btn__icon">🛒</span>
 
-      {/* Badge — itemCount > 0 නම් විතරක් show කරනවා */}
+      {/* Badge — only shown when itemCount is greater than 0 */}
       {itemCount > 0 && (
         <span className="cart-badge-btn__count">
           {itemCount > 99 ? '99+' : itemCount}

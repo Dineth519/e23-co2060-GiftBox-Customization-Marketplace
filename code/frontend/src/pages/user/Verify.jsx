@@ -31,7 +31,7 @@ const Verify = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/auth/verify-email', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/verify-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
@@ -68,7 +68,7 @@ const Verify = () => {
     setResendCountdown(60);
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/resend-code', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/resend-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

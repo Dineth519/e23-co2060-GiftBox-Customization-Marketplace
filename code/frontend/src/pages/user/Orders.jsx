@@ -95,40 +95,73 @@ export default function Orders() {
 
   // ── Fetch orders from Spring Boot API ──────────────────────────────────────
   // useEffect runs once when the page first loads.
-  // It calls your Spring Boot backend to get the customer's orders.
+  // localStorage.getItem('userId') — userId saved at login time
   useEffect(() => {
     async function fetchOrders() {
       try {
-        // TODO: replace with your real Spring Boot URL
-        // Also add Authorization header if you use JWT tokens:
-        // headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        const response = await fetch('http://localhost:8080/api/orders/customer', {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        // Read the logged-in customer's userId from localStorage
+        const customerId = localStorage.getItem('userId');
+
+        if (!customerId) {
+          // userId නොමැතිනම් sample data පෙන්වා login page redirect
+          console.warn('No userId found. Showing sample data.');
+          setOrders(sampleOrders);
+          setLoading(false);
+          return;
+        }
+
+        // GET /api/customers/{customerId}/orders — fetches ONLY this customer's orders
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/customers/${customerId}/orders`,
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
 
         if (response.ok) {
-          // If API responds successfully, use real data
           const data = await response.json();
-          setOrders(data);
+          // Map backend response fields to the frontend display format
+          const mapped = data.map(o => ({
+            id: `ORD-${o.orderId || o.order_id}`,
+            date: o.createdAt || o.created_at,
+            status: mapStatus(o.status),
+            items: [],           // order items separate endpoint — later
+            boxSize: o.boxSize || o.box_size || 'Standard',
+            ribbonColor: o.wrappingStyle || o.wrapping_style || '—',
+            message: o.giftMessage || o.gift_message || '',
+            total: o.totalAmount || o.total_amount || 0,
+          }));
+          setOrders(mapped);
         } else {
-          // If API fails, fall back to sample data so page still works
           console.warn('API not available, using sample data');
           setOrders(sampleOrders);
         }
       } catch (error) {
-        // If backend is not running yet, use sample data
         console.error('Orders API error:', error);
         setOrders(sampleOrders);
       } finally {
-        // Always stop the loading spinner whether API worked or not
         setLoading(false);
       }
     }
 
+    // DB status → display status map
+    function mapStatus(dbStatus) {
+      const map = {
+        'PENDING':    'Pending',
+        'CONFIRMED':  'Processing',
+        'RECEIVED':   'Processing',
+        'ASSEMBLING': 'Processing',
+        'READY':      'Processing',
+        'SHIPPED':    'Out for Delivery',
+        'DELIVERED':  'Delivered',
+        'CANCELLED':  'Cancelled',
+      };
+      return map[dbStatus] || dbStatus;
+    }
+
     fetchOrders();
   }, []); // empty [] means: run this only once when page loads
+
 
   // ── Filter orders based on active tab ─────────────────────────────────────
   // If filter is 'All', show everything.

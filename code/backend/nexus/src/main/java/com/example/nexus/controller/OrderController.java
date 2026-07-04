@@ -18,7 +18,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000") 
 public class OrderController {
 
     @Autowired
@@ -34,6 +33,12 @@ public class OrderController {
     @GetMapping("/sellers/{sellerId}/orders")
     public List<Order> getOrdersBySeller(@PathVariable Integer sellerId) {
         return orderRepository.findByPartnerIdOrderByCreatedAtDesc(sellerId);
+    }
+
+    // 1b. Customer-specific orders retrieval — each customer sees ONLY their own orders
+    @GetMapping("/customers/{customerId}/orders")
+    public List<Order> getOrdersByCustomer(@PathVariable Integer customerId) {
+        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
     }
 
     // 2. Vendor order status update (only from PENDING to CONFIRMED or CANCELLED)

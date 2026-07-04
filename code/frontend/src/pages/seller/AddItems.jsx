@@ -83,21 +83,21 @@ const AddItems = () => {
     try {
       let uploadedImageUrl = '';
 
-      // 1. පින්තූරයක් තියෙනවා නම් මුලින්ම Cloudinary එකට Upload කිරීම
+      // Step 1: If an image is selected, upload it to Cloudinary first
       if (images.length > 0) {
         const formData = new FormData();
-        formData.append('file', images[0].file); // Main image එක පමණක් යවමු
-        formData.append('upload_preset', 'giftora_items'); // Cloudinary Preset එක දෙන්න
-        formData.append('cloud_name', 'dju3eqysw'); // ඔයාගේ Cloudinary Name එක
+        formData.append('file', images[0].file); // Upload only the first (main) image
+        formData.append('upload_preset', 'giftora_items'); // Cloudinary upload preset
+        formData.append('cloud_name', 'dju3eqysw'); // Your Cloudinary cloud name
 
         const cloudinaryRes = await axios.post(
           'https://api.cloudinary.com/v1_1/dju3eqysw/image/upload',
           formData
         );
-        uploadedImageUrl = cloudinaryRes.data.secure_url; // Upload වුණු පින්තූරයේ URL එක
+        uploadedImageUrl = cloudinaryRes.data.secure_url; // Secure URL of the uploaded image
       }
 
-      // 2. Spring Boot Backend එකට යවන Payload එක හැදීම
+      // 2. Prepare payload for Spring Boot backend
       const payload = {
         name: form.name,
         description: form.description,
@@ -105,17 +105,18 @@ const AddItems = () => {
         discountPrice: form.discountPrice ? Number(form.discountPrice) : null,
         stockQuantity: parseInt(form.stock, 10),
         sku: form.sku ? form.sku : null,
-        isActive: form.is_active ? 1 : 0, // Boolean එක 1 හෝ 0 බවට පත් කිරීම
-        imageUrl: uploadedImageUrl || 'https://via.placeholder.com/220x150?text=No+Image', // පින්තූරයක් නැත්නම් Default එකක්
-        categoryId: 1 // දැනට 1 ලෙස යවමු. පසුව මෙය Category Dropdown එකේ ID එකට සම්බන්ධ කරන්න.
+        isActive: form.is_active ? 1 : 0, // Convert boolean to 1 (active) or 0 (inactive)
+        imageUrl: uploadedImageUrl || 'https://via.placeholder.com/220x150?text=No+Image', // Use default image if none uploaded
+        categoryId: 1 // TODO: connect this to the selected category dropdown ID
       };
 
-      const SELLER_ID = 2; // දැනට Gift World ගේ ID එක 
+      // Read the logged-in seller's userId from localStorage
+      const SELLER_ID = localStorage.getItem('userId');
 
-      // 3. Spring Boot API එකට POST Request එක යැවීම
-      await axios.post(`http://localhost:8080/api/sellers/${SELLER_ID}/products`, payload);
+      // Step 3: Send POST request to Spring Boot API to save the product
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/sellers/${SELLER_ID}/products`, payload);
 
-      // සාර්ථක වුණාම My Items පිටුවට යැවීම
+      // On success, navigate back to My Items page
       setTimeout(() => {
         setSubmitted(false);
         navigate('/seller/my-items');

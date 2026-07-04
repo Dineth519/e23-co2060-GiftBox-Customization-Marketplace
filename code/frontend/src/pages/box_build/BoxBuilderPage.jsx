@@ -4,7 +4,7 @@ import Header from '../../components/homepage/Header';
 import Footer from '../../components/homepage/Footer';
 import './BoxBuilderPage.css';
 
-// Cart Context එකෙන් දත්ත ගැනීම සඳහා
+// Import CartContext to read cart items for the box builder
 import { useCart } from '../../context/CartContext'; 
 
 const OCCASIONS = [
@@ -27,7 +27,7 @@ const WRAPPING_STYLES = [
   { id: 'Midnight Blue', color: '#1A1A2E' }
 ];
 
-const MAX_ITEMS_GLOBAL = 8; // ලොකුම box එකේ සීමාව
+const MAX_ITEMS_GLOBAL = 8; // Maximum item capacity (largest box size)
 
 const BoxBuilderPage = () => {
   const navigate = useNavigate();
@@ -72,7 +72,7 @@ const BoxBuilderPage = () => {
 
   // Handlers
   const handleAddItem = (product) => {
-    // තෝරාගත් box එකක් ඇත්නම් එහි සීමාව, නැත්නම් උපරිම සීමාව පරීක්ෂා කිරීම
+    // Check against the selected box's item limit, or the global max if no box is selected yet
     const currentLimit = boxSize ? boxSize.limit : MAX_ITEMS_GLOBAL;
     
     if (totalItemsCount >= currentLimit) {
@@ -121,7 +121,7 @@ const BoxBuilderPage = () => {
     };
 
     try {
-      const res = await fetch('http://localhost:8080/api/orders/custom-box', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/custom-box`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload)

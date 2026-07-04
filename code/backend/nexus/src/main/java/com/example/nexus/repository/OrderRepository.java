@@ -13,6 +13,9 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     // Orders page — seller orders sorted by date
     List<Order> findByPartnerIdOrderByCreatedAtDesc(Integer partnerId);
 
+    // Customer orders — only this customer's orders
+    List<Order> findByCustomerIdOrderByCreatedAtDesc(Integer customerId);
+
     // Dashboard — orders count today
     @Query(value = "SELECT COUNT(*) FROM orders WHERE partner_id = :partnerId AND DATE(created_at) = CURDATE()", nativeQuery = true)
     long countOrdersTodayByPartnerId(@Param("partnerId") Integer partnerId);

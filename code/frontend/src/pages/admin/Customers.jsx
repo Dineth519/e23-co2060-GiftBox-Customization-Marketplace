@@ -16,7 +16,7 @@ const Customers = () => {
 
   useEffect(() => {
     // Fetch all users from backend API and filter for customers
-    fetch('http://localhost:8080/api/users') 
+    fetch(`${process.env.REACT_APP_API_URL}/api/users`) 
       .then(res => res.json())
       .then(data => {
         const customerData = data.filter(user => user.role === 'CUSTOMER');
