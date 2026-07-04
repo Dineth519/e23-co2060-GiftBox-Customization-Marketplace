@@ -9,7 +9,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';  // Outlet renders the current page
 import Header from '../components/customer/Header';
-import Footer from '../components/homepage/Footer';
+import Footer from '../components/landingpage/Footer';
 
 export default function CustomerLayout() {
   return (

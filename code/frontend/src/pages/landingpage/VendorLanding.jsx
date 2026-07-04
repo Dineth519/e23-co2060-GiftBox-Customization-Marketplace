@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Layout components
-import Header from '../../components/homepage/Header';
-import Footer from '../../components/homepage/Footer';
+import Header from '../../components/landingpage/Header';
+import Footer from '../../components/landingpage/Footer';
 
-// We can reuse the exact same CSS file as the homepage to keep the theme identical!
-import './HomePage.css'; 
+// We can reuse the exact same CSS file as the landingpage to keep the theme identical!
+import './LandingPage.css'; 
 
 // ─── Data for Vendors ────────────────────────────────────────────────────────
 

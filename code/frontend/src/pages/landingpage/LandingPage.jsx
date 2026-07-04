@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Layout components
-import Header from '../../components/homepage/Header';
-import Footer from '../../components/homepage/Footer';
+import Header from '../../components/landingpage/Header';
+import Footer from '../../components/landingpage/Footer';
 
 // Stylesheet
-import './HomePage.css';
+import './LandingPage.css';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -79,57 +79,78 @@ const SHOWCASE_BOXES = [
   {
     id: 1,
     name: 'Romantic Bliss Box',
+    brand: 'Giftora Exclusive',
     desc: 'A carefully curated collection of romance-sparking treasures — from velvety chocolates to delicate florals, wrapped in signature gold ribbon.',
     price: 'LKR 6,800',
-    items: ['Artisan Chocolates', 'Red Roses', 'Scented Candle', 'Silk Ribbon', 'Love Note Card'],
-    bg: 'linear-gradient(135deg, #1a0a0a 0%, #3d1515 40%, #1A1A2E 100%)',
+    rating: 4.9,
+    reviews: 128,
+    items: [
+      { icon: '🍫', label: 'Artisan Chocolates' },
+      { icon: '🌹', label: 'Red Roses' },
+      { icon: '🕯️', label: 'Scented Candle' },
+      { icon: '🎀', label: 'Silk Gold Ribbon' },
+      { icon: '💌', label: 'Love Note Card' },
+    ],
+    image: '/boxes/romantic_bliss_box.png',
     accent: '#C9A961',
-    emoji: '🌹',
     tag: 'Best Seller',
   },
   {
     id: 2,
     name: 'Birthday Spectacular',
+    brand: 'Giftora Exclusive',
     desc: 'Every birthday deserves extraordinary. Packed with gourmet treats, personalised keepsakes, and a burst of colour that says: you matter.',
     price: 'LKR 4,500',
-    items: ['Mini Cake', 'Party Crackers', 'Personalised Mug', 'Gummies', 'Balloon Kit'],
-    bg: 'linear-gradient(135deg, #0a1a2e 0%, #16213E 50%, #0d2b1a 100%)',
+    rating: 4.8,
+    reviews: 214,
+    items: [
+      { icon: '🎂', label: 'Mini Birthday Cake' },
+      { icon: '🎉', label: 'Party Crackers' },
+      { icon: '🍬', label: 'Assorted Gummies' },
+      { icon: '🎈', label: 'Balloon Kit' },
+      { icon: '🍪', label: 'Macarons' },
+    ],
+    image: '/boxes/birthday_box.png',
     accent: '#5DADE2',
-    emoji: '🎂',
     tag: 'Most Popular',
   },
   {
     id: 3,
     name: 'Corporate Prestige Hamper',
-    desc: 'Make a powerful first impression. Thoughtfully assembled premium items that reflect your company\'s values and appreciation for people.',
+    brand: 'Giftora Exclusive',
+    desc: 'Make a powerful first impression. Thoughtfully assembled premium items that reflect your company\'s values and deep appreciation for people.',
     price: 'LKR 12,500',
-    items: ['Premium Wine', 'Imported Cheese', 'Branded Notebook', 'Artisan Coffee', 'Gold Pen'],
-    bg: 'linear-gradient(135deg, #0a0a1a 0%, #1A1A2E 60%, #0d1520 100%)',
+    rating: 5.0,
+    reviews: 89,
+    items: [
+      { icon: '🍷', label: 'Premium Wine' },
+      { icon: '🧀', label: 'Imported Cheese' },
+      { icon: '📓', label: 'Branded Notebook' },
+      { icon: '☕', label: 'Artisan Coffee' },
+      { icon: '🖊️', label: 'Gold Pen' },
+    ],
+    image: '/boxes/corporate_box.png',
     accent: '#D4AF37',
-    emoji: '💼',
     tag: 'Corporate',
   },
   {
     id: 4,
     name: 'Self-Care Sanctuary',
+    brand: 'Giftora Exclusive',
     desc: 'Because she deserves a day just for herself. Luxurious bath, skin, and wellness essentials wrapped in our signature pastel palette.',
     price: 'LKR 7,200',
-    items: ['Bath Bombs', 'Face Mask Set', 'Body Butter', 'Herbal Tea', 'Eye Pillow'],
-    bg: 'linear-gradient(135deg, #1a0e1a 0%, #2d1a2d 50%, #1A1A2E 100%)',
+    rating: 4.9,
+    reviews: 176,
+    items: [
+      { icon: '🛁', label: 'Bath Bombs' },
+      { icon: '🧖', label: 'Face Mask Set' },
+      { icon: '🧴', label: 'Body Butter' },
+      { icon: '🍵', label: 'Herbal Tea' },
+      { icon: '😌', label: 'Eye Pillow' },
+    ],
+    image: '/boxes/selfcare_box.png',
     accent: '#E8C97A',
-    emoji: '🧴',
     tag: 'For Her',
-  },
-  {
-    id: 5,
-    name: 'The Gourmet Journey',
-    desc: 'A world tour of flavours — rare spices, handcrafted sweets, aged cheeses, and exotic teas curated for the passionate foodie.',
-    price: 'LKR 9,400',
-    items: ['Aged Cheddar', 'Turkish Delight', 'Saffron', 'Earl Grey Tea', 'Dark Chocolate'],
-    bg: 'linear-gradient(135deg, #1a1000 0%, #2d2010 50%, #16213E 100%)',
-    accent: '#C9A961',
-    emoji: '🍽️',
-    tag: 'Gourmet',
   },
 ];
 
@@ -404,105 +425,168 @@ const PromoBanner = () => {
   );
 };
 
-// ─── Featured Gift Boxes Showcase ────────────
+// ─── Gift Box Showcase (chamacomputers.lk layout) ─────────────────────────────
 
 const GiftBoxShowcase = () => {
   const navigate = useNavigate();
   const [active, setActive] = useState(0);
-  const [transitioning, setTransitioning] = useState(false);
-  const [ref, visible] = useReveal(0.1);
+  const [imgFading, setImgFading] = useState(false);
+  const [ref, visible] = useReveal(0.08);
   const timerRef = useRef(null);
 
-  const goTo = useCallback((idx) => {
-    if (transitioning) return;
-    setTransitioning(true);
+  const switchTo = useCallback((idx) => {
+    if (idx === active) return;
+    setImgFading(true);
     setTimeout(() => {
       setActive(idx);
-      setTransitioning(false);
-    }, 300);
-  }, [transitioning]);
-
-  // Auto-advance every 5 seconds
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setActive(a => (a + 1) % SHOWCASE_BOXES.length);
-    }, 5000);
-    return () => clearInterval(timerRef.current);
-  }, []);
+      setImgFading(false);
+    }, 280);
+  }, [active]);
 
   const resetTimer = (idx) => {
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setActive(a => (a + 1) % SHOWCASE_BOXES.length);
-    }, 5000);
-    goTo(idx);
+    }, 6000);
+    switchTo(idx);
   };
 
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setActive(a => {
+        const next = (a + 1) % SHOWCASE_BOXES.length;
+        setImgFading(true);
+        setTimeout(() => setImgFading(false), 280);
+        return next;
+      });
+    }, 6000);
+    return () => clearInterval(timerRef.current);
+  }, []);
+
   const box = SHOWCASE_BOXES[active];
+  const stars = Math.round(box.rating);
 
   return (
-    <section className={`showcase section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
-      <div className="section-inner">
-        <div className="section-label">Featured Collections</div>
-        <h2 className="section-title left">🎁 Gift Box Showcase</h2>
+    <section
+      className={`scv2 section-reveal ${visible ? 'visible' : ''}`}
+      ref={ref}
+      style={{ '--box-accent': box.accent }}
+    >
+      {/* Section header */}
+      <div className="scv2__header section-inner">
+        <div className="section-label">Curated Collections</div>
+        <h2 className="scv2__title">Gift Box Showcase</h2>
       </div>
 
-      <div className={`showcase__stage ${transitioning ? 'showcase__stage--fade' : ''}`}
-           style={{ background: box.bg }}>
-        {/* Parallax deco */}
-        <div className="showcase__parallax-orb" style={{ background: `radial-gradient(circle, ${box.accent}30, transparent 60%)` }} />
+      {/* 3-column layout */}
+      <div className="scv2__stage">
 
-        {/* Content */}
-        <div className="showcase__content">
-          <div className="showcase__tag" style={{ color: box.accent, borderColor: `${box.accent}50`, background: `${box.accent}15` }}>
+        {/* ── LEFT: Details panel ── */}
+        <div className="scv2__left">
+          <div className="scv2__brand" style={{ color: box.accent }}>
+            {box.brand}
+          </div>
+
+          <h2 className="scv2__box-name" style={{ color: box.accent }}>
+            {box.name}
+          </h2>
+
+          <p className="scv2__desc">{box.desc}</p>
+
+          {/* Star rating */}
+          <div className="scv2__rating">
+            <span className="scv2__stars">
+              {Array.from({ length: 5 }, (_, i) => (
+                <span key={i} style={{ color: i < stars ? box.accent : 'rgba(255,255,255,0.2)' }}>★</span>
+              ))}
+            </span>
+            <span className="scv2__rating-num" style={{ color: box.accent }}>
+              {box.rating}
+            </span>
+            <span className="scv2__rating-count">({box.reviews} reviews)</span>
+          </div>
+
+          {/* Items in box */}
+          <div className="scv2__items-title">What's inside:</div>
+          <ul className="scv2__items">
+            {box.items.map((item, i) => (
+              <li key={i} className="scv2__item">
+                <span className="scv2__item-icon">{item.icon}</span>
+                <span className="scv2__item-label">{item.label}</span>
+              </li>
+            ))}
+          </ul>
+
+          {/* Price */}
+          <div className="scv2__price" style={{ color: box.accent }}>
+            {box.price}
+          </div>
+
+          {/* CTA */}
+          <button
+            className="scv2__build-btn"
+            style={{ background: `linear-gradient(135deg, ${box.accent} 0%, #D4AF37 100%)` }}
+            onClick={() => navigate('/build-box')}
+          >
+            <span>Build Now</span>
+            <span className="scv2__btn-arrow">→</span>
+          </button>
+        </div>
+
+        {/* ── CENTER: Large image ── */}
+        <div className="scv2__center">
+          {/* Corner brackets */}
+          <span className="scv2__corner scv2__corner--tl" style={{ borderColor: box.accent }} />
+          <span className="scv2__corner scv2__corner--tr" style={{ borderColor: box.accent }} />
+          <span className="scv2__corner scv2__corner--bl" style={{ borderColor: box.accent }} />
+          <span className="scv2__corner scv2__corner--br" style={{ borderColor: box.accent }} />
+
+          {/* Glow behind image */}
+          <div className="scv2__img-glow" style={{ background: `radial-gradient(circle at 50% 60%, ${box.accent}22 0%, transparent 70%)` }} />
+
+          {/* The box image */}
+          <img
+            key={active}
+            src={box.image}
+            alt={box.name}
+            className={`scv2__img ${imgFading ? 'scv2__img--fade' : ''}`}
+          />
+
+          {/* Tag badge */}
+          <div className="scv2__tag-badge" style={{ background: box.accent }}>
             {box.tag}
           </div>
-          <div className="showcase__emoji">{box.emoji}</div>
-          <h2 className="showcase__name">{box.name}</h2>
-          <p className="showcase__desc">{box.desc}</p>
+        </div>
 
-          <div className="showcase__items">
-            {box.items.map((item, i) => (
-              <span key={i} className="showcase__item-pill" style={{ borderColor: `${box.accent}40`, color: box.accent }}>
-                {item}
-              </span>
+        {/* ── RIGHT: Thumbnail strip ── */}
+        <div className="scv2__right">
+          <div className="scv2__thumbs">
+            {SHOWCASE_BOXES.map((b, i) => (
+              <button
+                key={b.id}
+                className={`scv2__thumb ${active === i ? 'scv2__thumb--active' : ''}`}
+                onClick={() => resetTimer(i)}
+                style={{ '--t-accent': b.accent }}
+              >
+                <img src={b.image} alt={b.name} className="scv2__thumb-img" />
+                <span className="scv2__thumb-name">{b.name}</span>
+              </button>
             ))}
           </div>
 
-          <div className="showcase__price-row">
-            <span className="showcase__price" style={{ color: box.accent }}>{box.price}</span>
-            <div className="showcase__actions">
-              <button className="showcase__btn-primary" style={{ background: `linear-gradient(135deg, ${box.accent}, #D4AF37)` }}
-                      onClick={() => navigate('/products')}>
-                View Box →
-              </button>
-              <button className="showcase__btn-secondary" style={{ borderColor: `${box.accent}60`, color: box.accent }}>
-                Add to Cart
-              </button>
-            </div>
+          {/* Dot indicators */}
+          <div className="scv2__dots">
+            {SHOWCASE_BOXES.map((_, i) => (
+              <button
+                key={i}
+                className={`scv2__dot ${active === i ? 'scv2__dot--active' : ''}`}
+                onClick={() => resetTimer(i)}
+                style={active === i ? { background: box.accent } : {}}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Progress bar */}
-        <div className="showcase__progress">
-          <div className="showcase__progress-bar" key={active} style={{ '--bar-color': box.accent }} />
-        </div>
-      </div>
-
-      {/* Thumbnail strip */}
-      <div className="showcase__thumbs">
-        {SHOWCASE_BOXES.map((b, i) => (
-          <button
-            key={b.id}
-            className={`showcase__thumb ${active === i ? 'active' : ''}`}
-            style={{ background: b.bg, '--thumb-accent': b.accent }}
-            onClick={() => resetTimer(i)}
-          >
-            <span className="showcase__thumb-emoji">{b.emoji}</span>
-            <span className="showcase__thumb-name">{b.name}</span>
-            <span className="showcase__thumb-price">{b.price}</span>
-          </button>
-        ))}
       </div>
     </section>
   );
@@ -531,8 +615,8 @@ const FeaturedProducts = () => {
   }, []);
 
   return (
-    <section className={`f ${visible ? 'visible' : ''}`} ref={ref}>
-      <div className="section-inner"eatured section-reveal>
+    <section className={`featured section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
+      <div className="section-inner">
         <div className="featured__header">
           <div>
             <div className="section-label">Curated Picks</div>
@@ -837,23 +921,16 @@ const BuilderCTA = () => {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-const HomePage = () => (
+const LandingPage = () => (
   <div className="home-page">
     <Header />
     <main>
       <HeroSection />
-      <TrustBar />
       <PromoBanner />
       <GiftBoxShowcase />
-      <FeaturedProducts />
-      <TrendingGrid />
-      <WhyGiftora />
-      <HowItWorks />
-      <Testimonials />
-      <BuilderCTA />
     </main>
     <Footer />
   </div>
 );
 
-export default HomePage;
+export default LandingPage;
