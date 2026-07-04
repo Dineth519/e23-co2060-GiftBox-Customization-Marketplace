@@ -11,7 +11,10 @@ import './SellerDashboard.css';
 
 // ── Config ────────────────────────────────────────────────────
 const API_BASE  = `${process.env.REACT_APP_API_URL}/api`;
-const SELLER_ID = 2;
+const getSellerId = () => {
+  const localId = localStorage.getItem('userId');
+  return localId ? parseInt(localId, 10) : 2; // fallback to 2 for development or preview
+};
 
 // ── Fallback mock data (API fail වුණොත් මේවා පෙන්වේ) ──────────
 const MOCK_WEEKLY = [
@@ -132,6 +135,8 @@ const SellerDashboard = () => {
   const [recent,   setRecent]   = useState(MOCK_RECENT);
   const [loading,  setLoading]  = useState(true);
 
+  const SELLER_ID = useMemo(() => getSellerId(), []);
+
   // ── Fetch dashboard data ──
   useEffect(() => {
     const fetchAll = async () => {
@@ -180,7 +185,7 @@ const SellerDashboard = () => {
     };
 
     fetchAll();
-  }, []);
+  }, [SELLER_ID]);
 
   // ── Derived stats ──
   const ordersToday  = stats?.ordersToday  ?? '--';

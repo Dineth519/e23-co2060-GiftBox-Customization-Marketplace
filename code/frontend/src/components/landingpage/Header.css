@@ -138,9 +138,34 @@
 }
 
 /* Responsive */
+@media (max-width: 1220px) {
+  .header-inner {
+    gap: 16px;
+    padding: 0 24px;
+  }
+  .nav-link {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  .header-btn-ghost, .header-btn-gold {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 1060px) {
+  .header-nav {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
-  .header-inner { padding: 0 24px; }
-  .header-nav { display: none; }
+  .header-inner {
+    padding: 0 16px;
+  }
+  .header-btn-ghost {
+    display: none;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
