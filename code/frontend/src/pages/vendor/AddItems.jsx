@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaArrowLeft, FaPlus, FaUpload, FaBoxOpen, FaDollarSign, FaImage } from 'react-icons/fa';
+import { FaArrowLeft, FaPlus, FaUpload, FaBoxOpen, FaDollarSign, FaImage, FaCheck } from 'react-icons/fa';
 import './AddItems.css';
+
+// Category icons mapping (emoji based — no extra dependency)
+const CATEGORY_ICONS = {
+  'Chocolates & Sweets':        '🍫',
+  'Candles & Fragrance':        '🕯️',
+  'Skincare & Beauty':          '💄',
+  'Stationery & Lifestyle':     '📝',
+  'Plush & Keepsakes':          '🧸',
+  'Gourmet Food & Drinks':      '☕',
+  'Gift Packaging & Fillers':   '🎀',
+  'Dried Botanicals & Decor':   '🪴',
+};
 
 // ── Reusable field components ──────────────────────────────────
 const Label = ({ children, required }) => (
@@ -19,12 +31,6 @@ const Textarea = ({ className = '', ...props }) => (
   <textarea className={`ai-textarea ${className}`} {...props} />
 );
 
-const Select = ({ children, className = '', ...props }) => (
-  <select className={`ai-select ${className}`} {...props}>
-    {children}
-  </select>
-);
-
 // ── Section Card ───────────────────────────────────────────────
 const SectionCard = ({ icon, title, children }) => (
   <div className="ai-card">
@@ -35,6 +41,92 @@ const SectionCard = ({ icon, title, children }) => (
     <div className="ai-card-body">{children}</div>
   </div>
 );
+
+// ── 2-Step Category Picker ──────────────────────────────────────
+const CategoryPicker = ({ categoriesTree, selectedSubId, onSelect }) => {
+  const [selectedMain, setSelectedMain] = useState(null);
+
+  // Auto-expand main category if a subcategory is already selected
+  useEffect(() => {
+    if (selectedSubId && categoriesTree.length > 0) {
+      const parent = categoriesTree.find(c =>
+        c.subcategories?.some(s => s.id === Number(selectedSubId))
+      );
+      if (parent) setSelectedMain(parent);
+    }
+  }, [selectedSubId, categoriesTree]);
+
+  const handleMainClick = (cat) => {
+    setSelectedMain(cat);
+    onSelect(''); // clear sub selection when main changes
+  };
+
+  const handleSubClick = (subId) => {
+    onSelect(subId);
+  };
+
+  return (
+    <div className="ai-cat-picker">
+      {/* Step 1 — Main Category Cards */}
+      <p className="ai-cat-step-label">Step 1 — Choose main category</p>
+      <div className="ai-cat-main-grid">
+        {categoriesTree.map(cat => (
+          <button
+            key={cat.id}
+            type="button"
+            className={`ai-cat-main-card ${selectedMain?.id === cat.id ? 'selected' : ''}`}
+            onClick={() => handleMainClick(cat)}
+          >
+            <span className="ai-cat-emoji">
+              {CATEGORY_ICONS[cat.name] || '🎁'}
+            </span>
+            <span className="ai-cat-name">{cat.name}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Step 2 — Sub-category Pills (appears after main selected) */}
+      {selectedMain && (
+        <div className="ai-cat-sub-wrap">
+          <p className="ai-cat-step-label">
+            Step 2 — Choose sub-category under <strong>{selectedMain.name}</strong>
+          </p>
+          <div className="ai-cat-sub-pills">
+            {selectedMain.subcategories?.length > 0 ? (
+              selectedMain.subcategories.map(sub => (
+                <button
+                  key={sub.id}
+                  type="button"
+                  className={`ai-cat-sub-pill ${Number(selectedSubId) === sub.id ? 'selected' : ''}`}
+                  onClick={() => handleSubClick(sub.id)}
+                >
+                  {Number(selectedSubId) === sub.id && <FaCheck size={10} style={{ marginRight: 5 }} />}
+                  {sub.name}
+                </button>
+              ))
+            ) : (
+              <p className="ai-cat-no-sub">No sub-categories yet for this category.</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Selection Summary */}
+      {selectedSubId && selectedMain && (
+        <div className="ai-cat-summary">
+          <span>✅</span>
+          <span>
+            <strong>{selectedMain.name}</strong>
+            {' → '}
+            <strong>
+              {selectedMain.subcategories?.find(s => s.id === Number(selectedSubId))?.name}
+            </strong>
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ── Main Component ─────────────────────────────────────────────
 const AddItems = () => {
@@ -81,7 +173,7 @@ const AddItems = () => {
   // ── Submit ──
   const handleSubmit = async () => {
     if (!form.name || !form.category || !form.price || !form.stock) {
-      alert('Please fill in all required fields.');
+      alert('Please fill in all required fields including sub-category.');
       return;
     }
 
@@ -90,21 +182,19 @@ const AddItems = () => {
     try {
       let uploadedImageUrl = '';
 
-      // Step 1: If an image is selected, upload it to Cloudinary first
       if (images.length > 0) {
         const formData = new FormData();
-        formData.append('file', images[0].file); // Upload only the first (main) image
-        formData.append('upload_preset', 'giftora_items'); // Cloudinary upload preset
-        formData.append('cloud_name', 'dju3eqysw'); // Your Cloudinary cloud name
+        formData.append('file', images[0].file);
+        formData.append('upload_preset', 'giftora_items');
+        formData.append('cloud_name', 'dju3eqysw');
 
         const cloudinaryRes = await axios.post(
           'https://api.cloudinary.com/v1_1/dju3eqysw/image/upload',
           formData
         );
-        uploadedImageUrl = cloudinaryRes.data.secure_url; // Secure URL of the uploaded image
+        uploadedImageUrl = cloudinaryRes.data.secure_url;
       }
 
-      // 2. Prepare payload for Spring Boot backend
       const payload = {
         name: form.name,
         description: form.description,
@@ -112,18 +202,14 @@ const AddItems = () => {
         discountPrice: form.discountPrice ? Number(form.discountPrice) : null,
         stockQuantity: parseInt(form.stock, 10),
         sku: form.sku ? form.sku : null,
-        isActive: form.is_active ? 1 : 0, // Convert boolean to 1 (active) or 0 (inactive)
-        imageUrl: uploadedImageUrl || 'https://via.placeholder.com/220x150?text=No+Image', // Use default image if none uploaded
+        isActive: form.is_active ? 1 : 0,
+        imageUrl: uploadedImageUrl || 'https://via.placeholder.com/220x150?text=No+Image',
         categoryId: Number(form.category)
       };
 
-      // Read the logged-in seller's userId from localStorage
       const SELLER_ID = localStorage.getItem('userId');
-
-      // Step 3: Send POST request to Spring Boot API to save the product
       await axios.post(`${process.env.REACT_APP_API_URL}/api/vendors/${SELLER_ID}/products`, payload);
 
-      // On success, navigate back to My Items page
       setTimeout(() => {
         setSubmitted(false);
         navigate('/vendor/my-items');
@@ -167,40 +253,37 @@ const AddItems = () => {
           <SectionCard icon={<FaBoxOpen />} title="Basic Information">
             <div className="ai-field">
               <Label required>Product Name</Label>
-              <Input name="name" value={form.name} onChange={handleChange} placeholder="e.g. Premium Gift Box Deluxe" />
+              <Input name="name" value={form.name} onChange={handleChange} placeholder="e.g. Ferrero Rocher 16-piece Box" />
             </div>
             <div className="ai-field">
               <Label required>Description</Label>
               <Textarea name="description" value={form.description} onChange={handleChange} placeholder="Describe your product — what's included, occasion, packaging…" />
             </div>
-            <div className="ai-row ai-row-2">
-              <div>
-                <Label required>Category</Label>
-                <Select name="category" value={form.category} onChange={handleChange}>
-                  <option value="">Select category</option>
-                  {categoriesTree.map(parent => (
-                    <optgroup key={parent.id} label={parent.name}>
-                      {parent.subcategories?.map(sub => (
-                        <option key={sub.id} value={sub.id}>{sub.name}</option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </Select>
-              </div>
-              <div>
-                <Label>Status</Label>
-                <div className="ai-toggle-row" style={{ marginTop: 0 }}>
-                  <div className="ai-toggle-label">
-                    <p>{form.is_active ? 'Active' : 'Inactive'}</p>
-                    <span>{form.is_active ? 'Visible to buyers' : 'Hidden from buyers'}</span>
-                  </div>
-                  <div
-                    className="ai-toggle"
-                    style={{ background: form.is_active ? 'var(--gold)' : '#D0C8B8' }}
-                    onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))}
-                  >
-                    <div className="ai-toggle-knob" style={{ left: form.is_active ? 23 : 3 }} />
-                  </div>
+
+            {/* 2-Step Category Picker */}
+            <div className="ai-field">
+              <Label required>Category</Label>
+              <CategoryPicker
+                categoriesTree={categoriesTree}
+                selectedSubId={form.category}
+                onSelect={(subId) => setForm(f => ({ ...f, category: subId }))}
+              />
+            </div>
+
+            {/* Active Toggle */}
+            <div className="ai-field">
+              <Label>Visibility Status</Label>
+              <div className="ai-toggle-row" style={{ marginTop: 0 }}>
+                <div className="ai-toggle-label">
+                  <p>{form.is_active ? 'Active' : 'Inactive'}</p>
+                  <span>{form.is_active ? 'Visible to buyers' : 'Hidden from buyers'}</span>
+                </div>
+                <div
+                  className="ai-toggle"
+                  style={{ background: form.is_active ? 'var(--gold)' : '#D0C8B8' }}
+                  onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))}
+                >
+                  <div className="ai-toggle-knob" style={{ left: form.is_active ? 23 : 3 }} />
                 </div>
               </div>
             </div>
@@ -224,12 +307,11 @@ const AddItems = () => {
                 <Input name="stock" type="number" value={form.stock} onChange={handleChange} placeholder="0" />
               </div>
               <div>
-                <Label>SKU</Label>
-                <Input name="sku" value={form.sku} onChange={handleChange} placeholder="e.g. GFT-BOX-001" />
+                <Label>SKU <span style={{ fontSize: '11px', color: '#999', fontWeight: 400 }}>(optional)</span></Label>
+                <Input name="sku" value={form.sku} onChange={handleChange} placeholder="e.g. CHOC-FERR-001" />
               </div>
             </div>
 
-            {/* Discount preview */}
             {form.price && form.discountPrice && Number(form.discountPrice) < Number(form.price) && (
               <div className="ai-discount-badge">
                 💰 Discount:{' '}
@@ -244,7 +326,7 @@ const AddItems = () => {
             )}
           </SectionCard>
 
-          {/* Image Upload — moved to left column, below pricing */}
+          {/* Image Upload */}
           <SectionCard icon={<FaImage />} title="Product Images">
             <div
               className={`ai-dropzone${dragOver ? ' drag-over' : ''}`}
