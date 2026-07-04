@@ -853,10 +853,18 @@ const FeaturedProducts = () => {
   );
 };
 
-// ─── NEW: Trending Items Grid ─────────────────────────────────────────────────
-
 const CATEGORY_MAP = {
-  1: 'Wine', 2: 'Watches', 3: 'Perfume', 4: 'Teddy Bears', 5: 'Bangles', 6: 'Chocolates',
+  1: 'Drinks & Beverages', 2: 'Watches', 3: 'Perfume & Fragrance', 
+  4: 'Teddy Bears & Plushes', 5: 'Jewelry & Accessories', 6: 'Chocolates & Sweets',
+  7: "Men's Watches", 8: "Ladies' Watches", 9: "Minimalist Watches",
+  10: "Premium Truffles", 11: "Bakery & Cookies", 12: "Macarons & Cupcakes",
+  13: "Men's Fragrances", 14: "Ladies' Perfumes",
+  15: "Plush Toys", 16: "Newborn Plushes",
+  17: "Bangles & Bracelets", 18: "Necklaces & Pendants", 19: "Earrings",
+  20: "Non-Alcoholic Wines", 21: "Gourmet Coffee & Teas",
+  22: "Self-Care & Wellness", 23: "Scented Candles", 24: "Organic Soaps & Bath", 25: "Lotions & Skincare",
+  26: "Gift Boxes & Packaging", 27: "Wooden Keepsake Boxes", 28: "Magnetic Cardboard Boxes", 29: "Velvet Gift Boxes",
+  30: "Flowers & Botanicals", 31: "Fresh Flowers", 32: "Preserved & Dried Flowers", 33: "Mini Succulents"
 };
 
 const TrendingGrid = () => {
@@ -869,8 +877,9 @@ const TrendingGrid = () => {
   const [quickView, setQuickView] = useState(null);
 
   useEffect(() => {
-    const fetchNew = fetch(`${process.env.REACT_APP_API_URL}/api/products/new-arrivals`).then(r => r.ok ? r.json() : Promise.reject());
-    const fetchHot = fetch(`${process.env.REACT_APP_API_URL}/api/products/hot-sellers`).then(r => r.ok ? r.json() : Promise.reject());
+    const apiBase = process.env.REACT_APP_API_URL || 'https://nexus-backend-axbdfzd2g4c0fwbf.austriaeast-01.azurewebsites.net';
+    const fetchNew = fetch(`${apiBase}/api/products/new-arrivals`).then(r => r.ok ? r.json() : Promise.reject());
+    const fetchHot = fetch(`${apiBase}/api/products/hot-sellers`).then(r => r.ok ? r.json() : Promise.reject());
 
     Promise.all([fetchNew, fetchHot])
       .then(([newData, hotData]) => {
@@ -884,7 +893,7 @@ const TrendingGrid = () => {
       })
       .catch(() => {
         // Fallback for Azure production database: fetch standard products and sort/slice manually
-        fetch(`${process.env.REACT_APP_API_URL}/api/products`)
+        fetch(`${apiBase}/api/products`)
           .then(r => r.json())
           .then(data => {
             if (Array.isArray(data)) {
