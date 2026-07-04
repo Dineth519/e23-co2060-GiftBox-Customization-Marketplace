@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, User, LogOut } from 'lucide-react'; // Added LogOut icon
+import { Bell, User, LogOut } from 'lucide-react';
 import './TopBar.css';
 import logo from '../../assets/logo-removebg-preview.png';
 
@@ -9,10 +9,12 @@ const TopBar = () => {
 
   // Function to handle session termination
   const handleLogout = () => {
-    // If you use localStorage for authentication, clear it here:
-    // localStorage.removeItem('token');
-    navigate('/'); 
+    localStorage.clear();
+    navigate('/login'); 
   };
+
+  const username = localStorage.getItem('username') || 'Vendor';
+  const displayName = username.includes('@') ? username.split('@')[0] : username;
 
   return (
     <header className="topbar-container">
@@ -42,8 +44,7 @@ const TopBar = () => {
           style={{ cursor: 'pointer' }}
         >
           <div className="profile-info">
-            {/* Updated name based on project lead details */}
-            <span className="profile-name">Dineth Sanjuna</span> 
+            <span className="profile-name" style={{ textTransform: 'capitalize' }}>{displayName}</span> 
             <span className="profile-role">Vendor</span>
           </div>
           <div className="profile-avatar">
@@ -60,7 +61,7 @@ const TopBar = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'rgba(231, 76, 60, 0.1)', // Subtle red tint
+            background: 'rgba(231, 76, 60, 0.1)',
             border: 'none',
             borderRadius: '8px',
             padding: '8px',

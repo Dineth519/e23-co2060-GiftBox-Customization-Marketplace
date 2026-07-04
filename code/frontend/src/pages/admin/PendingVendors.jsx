@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   FaArrowLeft, FaCheck, FaTimes, FaMapMarkerAlt, 
-  FaUser, FaPhone, FaStore, FaClock 
+  FaUser, FaPhone, FaStore, FaClock, FaEnvelope
 } from 'react-icons/fa';
 import './PendingVendors.css';
 
@@ -14,6 +14,7 @@ import './PendingVendors.css';
 const PendingVendors = () => {
   const navigate = useNavigate();
   const [pendingSellers, setPendingSellers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Fetch pending vendors from backend API on component mount
   useEffect(() => {
@@ -29,11 +30,17 @@ const PendingVendors = () => {
             name: p.fullName,       
             address: p.shopAddress, 
             phone: p.phoneNumber,   
-            br_no: p.brNo           
+            br_no: p.brNo,
+            email: p.email || 'No Email',
+            categories: p.categories || 'premium-gifts'
           }));
         setPendingSellers(pending);
+        setLoading(false);
       })
-      .catch(err => console.error("Error fetching data:", err));
+      .catch(err => {
+        console.error("Error fetching data:", err);
+        setLoading(false);
+      });
   }, []);
 
   /**
@@ -80,7 +87,7 @@ const PendingVendors = () => {
             <FaClock size={24} />
           </div>
           <div className="stat-content">
-            <h3 className="stat-number">{pendingSellers.length}</h3>
+            <h3 className="stat-number">{loading ? '...' : pendingSellers.length}</h3>
             <p className="stat-label">Pending Requests</p>
           </div>
         </div>
@@ -88,7 +95,11 @@ const PendingVendors = () => {
 
       {/* List of pending vendor requests */}
       <div className="pending-list">
-        {pendingSellers.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#6B7280', fontWeight: '500' }}>
+            Loading pending requests...
+          </div>
+        ) : pendingSellers.length === 0 ? (
           <div className="empty-state">
             <FaClock size={48} className="empty-icon" />
             <p className="empty-text">No pending requests found.</p>
@@ -108,16 +119,22 @@ const PendingVendors = () => {
                     <h2 className="shop-name">{seller.shop}</h2>
                     <div className="meta-grid">
                       <span className="meta-item">
-                        <FaUser size={12} /> {seller.name}
+                        <FaUser size={12} /> <strong>Owner:</strong> {seller.name}
                       </span>
                       <span className="meta-item">
-                        <FaPhone size={12} /> {seller.phone}
+                        <FaEnvelope size={12} /> <strong>Email:</strong> {seller.email}
                       </span>
                       <span className="meta-item">
-                        <FaMapMarkerAlt size={12} /> {seller.address}
+                        <FaPhone size={12} /> <strong>Phone:</strong> {seller.phone}
+                      </span>
+                      <span className="meta-item">
+                        <FaMapMarkerAlt size={12} /> <strong>Address:</strong> {seller.address}
                       </span>
                       <span className="meta-item br-number">
                         BR No: {seller.br_no}
+                      </span>
+                      <span className="meta-item" style={{ color: '#C9A961', fontWeight: '600' }}>
+                        Category: {seller.categories}
                       </span>
                     </div>
                   </div>

@@ -67,41 +67,50 @@ public class VendorController {
      */
     @PostMapping("/register")
     public ResponseEntity<?> registerVendor(@RequestBody VendorRegisterRequest request) {
-        if (userRepository.existsByUsername(request.getEmail())) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email/Username already exists"));
+        try {
+            if (userRepository.existsByUsername(request.getEmail())) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email/Username already exists"));
+            }
+            if (userRepository.existsByEmail(request.getEmail())) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email already registered"));
+            }
+
+            // 1. Create User
+            User user = new User();
+            user.setName(request.getOwnerName());
+            user.setUsername(request.getEmail()); // Use email as username for vendor login
+            user.setEmail(request.getEmail());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setRole(Role.VENDOR);
+            user.setVerified(true); // Auto-verify email for vendor registration convenience
+
+            userRepository.save(user);
+
+            // 2. Create Vendor
+            Vendor vendor = new Vendor();
+            vendor.setVendorId(user.getId().intValue());
+            vendor.setShopName(request.getShopName());
+            vendor.setFullName(request.getOwnerName());
+            vendor.setPhoneNumber(request.getPhone());
+            vendor.setShopAddress(request.getAddress() + ", " + request.getCity());
+            vendor.setBrNo(request.getBusinessRegNumber());
+            vendor.setCategories(request.getCategory());
+            vendor.setStatus("PENDING"); // Defaults to PENDING until approved by admin
+
+            vendorRepository.save(vendor);
+
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Application submitted successfully! Your shop registration is pending admin approval."
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of(
+                "success", false,
+                "message", e.getMessage(),
+                "errorType", e.getClass().getName()
+            ));
         }
-        if (userRepository.existsByEmail(request.getEmail())) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email already registered"));
-        }
-
-        // 1. Create User
-        User user = new User();
-        user.setName(request.getOwnerName());
-        user.setUsername(request.getEmail()); // Use email as username for vendor login
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.VENDOR);
-        user.setVerified(true); // Auto-verify email for vendor registration convenience
-
-        userRepository.save(user);
-
-        // 2. Create Vendor
-        Vendor vendor = new Vendor();
-        vendor.setVendorId(user.getId().intValue());
-        vendor.setShopName(request.getShopName());
-        vendor.setFullName(request.getOwnerName());
-        vendor.setPhoneNumber(request.getPhone());
-        vendor.setShopAddress(request.getAddress() + ", " + request.getCity());
-        vendor.setBrNo(request.getBusinessRegNumber());
-        vendor.setCategories(request.getCategory());
-        vendor.setStatus("PENDING"); // Defaults to PENDING until approved by admin
-
-        vendorRepository.save(vendor);
-
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Application submitted successfully! Your shop registration is pending admin approval."
-        ));
     }
 
     /**

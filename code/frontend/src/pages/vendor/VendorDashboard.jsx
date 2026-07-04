@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import {
   FaShoppingCart, FaDollarSign, FaBoxOpen, FaStar,
-  FaArrowUp, FaArrowDown,
+  FaArrowUp, FaArrowDown, FaStore, FaClock
 } from 'react-icons/fa';
 import './VendorDashboard.css';
 
@@ -15,33 +15,6 @@ const getSellerId = () => {
   const localId = localStorage.getItem('userId');
   return localId ? parseInt(localId, 10) : 2; // fallback to 2 for development or preview
 };
-
-// ── Fallback mock data (API fail වුණොත් මේවා පෙන්වේ) ──────────
-const MOCK_WEEKLY = [
-  { day: 'Mon', orders: 42, revenue: 210000 },
-  { day: 'Tue', orders: 58, revenue: 290000 },
-  { day: 'Wed', orders: 35, revenue: 175000 },
-  { day: 'Thu', orders: 71, revenue: 355000 },
-  { day: 'Fri', orders: 89, revenue: 445000 },
-  { day: 'Sat', orders: 96, revenue: 480000 },
-  { day: 'Sun', orders: 63, revenue: 315000 },
-];
-
-const MOCK_MONTHLY = [
-  { month: 'Oct', revenue: 1200000 },
-  { month: 'Nov', revenue: 1850000 },
-  { month: 'Dec', revenue: 2400000 },
-  { month: 'Jan', revenue: 1700000 },
-  { month: 'Feb', revenue: 2100000 },
-  { month: 'Mar', revenue: 2800000 },
-  { month: 'Apr', revenue: 3100000 },
-];
-
-const MOCK_RECENT = [
-  { order_id: 'GB1001', delivery_address: '123 Galle Rd, Colombo', created_at: new Date().toISOString(), status: 'PENDING',    total_amount: 2000 },
-  { order_id: 'GB1002', delivery_address: '45 Kandy Rd, Peradeniya', created_at: new Date().toISOString(), status: 'DELIVERED',  total_amount: 3500 },
-  { order_id: 'GB1003', delivery_address: '12 Temple Trees, Col 01', created_at: new Date().toISOString(), status: 'CONFIRMED',  total_amount: 1500 },
-];
 
 const STATUS_COLOR_MAP = {
   DELIVERED:  { bg: '#EAF3DE', color: '#2E7D52', border: '#A8D87A' },
@@ -89,19 +62,13 @@ const CustomTooltip = ({ active, payload, label, prefix = '' }) => {
   );
 };
 
-const StatCard = ({ icon, title, value, change, trend, sub }) => (
+const StatCard = ({ icon, title, value, sub }) => (
   <div className="sd-stat-card">
     <div className="sd-stat-icon">{icon}</div>
     <div className="sd-stat-body">
       <p className="sd-stat-title">{title}</p>
       <h3 className="sd-stat-value">{value}</h3>
-      <div className="sd-stat-footer">
-        <span className={`sd-stat-badge ${trend}`}>
-          {trend === 'up' ? <FaArrowUp size={9} /> : <FaArrowDown size={9} />}
-          {change}
-        </span>
-        {sub && <span className="sd-stat-sub">{sub}</span>}
-      </div>
+      {sub && <span className="sd-stat-sub" style={{ fontSize: '12px', color: '#7A869A', marginTop: '4px', display: 'block' }}>{sub}</span>}
     </div>
   </div>
 );
@@ -129,10 +96,10 @@ const StatusPill = ({ status }) => {
 // ── Main Component ────────────────────────────────────────────
 const VendorDashboard = () => {
   const [stats,    setStats]    = useState(null);
-  const [weekly,   setWeekly]   = useState(MOCK_WEEKLY);
-  const [monthly,  setMonthly]  = useState(MOCK_MONTHLY);
+  const [weekly,   setWeekly]   = useState([]);
+  const [monthly,  setMonthly]  = useState([]);
   const [pieData,  setPieData]  = useState([]);
-  const [recent,   setRecent]   = useState(MOCK_RECENT);
+  const [recent,   setRecent]   = useState([]);
   const [loading,  setLoading]  = useState(true);
 
   const SELLER_ID = useMemo(() => getSellerId(), []);
@@ -149,14 +116,22 @@ const VendorDashboard = () => {
           setStats(dash);
 
           // Weekly chart data
-          if (dash.weeklyData?.length)   setWeekly(dash.weeklyData.map(d => ({
-            day: d.day, orders: Number(d.orders), revenue: Number(d.revenue),
-          })));
+          if (dash.weeklyData?.length) {
+            setWeekly(dash.weeklyData.map(d => ({
+              day: d.day, orders: Number(d.orders), revenue: Number(d.revenue),
+            })));
+          } else {
+            setWeekly([]);
+          }
 
           // Monthly chart data
-          if (dash.monthlyRevenue?.length) setMonthly(dash.monthlyRevenue.map(d => ({
-            month: d.month, revenue: Number(d.revenue),
-          })));
+          if (dash.monthlyRevenue?.length) {
+            setMonthly(dash.monthlyRevenue.map(d => ({
+              month: d.month, revenue: Number(d.revenue),
+            })));
+          } else {
+            setMonthly([]);
+          }
 
           // Pie chart data
           if (dash.statusDistribution) {
@@ -166,6 +141,8 @@ const VendorDashboard = () => {
               value: total > 0 ? Math.round((Number(val) / total) * 100) : 0,
               color: PIE_COLORS[name] ?? '#AAA',
             })));
+          } else {
+            setPieData([]);
           }
         }
 
@@ -174,11 +151,16 @@ const VendorDashboard = () => {
         if (ordersRes.ok) {
           const orders = await ordersRes.json();
           setRecent(orders.slice(0, 5)); // latest 5 only
+        } else {
+          setRecent([]);
         }
 
       } catch (err) {
         console.error('Dashboard fetch error:', err);
-        // Fallback mock data already set as default state
+        setWeekly([]);
+        setMonthly([]);
+        setPieData([]);
+        setRecent([]);
       } finally {
         setLoading(false);
       }
@@ -188,9 +170,9 @@ const VendorDashboard = () => {
   }, [SELLER_ID]);
 
   // ── Derived stats ──
-  const ordersToday  = stats?.ordersToday  ?? '--';
-  const revenueToday = stats ? fmtLKR(stats.revenueToday) : '--';
-  const totalProducts = stats?.totalProducts ?? '--';
+  const ordersToday  = stats ? stats.ordersToday : 0;
+  const revenueToday = stats ? fmtLKR(stats.revenueToday) : '0';
+  const totalProducts = stats ? stats.totalProducts : 0;
 
   return (
     <div className="sd-page">
@@ -211,150 +193,130 @@ const VendorDashboard = () => {
 
       {/* ── Stats Grid ── */}
       <div className="sd-stats-grid">
-        <StatCard icon={<FaShoppingCart />} title="Orders Today"   value={ordersToday}   change="+23.1%" trend="up"   sub="vs yesterday" />
-        <StatCard icon={<FaDollarSign />}   title="Revenue (LKR)"  value={revenueToday}  change="+15.3%" trend="up"   sub="vs yesterday" />
-        <StatCard icon={<FaBoxOpen />}      title="Total Products" value={totalProducts} change="+4"     trend="up"   sub="this week" />
-        <StatCard icon={<FaStar />}         title="Avg Rating"     value="4.8★"          change="-0.1"   trend="down" sub="last 30 days" />
+        <StatCard icon={<FaShoppingCart />} title="Orders Today"   value={ordersToday} sub="Updated live" />
+        <StatCard icon={<FaDollarSign />}   title="Revenue Today"  value={`LKR ${revenueToday}`} sub="Gross sales" />
+        <StatCard icon={<FaBoxOpen />}      title="Total Products" value={totalProducts} sub="Active catalog items" />
+        <StatCard icon={<FaStar />}         title="Avg Rating"     value="N/A" sub="No ratings yet" />
       </div>
 
       {/* ── Charts Row 1: Orders + Revenue ── */}
-      <div className="sd-row-2">
-        <ChartCard>
-          <SectionTitle title="Orders This Week" />
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={weekly} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="ordersGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#C9A84C" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#C9A84C" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F0EAD8" />
-              <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#7A869A' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#7A869A' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="orders" name="Orders" stroke="#C9A84C" strokeWidth={2.5} fill="url(#ordersGrad)" dot={{ fill: '#C9A84C', r: 4 }} activeDot={{ r: 6 }} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <ChartCard>
-          <SectionTitle title="Daily Revenue (LKR)" />
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={weekly} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-              <defs>
-                <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#C9A84C" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#E8C96A" stopOpacity={0.6} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F0EAD8" />
-              <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#7A869A' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#7A869A' }} axisLine={false} tickLine={false} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
-              <Tooltip content={<CustomTooltip prefix="LKR " />} />
-              <Bar dataKey="revenue" name="Revenue" fill="url(#revenueGrad)" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
-
-      {/* ── Charts Row 2: Monthly Revenue + Pie ── */}
-      <div className="sd-row-2-1">
-        <ChartCard>
-          <SectionTitle title="Monthly Revenue (LKR)" />
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={monthly} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="monthGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#1A2340" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#1A2340" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F0EAD8" />
-              <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#7A869A' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#7A869A' }} axisLine={false} tickLine={false} tickFormatter={v => `${(v / 1000000).toFixed(1)}M`} />
-              <Tooltip content={<CustomTooltip prefix="LKR " />} />
-              <Area type="monotone" dataKey="revenue" name="Revenue" stroke="#1A2340" strokeWidth={2.5} fill="url(#monthGrad)" dot={{ fill: '#1A2340', r: 4 }} activeDot={{ r: 6, fill: '#C9A84C' }} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <ChartCard>
-          <SectionTitle title="Order Status" />
-          {pieData.length > 0 ? (
-            <>
-              <ResponsiveContainer width="100%" height={180}>
-                <PieChart>
-                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
-                    {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                  </Pie>
-                  <Tooltip formatter={(v) => [`${v}%`, '']} />
-                </PieChart>
+      <div className="sd-charts-row">
+        <ChartCard style={{ flex: 2 }}>
+          <SectionTitle title="Weekly Sales Trend" />
+          <div className="sd-chart-wrap">
+            {weekly.length === 0 ? (
+              <div className="empty-chart-placeholder">No weekly sales records yet.</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={weekly}>
+                  <defs>
+                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#C9A84C" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#C9A84C" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ECEFF1" />
+                  <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fill: '#7A869A', fontSize: 11 }} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#7A869A', fontSize: 11 }} tickFormatter={(v) => `LKR ${v/1000}k`} />
+                  <Tooltip content={<CustomTooltip prefix="LKR " />} cursor={{ stroke: '#C9A84C', strokeWidth: 1 }} />
+                  <Area type="monotone" dataKey="revenue" name="Revenue" stroke="#C9A84C" strokeWidth={2} fillOpacity={1} fill="url(#colorRev)" />
+                </AreaChart>
               </ResponsiveContainer>
-              <div className="sd-pie-legend">
-                {pieData.map(s => (
-                  <div key={s.name} className="sd-pie-legend-item">
-                    <div className="sd-pie-dot" style={{ background: s.color }} />
-                    <span>{s.name} <strong style={{ color: '#1A2340' }}>{s.value}%</strong></span>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="sd-loading">No data yet</div>
-          )}
-        </ChartCard>
-      </div>
-
-      {/* ── Bottom Row: Recent Orders ── */}
-      <div className="sd-row-bottom">
-        <ChartCard>
-          <SectionTitle title="Recent Orders" action="View All" />
-          {loading ? (
-            <div className="sd-loading">Loading...</div>
-          ) : (
-            <table className="sd-table">
-              <thead>
-                <tr>
-                  {['Order ID', 'Address', 'Amount (LKR)', 'Status', 'Time'].map(h => (
-                    <th key={h}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {recent.map((o, i) => (
-                  <tr key={o.order_id} style={{ borderBottom: i < recent.length - 1 ? '1px solid #F5F0E8' : 'none' }}>
-                    <td className="sd-order-id">#{o.order_id}</td>
-                    <td className="sd-order-product">{o.delivery_address}</td>
-                    <td className="sd-order-amount">{fmtLKR(o.total_amount)}</td>
-                    <td><StatusPill status={o.status} /></td>
-                    <td className="sd-order-time">{timeAgo(o.created_at)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </ChartCard>
-
-        {/* Stats Summary Card */}
-        <ChartCard>
-          <SectionTitle title="Order Summary" />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {[
-              { label: 'Total Orders',    value: stats ? (stats.ordersToday ?? 0) : '--',  color: '#1A2340' },
-              { label: 'Total Revenue',   value: stats ? `LKR ${fmtLKR(stats.revenueToday)}` : '--', color: '#C9A84C' },
-              { label: 'Total Products',  value: stats?.totalProducts ?? '--', color: '#1A2340' },
-              { label: 'Pending Orders',  value: pieData.find(p => p.name === 'PENDING')?.value != null ? `${pieData.find(p => p.name === 'PENDING').value}%` : '--', color: '#185FA5' },
-              { label: 'Delivered',       value: pieData.find(p => p.name === 'DELIVERED')?.value != null ? `${pieData.find(p => p.name === 'DELIVERED').value}%` : '--', color: '#2E7D52' },
-              { label: 'Cancelled',       value: pieData.find(p => p.name === 'CANCELLED')?.value != null ? `${pieData.find(p => p.name === 'CANCELLED').value}%` : '--', color: '#C0392B' },
-            ].map(row => (
-              <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#F8F4EC', borderRadius: 10 }}>
-                <span style={{ fontSize: 13, color: '#5A6478', fontWeight: 500 }}>{row.label}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: row.color }}>{row.value}</span>
-              </div>
-            ))}
+            )}
           </div>
         </ChartCard>
+
+        <ChartCard style={{ flex: 1.2 }}>
+          <SectionTitle title="Weekly Order Count" />
+          <div className="sd-chart-wrap">
+            {weekly.length === 0 ? (
+              <div className="empty-chart-placeholder">No weekly orders yet.</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={weekly}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ECEFF1" />
+                  <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fill: '#7A869A', fontSize: 11 }} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#7A869A', fontSize: 11 }} allowDecimals={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="orders" name="Orders" fill="#1A2340" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </ChartCard>
+      </div>
+
+      {/* ── Row 3: Orders List + Status Distribution ── */}
+      <div className="sd-bottom-row">
+        
+        {/* Left: Recent Orders */}
+        <div className="sd-orders-list-card">
+          <SectionTitle title="Recent Incoming Orders" />
+          
+          <div className="sd-table-wrap">
+            {recent.length === 0 ? (
+              <div className="empty-table-placeholder">
+                <FaClock size={36} style={{ color: '#C9A84C', opacity: 0.5, marginBottom: '12px' }} />
+                <p>No orders received yet.</p>
+              </div>
+            ) : (
+              <table className="sd-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Destination</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: 'right' }}>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recent.map((o) => (
+                    <tr key={o.order_id}>
+                      <td className="sd-td-id">#{o.order_id}</td>
+                      <td>{o.delivery_address}</td>
+                      <td className="sd-td-time">{timeAgo(o.created_at)}</td>
+                      <td><StatusPill status={o.status} /></td>
+                      <td style={{ textAlign: 'right', fontWeight: 600 }}>LKR {fmtLKR(o.total_amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* Right: Status Pie Chart */}
+        <ChartCard style={{ flex: 1 }}>
+          <SectionTitle title="Order Fulfilment Status" />
+          <div className="sd-pie-wrap">
+            {pieData.length === 0 ? (
+              <div className="empty-chart-placeholder">No order status breakdown available.</div>
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={3} dataKey="value">
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => `${value}%`} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="sd-pie-legend">
+                  {pieData.map((d, i) => (
+                    <div key={i} className="legend-item">
+                      <span className="legend-dot" style={{ background: d.color }} />
+                      <span className="legend-label">{d.name} ({d.value}%)</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </ChartCard>
+
       </div>
 
     </div>

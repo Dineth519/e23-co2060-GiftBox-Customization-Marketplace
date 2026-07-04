@@ -253,18 +253,18 @@ const Settings = () => {
   const [profile, setProfile] = useState({
     firstName: "",
     lastName: "",
-    email: "",
+    email: localStorage.getItem('username') || "",
     phone: "",
     shopName: "",
     shopCategory: "premium-gifts",
-    bio: "We specialize in handcrafted premium gift boxes for all occasions.",
+    bio: "",
     address: "",
     city: "",
     district: "Central",
     bankName: "Commercial Bank",
-    accountNo: "1234567890",
+    accountNo: "",
     accountName: "",
-    branch: "Kandy",
+    branch: "",
   });
 
   const VENDOR_ID = localStorage.getItem('userId');

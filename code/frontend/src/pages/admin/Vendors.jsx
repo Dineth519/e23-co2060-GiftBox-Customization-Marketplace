@@ -17,6 +17,7 @@ const Vendors = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [activeSellers, setActiveSellers] = useState([]); 
   const [pendingCount, setPendingCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   // Fetch active and pending vendors from backend API on mount
   useEffect(() => {
@@ -42,8 +43,12 @@ const Vendors = () => {
           }));
         
         setActiveSellers(active);
+        setLoading(false);
       })
-      .catch(err => console.error("Error fetching vendors:", err));
+      .catch(err => {
+        console.error("Error fetching vendors:", err);
+        setLoading(false);
+      });
   }, []);
 
   /**
@@ -131,9 +136,12 @@ const Vendors = () => {
         </div>
       </div>
 
-      {/* List of active vendors with expandable details */}
       <div className="partners-list">
-        {activeSellers.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#6B7280', fontWeight: '500' }}>
+            Loading vendors...
+          </div>
+        ) : activeSellers.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon-wrapper">
               <FaStore size={56} className="empty-icon" />
