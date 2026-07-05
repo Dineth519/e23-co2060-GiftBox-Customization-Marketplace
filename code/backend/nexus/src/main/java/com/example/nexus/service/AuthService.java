@@ -4,6 +4,8 @@ import com.example.nexus.dto.*;
 import com.example.nexus.model.Role;
 import com.example.nexus.model.Customer;
 import com.example.nexus.repository.CustomerRepository;
+import com.example.nexus.model.Vendor;
+import com.example.nexus.repository.VendorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -92,12 +94,33 @@ public class AuthService {
         return new AuthResponse(true, "Email verified successfully! You can now login.");
     }
 
+    @Autowired
+    private VendorRepository vendorRepository;
+
     // ── Login ──────────────────────────────────
     public AuthResponse login(LoginRequest request) {
 
-        Optional<Customer> userOpt = customerRepository.findByUsername(request.getUsername());
+        String loginInput = request.getUsername();
+
+        // 1. Try by Username
+        Optional<Customer> userOpt = customerRepository.findByUsername(loginInput);
+        
+        // 2. Try by Email
         if (userOpt.isEmpty()) {
-            userOpt = customerRepository.findByEmail(request.getUsername());
+            userOpt = customerRepository.findByEmail(loginInput);
+        }
+
+        // 3. Try by Owner/Full Name
+        if (userOpt.isEmpty()) {
+            userOpt = customerRepository.findByName(loginInput);
+        }
+
+        // 4. Try by Vendor Shop Name
+        if (userOpt.isEmpty()) {
+            Optional<Vendor> vendorOpt = vendorRepository.findByShopName(loginInput);
+            if (vendorOpt.isPresent()) {
+                userOpt = customerRepository.findById((long) vendorOpt.get().getVendorId());
+            }
         }
 
         if (userOpt.isEmpty()) {

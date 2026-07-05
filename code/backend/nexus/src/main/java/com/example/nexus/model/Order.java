@@ -63,6 +63,10 @@ public class Order {
     @JsonProperty("wrapping_style")
     private String wrappingStyle;
 
+    @Column(name = "order_type")
+    @JsonProperty("order_type")
+    private String orderType;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
