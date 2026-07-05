@@ -64,8 +64,9 @@ public class ProductController {
                 dto.setCategory(product.getCategoryId() == null
                     ? "Uncategorized"
                     : categoryRepository.findById(product.getCategoryId())
-                        .map(Category::getName)
-                        .orElse("Category ID: " + product.getCategoryId()));
+                        .map(com.example.nexus.model.Category::getName)
+                        .orElse("Unknown"));
+                dto.setSubCategory(product.getSubCategory());
                 dto.setPrice(product.getPrice());
                 dto.setStock(product.getStockQuantity() != null ? product.getStockQuantity() : 0);
                 dto.setSold(0);
