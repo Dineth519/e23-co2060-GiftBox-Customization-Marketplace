@@ -25,11 +25,11 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     Double getRevenueTodayByVendorId(@Param("vendorId") Integer vendorId);
 
     // Dashboard — weekly orders + revenue (last 7 days)
-    @Query(value = "SELECT DATE_FORMAT(created_at, '%a') as day, COUNT(*) as orders, SUM(total_amount) as revenue FROM orders WHERE vendor_id = :vendorId AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY DATE(created_at), day ORDER BY DATE(created_at)", nativeQuery = true)
+    @Query(value = "SELECT DATE_FORMAT(created_at, '%a') as day, COUNT(*) as orders, SUM(total_amount) as revenue FROM orders WHERE vendor_id = :vendorId AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY DATE(created_at), DATE_FORMAT(created_at, '%a') ORDER BY DATE(created_at)", nativeQuery = true)
     List<Object[]> getWeeklyOrdersAndRevenue(@Param("vendorId") Integer vendorId);
 
     // Dashboard — monthly revenue (last 7 months)
-    @Query(value = "SELECT DATE_FORMAT(created_at, '%b') as month, SUM(total_amount) as revenue FROM orders WHERE vendor_id = :vendorId AND status != 'CANCELLED' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 MONTH) GROUP BY YEAR(created_at), MONTH(created_at) ORDER BY YEAR(created_at), MONTH(created_at)", nativeQuery = true)
+    @Query(value = "SELECT DATE_FORMAT(created_at, '%b') as month, SUM(total_amount) as revenue FROM orders WHERE vendor_id = :vendorId AND status != 'CANCELLED' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 MONTH) GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b') ORDER BY YEAR(created_at), MONTH(created_at)", nativeQuery = true)
     List<Object[]> getMonthlyRevenue(@Param("vendorId") Integer vendorId);
 
     // Dashboard — order status distribution

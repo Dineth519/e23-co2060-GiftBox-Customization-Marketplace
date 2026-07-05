@@ -70,9 +70,9 @@ END;
 
 -- 9. Add one admin data and one assembler data
 INSERT INTO users (name, username, email, password, role, is_verified)
-VALUES ('Admin', 'admin', 'admin@giftora.com', '$2a$10$EP3Pmk3NtiYH4lGQXvAvTOJDgJes6EelouLsERxKbCzgALwuLzGqG', 'ADMIN', 1);
+VALUES ('Admin', 'admin', 'admin@giftora.com', '$2a$12$T7GRMHHTzkYTYgGmAoE2ReyfM.3Cb2U7Y3UC.UuVEe7TS7gbES9HC', 'ADMIN', 1);
 
 INSERT INTO users (name, username, email, password, role, is_verified)
-VALUES ('Assembler', 'assembler', 'assembler1@giftora.com', '$2a$10$EP3Pmk3NtiYH4lGQXvAvTOJDgJes6EelouLsERxKbCzgALwuLzGqG', 'ASSEMBLER', 1);
+VALUES ('Assembler', 'assembler', 'assembler@giftora.com', '$2a$12$T7GRMHHTzkYTYgGmAoE2ReyfM.3Cb2U7Y3UC.UuVEe7TS7gbES9HC', 'ASSEMBLER', 1);
 
 SET FOREIGN_KEY_CHECKS = 1;
