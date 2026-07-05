@@ -5,51 +5,21 @@
 import React, { useState, useEffect } from 'react';
 import './Profile.css';
 
-// ─── SAMPLE DATA (replace with real API calls) ────────────────────────────────
-const sampleProfile = {
-  firstName: 'Nimasha',
-  lastName:  'Perera',
-  email:     'nimasha@gmail.com',
-  phone:     '077 123 4567',
-  joinDate:  '2025-10-01',
-};
-
-const sampleAddresses = [
-  {
-    id: 1,
-    label: 'Home',
-    line1: '42 Galle Road',
-    city:  'Colombo 03',
-    province: 'Western Province',
-    isDefault: true,
-  },
-  {
-    id: 2,
-    label: 'Office',
-    line1: '10 Union Place',
-    city:  'Colombo 02',
-    province: 'Western Province',
-    isDefault: false,
-  },
-];
-
-const sampleStats = {
-  totalOrders: 4,
-  delivered:   1,
-  inProgress:  3,
-  totalSpent:  11840,
-};
-
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function Profile() {
 
   const [profile,      setProfile]      = useState(null);
-  const [addresses,    setAddresses]    = useState([]);
-  const [stats,        setStats]        = useState(null);
+  const [address,      setAddress]      = useState(null);
+  const [stats,        setStats]        = useState({
+    totalOrders: 0,
+    delivered:   0,
+    inProgress:  0,
+    totalSpent:  0
+  });
   const [loading,      setLoading]      = useState(true);
   const [activeTab,    setActiveTab]    = useState('info');
 
-  const [infoForm,     setInfoForm]     = useState({ firstName:'', lastName:'', email:'', phone:'' });
+  const [infoForm,     setInfoForm]     = useState({ name:'', email:'', phone:'' });
   const [infoSaved,    setInfoSaved]    = useState(false);
   const [infoError,    setInfoError]    = useState('');
 
@@ -57,63 +27,82 @@ export default function Profile() {
   const [passSaved,    setPassSaved]    = useState(false);
   const [passError,    setPassError]    = useState('');
 
-  const [showAddrForm, setShowAddrForm] = useState(false);
-  const [newAddr,      setNewAddr]      = useState({ label:'', line1:'', city:'', province:'' });
+  const [addrForm,     setAddrForm]     = useState({ line1:'', line2:'', city:'', district:'', province:'', postalCode:'' });
+  const [addrSaved,    setAddrSaved]    = useState(false);
   const [addrError,    setAddrError]    = useState('');
+
+  const userId = localStorage.getItem('userId');
+  const username = localStorage.getItem('username');
 
   // ── Fetch on mount ────────────────────────────────────────────────────────
   useEffect(() => {
     async function fetchData() {
+      if (!userId || !username) {
+        setLoading(false);
+        return;
+      }
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/customer/profile`, {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        // Fetch profile
+        const res = await fetch(`http://localhost:8080/api/customers/${userId}`);
         if (res.ok) {
           const data = await res.json();
-          setProfile(data.profile);
-          setAddresses(data.addresses);
-          setStats(data.stats);
+          setProfile(data);
           setInfoForm({
-            firstName: data.profile.firstName,
-            lastName:  data.profile.lastName,
-            email:     data.profile.email,
-            phone:     data.profile.phone,
+            name: data.name || '',
+            email: data.email || '',
+            phone: data.phoneNumber || '',
           });
-        } else throw new Error();
-      } catch {
-        setProfile(sampleProfile);
-        setAddresses(sampleAddresses);
-        setStats(sampleStats);
-        setInfoForm({
-          firstName: sampleProfile.firstName,
-          lastName:  sampleProfile.lastName,
-          email:     sampleProfile.email,
-          phone:     sampleProfile.phone,
-        });
+          
+          setAddrForm({
+            line1: data.addressLine1 || '',
+            line2: data.addressLine2 || '',
+            city: data.city || '',
+            district: data.district || '',
+            province: data.province || '',
+            postalCode: data.postalCode || '',
+          });
+          setAddress(data);
+        }
+
+        // Fetch stats (mocked for now until backend orders endpoint is ready)
+        // If there's a backend endpoint for orders, you can sum it up here
+      } catch (err) {
+        console.error("Failed to load profile", err);
       } finally {
         setLoading(false);
       }
     }
     fetchData();
-  }, []);
+  }, [userId, username]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   async function handleSaveInfo() {
-    if (!infoForm.firstName || !infoForm.lastName || !infoForm.email || !infoForm.phone) {
-      setInfoError('Please fill in all fields.');
+    if (!infoForm.name || !infoForm.email) {
+      setInfoError('Please fill in name and email.');
       return;
     }
     setInfoError('');
     try {
-      await fetch(`${process.env.REACT_APP_API_URL}/api/customer/profile`, {
+      const res = await fetch(`http://localhost:8080/api/customers/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(infoForm),
+        body: JSON.stringify({
+          name: infoForm.name,
+          email: infoForm.email,
+          phoneNumber: infoForm.phone
+        }),
       });
-    } catch { /* backend not ready */ }
-    setProfile((prev) => ({ ...prev, ...infoForm }));
-    setInfoSaved(true);
-    setTimeout(() => setInfoSaved(false), 2000);
+      if (res.ok) {
+        const updated = await res.json();
+        setProfile(updated);
+        setInfoSaved(true);
+        setTimeout(() => setInfoSaved(false), 2000);
+      } else {
+        setInfoError('Failed to update profile.');
+      }
+    } catch (err) {
+      setInfoError('Network error while saving profile.');
+    }
   }
 
   async function handleChangePassword() {
@@ -131,45 +120,71 @@ export default function Profile() {
     }
     setPassError('');
     try {
-      await fetch(`${process.env.REACT_APP_API_URL}/api/customer/password`, {
+      const res = await fetch(`http://localhost:8080/api/customers/${userId}/password`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword: passForm.current, newPassword: passForm.newPass }),
       });
-    } catch { /* backend not ready */ }
-    setPassSaved(true);
-    setPassForm({ current: '', newPass: '', confirm: '' });
-    setTimeout(() => setPassSaved(false), 2000);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPassSaved(true);
+        setPassForm({ current: '', newPass: '', confirm: '' });
+        setTimeout(() => setPassSaved(false), 2000);
+      } else {
+        setPassError(data.message || 'Failed to update password.');
+      }
+    } catch (err) {
+      setPassError('Network error while changing password.');
+    }
   }
 
-  async function handleAddAddress() {
-    if (!newAddr.label || !newAddr.line1 || !newAddr.city || !newAddr.province) {
-      setAddrError('Please fill in all address fields.');
+  async function handleSaveAddress() {
+    if (!addrForm.line1 || !addrForm.city || !addrForm.province) {
+      setAddrError('Please fill in Address Line 1, City, and Province.');
       return;
     }
     setAddrError('');
-    const address = { ...newAddr, id: Date.now(), isDefault: addresses.length === 0 };
     try {
-      await fetch(`${process.env.REACT_APP_API_URL}/api/customer/addresses`, {
+      const res = await fetch(`http://localhost:8080/api/customers/${username}/address`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(address),
+        body: JSON.stringify({
+          addressLine1: addrForm.line1,
+          addressLine2: addrForm.line2,
+          city: addrForm.city,
+          district: addrForm.district,
+          province: addrForm.province,
+          postalCode: addrForm.postalCode,
+          phoneNumber: infoForm.phone // Assuming same phone
+        }),
       });
-    } catch { /* backend not ready */ }
-    setAddresses((prev) => [...prev, address]);
-    setNewAddr({ label:'', line1:'', city:'', province:'' });
-    setShowAddrForm(false);
-  }
-
-  function handleRemoveAddress(id) {
-    setAddresses((prev) => prev.filter((a) => a.id !== id));
-  }
-
-  function handleSetDefault(id) {
-    setAddresses((prev) => prev.map((a) => ({ ...a, isDefault: a.id === id })));
+      
+      if (res.ok) {
+        // Also update the main customer record just in case
+        await fetch(`http://localhost:8080/api/customers/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              addressLine1: addrForm.line1,
+              addressLine2: addrForm.line2,
+              city: addrForm.city,
+              district: addrForm.district,
+              province: addrForm.province,
+              postalCode: addrForm.postalCode,
+            }),
+        });
+        setAddrSaved(true);
+        setTimeout(() => setAddrSaved(false), 2000);
+      } else {
+          setAddrError('Failed to save address.');
+      }
+    } catch (err) {
+        setAddrError('Network error while saving address.');
+    }
   }
 
   function formatDate(dateStr) {
+    if (!dateStr) return 'Recently';
     return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
   }
 
@@ -182,6 +197,14 @@ export default function Profile() {
       </div>
     );
   }
+  
+  if (!profile) {
+      return (
+        <div className="pf-loading">
+            <p>Please log in to view your profile.</p>
+        </div>
+      );
+  }
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
   return (
@@ -192,12 +215,12 @@ export default function Profile() {
         <div className="pf-hero-bg" />
         <div className="pf-hero-inner">
           <div className="pf-avatar">
-            {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
+            {profile.name ? profile.name.charAt(0).toUpperCase() : 'C'}
           </div>
           <div className="pf-hero-info">
-            <h1 className="pf-name">{profile.firstName} {profile.lastName}</h1>
+            <h1 className="pf-name">{profile.name}</h1>
             <p className="pf-meta">{profile.email}</p>
-            <p className="pf-meta">Member since {formatDate(profile.joinDate)}</p>
+            <p className="pf-meta">Member since {formatDate(profile.createdAt)}</p>
             <span className="pf-badge">Premium Member</span>
           </div>
         </div>
@@ -228,7 +251,7 @@ export default function Profile() {
         {[
           { key: 'info',      label: 'Personal Info',     icon: '👤' },
           { key: 'password',  label: 'Password',          icon: '🔒' },
-          { key: 'addresses', label: 'Addresses',         icon: '📍' },
+          { key: 'addresses', label: 'Address',           icon: '📍' },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -253,24 +276,14 @@ export default function Profile() {
             </div>
 
             <div className="pf-form-row">
-              <div className="pf-form-group">
-                <label className="pf-label">First Name</label>
+              <div className="pf-form-group" style={{ flex: '1 1 100%' }}>
+                <label className="pf-label">Full Name</label>
                 <input
                   className="pf-input"
                   type="text"
-                  value={infoForm.firstName}
-                  onChange={(e) => setInfoForm({ ...infoForm, firstName: e.target.value })}
-                  placeholder="First name"
-                />
-              </div>
-              <div className="pf-form-group">
-                <label className="pf-label">Last Name</label>
-                <input
-                  className="pf-input"
-                  type="text"
-                  value={infoForm.lastName}
-                  onChange={(e) => setInfoForm({ ...infoForm, lastName: e.target.value })}
-                  placeholder="Last name"
+                  value={infoForm.name}
+                  onChange={(e) => setInfoForm({ ...infoForm, name: e.target.value })}
+                  placeholder="Full name"
                 />
               </div>
             </div>
@@ -362,69 +375,31 @@ export default function Profile() {
 
         {/* ─ Delivery Addresses ─ */}
         {activeTab === 'addresses' && (
-          <div>
-            <div className="pf-addresses-list">
-              {addresses.map((addr) => (
-                <div key={addr.id} className={`pf-addr-card ${addr.isDefault ? 'default' : ''}`}>
-                  <div className="pf-addr-top">
-                    <div className="pf-addr-label-row">
-                      <span className="pf-addr-label">{addr.label}</span>
-                      {addr.isDefault && (
-                        <span className="pf-addr-default-badge">Default</span>
-                      )}
-                    </div>
-                    <div className="pf-addr-actions">
-                      {!addr.isDefault && (
-                        <button
-                          className="pf-addr-btn"
-                          onClick={() => handleSetDefault(addr.id)}
-                        >
-                          Set Default
-                        </button>
-                      )}
-                      <button
-                        className="pf-addr-btn danger"
-                        onClick={() => handleRemoveAddress(addr.id)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                  <p className="pf-addr-text">{addr.line1}, {addr.city}</p>
-                  <p className="pf-addr-text muted">{addr.province}</p>
-                </div>
-              ))}
-            </div>
-
-            {!showAddrForm ? (
-              <button className="pf-add-addr-btn" onClick={() => setShowAddrForm(true)}>
-                + Add New Address
-              </button>
-            ) : (
-              <div className="pf-card">
+            <div className="pf-card">
                 <div className="pf-card-header">
-                  <h3 className="pf-card-title">New Address</h3>
+                  <h3 className="pf-card-title">Delivery Address</h3>
+                  <p className="pf-card-desc">Update your default delivery address.</p>
                 </div>
 
                 <div className="pf-form-row">
-                  <div className="pf-form-group">
-                    <label className="pf-label">Label (e.g. Home, Office)</label>
-                    <input
-                      className="pf-input"
-                      type="text"
-                      value={newAddr.label}
-                      onChange={(e) => setNewAddr({ ...newAddr, label: e.target.value })}
-                      placeholder="Home"
-                    />
-                  </div>
                   <div className="pf-form-group">
                     <label className="pf-label">Street / Line 1</label>
                     <input
                       className="pf-input"
                       type="text"
-                      value={newAddr.line1}
-                      onChange={(e) => setNewAddr({ ...newAddr, line1: e.target.value })}
+                      value={addrForm.line1}
+                      onChange={(e) => setAddrForm({ ...addrForm, line1: e.target.value })}
                       placeholder="42 Galle Road"
+                    />
+                  </div>
+                  <div className="pf-form-group">
+                    <label className="pf-label">Line 2 (Optional)</label>
+                    <input
+                      className="pf-input"
+                      type="text"
+                      value={addrForm.line2}
+                      onChange={(e) => setAddrForm({ ...addrForm, line2: e.target.value })}
+                      placeholder="Apartment, suite, etc."
                     />
                   </div>
                 </div>
@@ -435,8 +410,8 @@ export default function Profile() {
                     <input
                       className="pf-input"
                       type="text"
-                      value={newAddr.city}
-                      onChange={(e) => setNewAddr({ ...newAddr, city: e.target.value })}
+                      value={addrForm.city}
+                      onChange={(e) => setAddrForm({ ...addrForm, city: e.target.value })}
                       placeholder="Colombo 03"
                     />
                   </div>
@@ -445,9 +420,32 @@ export default function Profile() {
                     <input
                       className="pf-input"
                       type="text"
-                      value={newAddr.province}
-                      onChange={(e) => setNewAddr({ ...newAddr, province: e.target.value })}
+                      value={addrForm.province}
+                      onChange={(e) => setAddrForm({ ...addrForm, province: e.target.value })}
                       placeholder="Western Province"
+                    />
+                  </div>
+                </div>
+
+                <div className="pf-form-row">
+                  <div className="pf-form-group">
+                    <label className="pf-label">District</label>
+                    <input
+                      className="pf-input"
+                      type="text"
+                      value={addrForm.district}
+                      onChange={(e) => setAddrForm({ ...addrForm, district: e.target.value })}
+                      placeholder="Colombo"
+                    />
+                  </div>
+                  <div className="pf-form-group">
+                    <label className="pf-label">Postal Code</label>
+                    <input
+                      className="pf-input"
+                      type="text"
+                      value={addrForm.postalCode}
+                      onChange={(e) => setAddrForm({ ...addrForm, postalCode: e.target.value })}
+                      placeholder="00300"
                     />
                   </div>
                 </div>
@@ -455,19 +453,11 @@ export default function Profile() {
                 {addrError && <p className="pf-error">{addrError}</p>}
 
                 <div className="pf-form-row" style={{ marginTop: '8px' }}>
-                  <button className="pf-btn-primary" onClick={handleAddAddress}>
-                    Save Address
-                  </button>
-                  <button
-                    className="pf-btn-outline"
-                    onClick={() => { setShowAddrForm(false); setAddrError(''); }}
-                  >
-                    Cancel
+                  <button className={`pf-btn-primary ${addrSaved ? 'saved' : ''}`} onClick={handleSaveAddress}>
+                    {addrSaved ? '✓ Saved!' : 'Save Address'}
                   </button>
                 </div>
-              </div>
-            )}
-          </div>
+            </div>
         )}
 
       </div>
