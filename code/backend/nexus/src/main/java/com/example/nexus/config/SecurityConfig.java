@@ -27,7 +27,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()  // දැනට සියල්ල allow — JWT පස්සෙ restrict කරමු
+                .anyRequest().permitAll()  // allow all for now - restrict with JWT later
             );
         return http.build();
     }

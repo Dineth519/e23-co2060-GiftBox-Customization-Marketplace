@@ -2,8 +2,12 @@ package com.example.nexus.controller;
 
 import com.example.nexus.dto.ProductDTO;
 import com.example.nexus.model.Product;
+import com.example.nexus.model.Category;
 import com.example.nexus.repository.ProductRepository;
+import com.example.nexus.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,16 +21,41 @@ public class ProductController {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     // GET /api/products — Fetch all products for the customer-facing Products Page
     @GetMapping("/products")
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    // ── GET /api/sellers/{sellerId}/products — Seller dashboard ──
-    @GetMapping("/sellers/{sellerId}/products")
-    public List<ProductDTO> getProductsBySeller(@PathVariable Integer sellerId) {
-        return productRepository.findByPartnerId(sellerId)
+    // GET /api/products/new-arrivals — Latest 8 active products (landing page)
+    @GetMapping("/products/new-arrivals")
+    public List<Product> getNewArrivals() {
+        return productRepository.findAll(
+            PageRequest.of(0, 8, Sort.by(Sort.Direction.DESC, "id"))
+        ).getContent()
+          .stream()
+          .filter(p -> p.getIsActive() == null || p.getIsActive() == 1)
+          .collect(Collectors.toList());
+    }
+
+    // GET /api/products/hot-sellers — Top 8 by rating (landing page)
+    @GetMapping("/products/hot-sellers")
+    public List<Product> getHotSellers() {
+        return productRepository.findAll(
+            PageRequest.of(0, 8, Sort.by(Sort.Direction.DESC, "rating"))
+        ).getContent()
+          .stream()
+          .filter(p -> p.getIsActive() == null || p.getIsActive() == 1)
+          .collect(Collectors.toList());
+    }
+
+    // ── GET /api/vendors/{vendorId}/products — Vendor dashboard ──
+    @GetMapping("/vendors/{vendorId}/products")
+    public List<ProductDTO> getProductsByVendor(@PathVariable Integer vendorId) {
+        return productRepository.findByVendorId(vendorId)
             .stream()
             .map(product -> {
                 ProductDTO dto = new ProductDTO();
@@ -34,7 +63,10 @@ public class ProductController {
                 dto.setName(product.getName());
                 dto.setCategory(product.getCategoryId() == null
                     ? "Uncategorized"
-                    : "Category ID: " + product.getCategoryId());
+                    : categoryRepository.findById(product.getCategoryId())
+                        .map(com.example.nexus.model.Category::getName)
+                        .orElse("Unknown"));
+                dto.setSubCategory(product.getSubCategory());
                 dto.setPrice(product.getPrice());
                 dto.setStock(product.getStockQuantity() != null ? product.getStockQuantity() : 0);
                 dto.setSold(0);
@@ -56,12 +88,12 @@ public class ProductController {
             .collect(Collectors.toList());
     }
 
-    // ── POST /api/sellers/{sellerId}/products — product creation ──
-    @PostMapping("/sellers/{sellerId}/products")
+    // ── POST /api/vendors/{vendorId}/products — product creation ──
+    @PostMapping("/vendors/{vendorId}/products")
     public ResponseEntity<Product> addProduct(
-            @PathVariable Integer sellerId,
+            @PathVariable Integer vendorId,
             @RequestBody Product product) {
-        product.setPartnerId(sellerId);
+        product.setVendorId(vendorId);
         Product saved = productRepository.save(product);
         return ResponseEntity.ok(saved);
     }

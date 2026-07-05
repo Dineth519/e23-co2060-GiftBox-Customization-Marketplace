@@ -24,8 +24,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            return ResponseEntity.ok(authService.login(request));
+        } catch (Exception e) {
+            java.util.Map<String, String> err = new java.util.LinkedHashMap<>();
+            err.put("error", e.getClass().getSimpleName());
+            err.put("message", e.getMessage());
+            // Optionally print stack trace to terminal
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(err);
+        }
     }
 
     @PostMapping("/resend-code")

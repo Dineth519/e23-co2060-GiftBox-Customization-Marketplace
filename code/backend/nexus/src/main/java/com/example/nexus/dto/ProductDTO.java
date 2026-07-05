@@ -13,6 +13,8 @@ public class ProductDTO {
     private String status;
     private String image;
 
+    private String subCategory;
+
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public String getName() { return name; }
@@ -31,4 +33,6 @@ public class ProductDTO {
     public void setStatus(String status) { this.status = status; }
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
+    public String getSubCategory() { return subCategory; }
+    public void setSubCategory(String subCategory) { this.subCategory = subCategory; }
 }

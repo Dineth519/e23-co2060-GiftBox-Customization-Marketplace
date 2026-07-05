@@ -3,24 +3,24 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 
 // Public and user pages
-import HomePage from './pages/homepage/HomePage.jsx';
-import HowItWorksPage from './pages/homepage/HowItWorksPage.jsx';
-import AboutUsPage from './pages/homepage/AboutUsPage.jsx';
-import CustomerHome from './pages/user/CustomerHome.jsx';
-import Verify from './pages/user/Verify.jsx';
-import VendorLanding from './pages/homepage/VendorLanding.jsx';
+import LandingPage from './pages/landingpage/LandingPage.jsx';
+import HowItWorksPage from './pages/landingpage/HowItWorksPage.jsx';
+import AboutUsPage from './pages/landingpage/AboutUsPage.jsx';
+import CustomerHome from './pages/customer/CustomerHome.jsx';
+import Verify from './pages/customer/Verify.jsx';
+import VendorLanding from './pages/landingpage/VendorLanding.jsx';
 
 //Customer
-import GiftCustomizer from './pages/user/GiftCustomizer.jsx';
-import CustomerOrders from './pages/user/Orders.jsx';
-import OrderDetail from './pages/user/OrderDetail.jsx';
+import GiftCustomizer from './pages/customer/GiftCustomizer.jsx';
+import CustomerOrders from './pages/customer/Orders.jsx';
+import OrderDetail from './pages/customer/OrderDetail.jsx';
 import CustomerLayout from './layouts/CustomerLayout.jsx';  
-import CustomerCart from './pages/user/CustomerCart.jsx';
-import CustomerProfile from './pages/user/Profile.jsx'
-import AboutUs from './pages/user/AboutUsPage.jsx';
-import HowItWorks from './pages/user/HowItWorksPage.jsx';
-import BoxBuilder from './pages/user/BoxBuilderPage.jsx'
-import Checkout from './pages/user/Checkout.jsx';
+import CustomerCart from './pages/customer/CustomerCart.jsx';
+import CustomerProfile from './pages/customer/Profile.jsx'
+import AboutUs from './pages/customer/AboutUsPage.jsx';
+import HowItWorks from './pages/customer/HowItWorksPage.jsx';
+import BoxBuilder from './pages/customer/BoxBuilderPage.jsx'
+import Checkout from './pages/customer/Checkout.jsx';
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
@@ -29,29 +29,38 @@ import VendorRegistration from './pages/auth/VendorRegistration.jsx';
 // Admin components and pages
 import Sidebar from './components/admin/Sidebar.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
-import Partners from './pages/admin/Partners.jsx';
-import PendingPartners from './pages/admin/PendingPartners.jsx';
+import Vendors from './pages/admin/Vendors.jsx';
+import PendingVendors from './pages/admin/PendingVendors.jsx';
 import Customers from './pages/admin/Customers.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
 import Settings from './pages/admin/Settings.jsx';
 import StaffManagement from './pages/admin/StaffManagement.jsx';
 
-// Seller components and pages
-import SellerDashboard from './pages/seller/SellerDashboard.jsx';
-import SellerLayout from './layouts/SellerLayout.jsx';
-import MyItems from './pages/seller/MyItems.jsx';
-import AddItems from './pages/seller/AddItems.jsx';
-import Orders from './pages/seller/Orders.jsx';
-import SellerSettings from './pages/seller/Settings.jsx';
+// Vendor components and pages
+import VendorDashboard from './pages/vendor/VendorDashboard.jsx';
+import VendorLayout from './layouts/VendorLayout.jsx';
+import MyItems from './pages/vendor/MyItems.jsx';
+import AddItems from './pages/vendor/AddItems.jsx';
+import Orders from './pages/vendor/Orders.jsx';
+import VendorSettings from './pages/vendor/Settings.jsx';
 
-// Homepage
-import ProductsPage from './pages/homepage/ProductsPage.jsx';
+// Landingpage
+import ProductsPage from './pages/landingpage/ProductsPage.jsx';
 import AddressForm from './components/user/AddressForm.jsx';
 import { CartProvider } from './context/CartContext.jsx';
-import CartPage from './pages/homepage/CartPage.jsx';
+import CartPage from './pages/landingpage/CartPage.jsx';
 
 // Box Builder
 import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
+
+// Scroll to top helper on route navigation
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
 // Layout wrapper component for general and user routes
 const LayoutWrapper = ({ children }) => {
@@ -81,9 +90,10 @@ function App() {
   return (
     <CartProvider>                                      
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Public and user routes */}
-          <Route path="/" element={<LayoutWrapper><HomePage /></LayoutWrapper>} />
+          <Route path="/" element={<LayoutWrapper><LandingPage /></LayoutWrapper>} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/how-it-works" element={<LayoutWrapper><HowItWorksPage /></LayoutWrapper>} />
           <Route path="/about-us" element={<LayoutWrapper><AboutUsPage /></LayoutWrapper>} />
@@ -112,17 +122,17 @@ function App() {
 
           </Route>
 
-          {/* Seller routes */}
-          <Route path="/seller/*" element={
-            <SellerLayout>
+          {/* Vendor routes */}
+          <Route path="/vendor/*" element={
+            <VendorLayout>
               <Routes>
-                <Route path="/" element={<SellerDashboard />} />
+                <Route path="/" element={<VendorDashboard />} />
                 <Route path="my-items" element={<MyItems />} />
                 <Route path="add-items" element={<AddItems />} />
                 <Route path="orders" element={<Orders />} />
-                <Route path="settings" element={<SellerSettings />} />
+                <Route path="settings" element={<VendorSettings />} />
               </Routes>
-            </SellerLayout>
+            </VendorLayout>
           } />
 
           {/* Admin routes using AdminLayout for sidebar and styling */}
@@ -130,8 +140,8 @@ function App() {
             <AdminLayout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="partners" element={<Partners />} />
-                <Route path="partners/pending" element={<PendingPartners />} />
+                <Route path="vendors" element={<Vendors />} />
+                <Route path="vendors/pending" element={<PendingVendors />} />
                 <Route path="customers" element={<Customers />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="staff-management" element={<StaffManagement />} />

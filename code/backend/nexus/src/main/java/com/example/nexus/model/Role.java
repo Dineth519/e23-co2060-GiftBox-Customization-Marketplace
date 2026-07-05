@@ -2,7 +2,7 @@ package com.example.nexus.model;
 
 public enum Role {
     CUSTOMER, 
-    PARTNER,
+    VENDOR,
     ADMIN, 
     ASSEMBLER
 }

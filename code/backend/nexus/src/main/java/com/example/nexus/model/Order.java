@@ -21,9 +21,9 @@ public class Order {
     @JsonProperty("customer_id")
     private Integer customerId;
 
-    @Column(name = "partner_id")
-    @JsonProperty("partner_id")
-    private Integer partnerId;
+    @Column(name = "vendor_id")
+    @JsonProperty("vendor_id")
+    private Integer vendorId;
 
     @Column(name = "assembler_id")
     @JsonProperty("assembler_id")

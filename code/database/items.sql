@@ -13,7 +13,7 @@ INSERT INTO categories (name) VALUES
 ON DUPLICATE KEY UPDATE name=name;
 
 -- 2. Insert Products (Items)
--- මෙහි status වෙනුවට අලුත් schema එකේ ඇති is_active (1 = Active, 0 = Inactive) භාවිතා කර ඇත.
+-- Instead of status, is_active (1 = Active, 0 = Inactive) from the new schema is used here.
 
 -- Wine Category -> Assigned to Partner 2 (Gift World)
 INSERT INTO products (partner_id, name, price, stock_quantity, sku, image_url, category_id, is_active) VALUES

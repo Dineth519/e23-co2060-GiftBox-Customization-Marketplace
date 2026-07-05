@@ -1,8 +1,8 @@
 -- ============================================================
 -- V1__initial_schema.sql
 -- Flyway Migration - Initial Schema
--- NOTE: DROP/CREATE DATABASE & USE statements නැහැ.
---       Flyway application.properties වල දාපු DB එකට connect වෙනවා.
+-- NOTE: DROP/CREATE DATABASE & USE statements are not included.
+--       Connects to the DB specified in Flyway application.properties.
 -- ============================================================
 
 -- ============================================================
