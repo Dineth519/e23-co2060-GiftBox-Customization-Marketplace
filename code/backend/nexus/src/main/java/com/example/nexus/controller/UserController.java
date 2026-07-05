@@ -5,6 +5,7 @@ import com.example.nexus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 @RestController
@@ -13,6 +14,52 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // Get single user by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Update user profile details
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        return userRepository.findById(id).map(user -> {
+            if (updatedUser.getName() != null) user.setName(updatedUser.getName());
+            if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
+            if (updatedUser.getPhoneNumber() != null) user.setPhoneNumber(updatedUser.getPhoneNumber());
+            if (updatedUser.getAddressLine1() != null) user.setAddressLine1(updatedUser.getAddressLine1());
+            if (updatedUser.getAddressLine2() != null) user.setAddressLine2(updatedUser.getAddressLine2());
+            if (updatedUser.getCity() != null) user.setCity(updatedUser.getCity());
+            if (updatedUser.getDistrict() != null) user.setDistrict(updatedUser.getDistrict());
+            if (updatedUser.getProvince() != null) user.setProvince(updatedUser.getProvince());
+            if (updatedUser.getPostalCode() != null) user.setPostalCode(updatedUser.getPostalCode());
+            User saved = userRepository.save(user);
+            return ResponseEntity.ok(saved);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // Update user password
+    @PutMapping("/{id}/password")
+    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody java.util.Map<String, String> request) {
+        return userRepository.findById(id).map(user -> {
+            String currentPassword = request.get("currentPassword");
+            String newPassword = request.get("newPassword");
+
+            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "Incorrect current password"));
+            }
+
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return ResponseEntity.ok(java.util.Map.of("success", true, "message", "Password updated successfully"));
+        }).orElse(ResponseEntity.notFound().build());
+    }
 
     // Get all users
     @GetMapping

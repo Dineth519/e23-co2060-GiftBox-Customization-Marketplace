@@ -8,10 +8,12 @@ const TopBar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear authentication tokens if applicable
-    // localStorage.removeItem('token');
-    navigate('/');
+    localStorage.clear();
+    navigate('/login');
   };
+
+  const username = localStorage.getItem('username') || 'Admin';
+  const displayName = username.includes('@') ? username.split('@')[0] : username;
 
   return (
     <header className="topbar-container">
@@ -37,7 +39,7 @@ const TopBar = () => {
         {/* Profile Section */}
         <div className="profile-section">
           <div className="profile-info">
-            <span className="profile-name">Mathew Anderson</span>
+            <span className="profile-name" style={{ textTransform: 'capitalize' }}>{displayName}</span>
             <span className="profile-role">Administrator</span>
           </div>
           <div className="profile-avatar">

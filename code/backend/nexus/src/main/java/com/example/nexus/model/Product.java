@@ -12,8 +12,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "partner_id", nullable = false)
-    private Integer partnerId;
+    @Column(name = "vendor_id", nullable = false)
+    private Integer vendorId;
 
     @JsonProperty("categoryId")
     @Column(name = "category_id")
@@ -54,8 +54,8 @@ public class Product {
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     
-    public Integer getPartnerId() { return partnerId; }
-    public void setPartnerId(Integer partnerId) { this.partnerId = partnerId; }
+    public Integer getVendorId() { return vendorId; }
+    public void setVendorId(Integer vendorId) { this.vendorId = vendorId; }
 
     public Integer getCategoryId() { return categoryId; }
     public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }

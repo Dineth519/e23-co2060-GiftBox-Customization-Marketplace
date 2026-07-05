@@ -96,6 +96,9 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
 
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(request.getUsername());
+        }
 
         if (userOpt.isEmpty()) {
             return new AuthResponse(false, "User not found");

@@ -6,7 +6,7 @@ import {
 } from 'react-icons/fa';
 
 import Header from '../../components/customer/Header';
-import Footer from '../../components/homepage/Footer';
+import Footer from '../../components/landingpage/Footer';
 import { useCart } from '../../context/CartContext';
 import './CustomerHome.css';
 

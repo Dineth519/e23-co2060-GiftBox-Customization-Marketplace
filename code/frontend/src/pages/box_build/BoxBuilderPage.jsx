@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/homepage/Header';
-import Footer from '../../components/homepage/Footer';
+import Header from '../../components/landingpage/Header';
+import Footer from '../../components/landingpage/Footer';
 import './BoxBuilderPage.css';
 
 // Import CartContext to read cart items for the box builder
@@ -115,7 +115,7 @@ const BoxBuilderPage = () => {
     
     setSubmitting(true);
     const orderPayload = {
-      customerId: 5, partnerId: 2, deliveryAddress, occasion, boxSize: boxSize.id,
+      customerId: 5, vendorId: 2, deliveryAddress, occasion, boxSize: boxSize.id,
       giftMessage, recipientName, wrappingStyle,
       items: Object.entries(selectedItems).map(([id, qty]) => ({ productId: parseInt(id), quantity: qty }))
     };

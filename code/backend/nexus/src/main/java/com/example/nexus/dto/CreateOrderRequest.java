@@ -6,7 +6,7 @@ import java.util.List;
 @Data
 public class CreateOrderRequest {
     private Integer customerId;
-    private Integer partnerId;
+    private Integer vendorId;
     private String deliveryAddress;
     private String occasion;
     private String boxSize;
