@@ -1,11 +1,11 @@
 package com.example.nexus.controller;
 
 import com.example.nexus.model.Vendor;
-import com.example.nexus.model.Customer;
+import com.example.nexus.model.User;
 import com.example.nexus.model.Role;
 import com.example.nexus.dto.VendorRegisterRequest;
 import com.example.nexus.repository.VendorRepository;
-import com.example.nexus.repository.CustomerRepository;
+import com.example.nexus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +23,7 @@ public class VendorController {
     private VendorRepository vendorRepository;
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -68,27 +68,27 @@ public class VendorController {
     @PostMapping("/register")
     public ResponseEntity<?> registerVendor(@RequestBody VendorRegisterRequest request) {
         try {
-            if (customerRepository.existsByUsername(request.getEmail())) {
+            if (userRepository.existsByUsername(request.getEmail())) {
                 return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email/Username already exists"));
             }
-            if (customerRepository.existsByEmail(request.getEmail())) {
+            if (userRepository.existsByEmail(request.getEmail())) {
                 return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email already registered"));
             }
 
-            // 1. Create Customer
-            Customer customer = new Customer();
-            customer.setName(request.getOwnerName());
-            customer.setUsername(request.getEmail()); // Use email as username for vendor login
-            customer.setEmail(request.getEmail());
-            customer.setPassword(passwordEncoder.encode(request.getPassword()));
-            customer.setRole(Role.VENDOR);
-            customer.setVerified(true); // Auto-verify email for vendor registration convenience
+            // 1. Create User
+            User user = new User();
+            user.setName(request.getOwnerName());
+            user.setUsername(request.getEmail()); // Use email as username for vendor login
+            user.setEmail(request.getEmail());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setRole(Role.VENDOR);
+            user.setVerified(true); // Auto-verify email for vendor registration convenience
 
-            customerRepository.save(customer);
+            userRepository.save(user);
 
             // 2. Create Vendor
             Vendor vendor = new Vendor();
-            vendor.setVendorId(customer.getId().intValue());
+            vendor.setVendorId(user.getId().intValue());
             vendor.setShopName(request.getShopName());
             vendor.setFullName(request.getOwnerName());
             vendor.setPhoneNumber(request.getPhone());

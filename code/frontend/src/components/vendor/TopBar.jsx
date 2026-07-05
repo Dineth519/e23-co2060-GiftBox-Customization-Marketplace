@@ -18,7 +18,7 @@ const TopBar = () => {
         return;
       }
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/customers/${userId}`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`);
         if (res.ok) {
           const data = await res.json();
           setDisplayName(data.name || (username.includes('@') ? username.split('@')[0] : username));
