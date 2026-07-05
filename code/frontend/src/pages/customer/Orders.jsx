@@ -103,7 +103,7 @@ export default function Orders() {
         const customerId = localStorage.getItem('userId');
 
         if (!customerId) {
-          // userId නොමැතිනම් sample data පෙන්වා login page redirect
+          // If no userId, show sample data and redirect to login page
           console.warn('No userId found. Showing sample data.');
           setOrders(sampleOrders);
           setLoading(false);
