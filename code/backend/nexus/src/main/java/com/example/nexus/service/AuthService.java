@@ -2,8 +2,8 @@ package com.example.nexus.service;
 
 import com.example.nexus.dto.*;
 import com.example.nexus.model.Role;
-import com.example.nexus.model.Customer;
-import com.example.nexus.repository.CustomerRepository;
+import com.example.nexus.model.User;
+import com.example.nexus.repository.UserRepository;
 import com.example.nexus.model.Vendor;
 import com.example.nexus.repository.VendorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.Random;
 public class AuthService {
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -29,29 +29,29 @@ public class AuthService {
     // ── Register ───────────────────────────────
     public AuthResponse register(RegisterRequest request) {
 
-        if (customerRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             return new AuthResponse(false, "Username already exists");
         }
 
-        if (customerRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             return new AuthResponse(false, "Email already registered");
         }
 
         // Generate 6-digit OTP
         String code = String.format("%06d", new Random().nextInt(999999));
 
-        // Build customer — not verified yet
-        Customer customer = new Customer();
-        customer.setName(request.getName());
-        customer.setUsername(request.getUsername());
-        customer.setEmail(request.getEmail());
-        customer.setPassword(passwordEncoder.encode(request.getPassword()));
-        customer.setRole(Role.CUSTOMER);
-        customer.setVerified(false);
-        customer.setVerificationCode(code);
-        customer.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10)); // 10 min expiry
+        // Build user — not verified yet
+        User user = new User();
+        user.setName(request.getName());
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.CUSTOMER);
+        user.setVerified(false);
+        user.setVerificationCode(code);
+        user.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10)); // 10 min expiry
 
-        customerRepository.save(customer);
+        userRepository.save(user);
 
         // Send email
         emailService.sendVerificationCode(request.getEmail(), code);
@@ -62,34 +62,34 @@ public class AuthService {
     // ── Verify Email ───────────────────────────
     public AuthResponse verifyEmail(VerifyRequest request) {
 
-        Optional<Customer> userOpt = customerRepository.findByEmail(request.getEmail());
+        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
 
         if (userOpt.isEmpty()) {
-            return new AuthResponse(false, "Customer not found");
+            return new AuthResponse(false, "User not found");
         }
 
-        Customer customer = userOpt.get();
+        User user = userOpt.get();
 
         // Already verified?
-        if (customer.isVerified()) {
+        if (user.isVerified()) {
             return new AuthResponse(false, "Email already verified");
         }
 
         // Code expired?
-        if (LocalDateTime.now().isAfter(customer.getCodeExpiresAt())) {
+        if (LocalDateTime.now().isAfter(user.getCodeExpiresAt())) {
             return new AuthResponse(false, "Verification code expired. Please register again.");
         }
 
         // Wrong code?
-        if (!customer.getVerificationCode().equals(request.getCode())) {
+        if (!user.getVerificationCode().equals(request.getCode())) {
             return new AuthResponse(false, "Invalid verification code");
         }
 
         // All good — mark as verified
-        customer.setVerified(true);
-        customer.setVerificationCode(null);  // clear code after use
-        customer.setCodeExpiresAt(null);
-        customerRepository.save(customer);
+        user.setVerified(true);
+        user.setVerificationCode(null);  // clear code after use
+        user.setCodeExpiresAt(null);
+        userRepository.save(user);
 
         return new AuthResponse(true, "Email verified successfully! You can now login.");
     }
@@ -103,65 +103,65 @@ public class AuthService {
         String loginInput = request.getUsername();
 
         // 1. Try by Username
-        Optional<Customer> userOpt = customerRepository.findByUsername(loginInput);
+        Optional<User> userOpt = userRepository.findByUsername(loginInput);
         
         // 2. Try by Email
         if (userOpt.isEmpty()) {
-            userOpt = customerRepository.findByEmail(loginInput);
+            userOpt = userRepository.findByEmail(loginInput);
         }
 
         // 3. Try by Owner/Full Name
         if (userOpt.isEmpty()) {
-            userOpt = customerRepository.findByName(loginInput);
+            userOpt = userRepository.findByName(loginInput);
         }
 
         // 4. Try by Vendor Shop Name
         if (userOpt.isEmpty()) {
             Optional<Vendor> vendorOpt = vendorRepository.findByShopName(loginInput);
             if (vendorOpt.isPresent()) {
-                userOpt = customerRepository.findById((long) vendorOpt.get().getVendorId());
+                userOpt = userRepository.findById(vendorOpt.get().getVendorId());
             }
         }
 
         if (userOpt.isEmpty()) {
-            return new AuthResponse(false, "Customer not found");
+            return new AuthResponse(false, "User not found");
         }
 
-        Customer customer = userOpt.get();
+        User user = userOpt.get();
 
         // Block login if not verified
-        if (!customer.isVerified()) {
+        if (!user.isVerified()) {
             return new AuthResponse(false, "Please verify your email before logging in");
         }
 
-        if (!passwordEncoder.matches(request.getPassword(), customer.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return new AuthResponse(false, "Incorrect password");
         }
 
-        // Changed part: sending Role and Customer ID
-        return new AuthResponse(true, "Login Successful", customer.getRole().name(), customer.getId().intValue());
+        // Changed part: sending Role and User ID
+        return new AuthResponse(true, "Login Successful", user.getRole().name(), user.getId().intValue());
     }
 
     // ── Resend Code ────────────────────────────
     public AuthResponse resendCode(String email) {
 
-        Optional<Customer> userOpt = customerRepository.findByEmail(email);
+        Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isEmpty()) {
-            return new AuthResponse(false, "Customer not found");
+            return new AuthResponse(false, "User not found");
         }
 
-        Customer customer = userOpt.get();
+        User user = userOpt.get();
 
-        if (customer.isVerified()) {
+        if (user.isVerified()) {
             return new AuthResponse(false, "Email already verified");
         }
 
         // Generate new code
         String newCode = String.format("%06d", new Random().nextInt(999999));
-        customer.setVerificationCode(newCode);
-        customer.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10));
-        customerRepository.save(customer);
+        user.setVerificationCode(newCode);
+        user.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
 
         emailService.sendVerificationCode(email, newCode);
 
