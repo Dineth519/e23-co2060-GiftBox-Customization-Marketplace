@@ -26,6 +26,7 @@ const VENDOR_TESTIMONIALS = [
   { name: 'Sarah L.',       shop: 'Sweet Delights', quote: 'Joining Giftora changed our bakery. We went from 10 orders a week to 50+ just from people adding our brownies to custom gift boxes!', stars: 5, initial: 'S' },
   { name: 'Malik F.',       shop: 'Glow Candles',   quote: 'The fact that I don’t have to worry about the final luxury packaging or island-wide delivery is a lifesaver. Highly recommended.', stars: 5, initial: 'M' },
   { name: 'Nethmi de Silva',shop: 'Blossom Co.',    quote: 'The dashboard is so easy to use. I can track my inventory and see exactly what is trending right now.', stars: 5, initial: 'N' },
+  { name: 'Sarah L.',       shop: 'Sweet Delights', quote: 'Joining Giftora changed our bakery. We went from 10 orders a week to 50+ just from people adding our brownies to custom gift boxes!', stars: 5, initial: 'S' },
 ];
 
 const VALUE_STATS = [
@@ -147,8 +148,8 @@ const VendorHowItWorks = () => {
   return (
     <section className={`how-it-works section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
       <div className="section-inner">
-        <div className="section-label center">Process</div>
-        <h2 className="section-title center">How Becoming a Partner Works</h2>
+        <div className="section-label center" style={{ fontSize: '15px' }}>Process</div>
+        <h2 className="section-title center" style={{ fontSize: '45px' }}>How Becoming a Partner Works</h2>
 
         <div className="how-it-works__steps">
           {VENDOR_STEPS.map((step, i) => (
@@ -201,8 +202,8 @@ const VendorTestimonials = () => {
     <section className={`testimonials section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
       <div className="testimonials__bg" />
       <div className="section-inner">
-        <div className="section-label center">Success Stories</div>
-        <h2 className="section-title center">Hear From Our Partners</h2>
+        <div className="section-label center" style={{ fontSize: '15px' }}>Success Stories</div>
+        <h2 className="section-title center" style={{ fontSize: '45px' }} >Hear From Our Partners</h2>
 
         <div className="testimonials__grid">
           {VENDOR_TESTIMONIALS.map((t, i) => (
@@ -254,7 +255,7 @@ const VendorLanding = () => (
     <main>
       <VendorHero />
       <div className="unified-light-bg">
-        <VendorStats />
+        {/* <VendorStats /> */}
         <VendorBenefits />
         <VendorHowItWorks />
         <VendorTestimonials />

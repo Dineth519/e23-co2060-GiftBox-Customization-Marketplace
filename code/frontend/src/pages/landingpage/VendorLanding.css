@@ -23,7 +23,7 @@
   flex: 1;
   text-align: center;
   padding: 40px 32px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(198, 95, 95, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-lg);
   backdrop-filter: blur(8px);
@@ -54,6 +54,7 @@
   opacity: 0.2;
   margin-bottom: -15px;
   user-select: none;
+  padding-bottom: 10px;
 }
 
 .step-card__icon {
