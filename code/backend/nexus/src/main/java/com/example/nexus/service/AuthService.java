@@ -1,11 +1,9 @@
 package com.example.nexus.service;
 
 import com.example.nexus.dto.*;
-import com.example.nexus.model.Role;
 import com.example.nexus.model.Customer;
+import com.example.nexus.model.Role;
 import com.example.nexus.repository.CustomerRepository;
-import com.example.nexus.model.Vendor;
-import com.example.nexus.repository.VendorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +23,9 @@ public class AuthService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private JwtService jwtService;
 
     // ── Register ───────────────────────────────
     public AuthResponse register(RegisterRequest request) {
@@ -62,13 +63,13 @@ public class AuthService {
     // ── Verify Email ───────────────────────────
     public AuthResponse verifyEmail(VerifyRequest request) {
 
-        Optional<Customer> userOpt = customerRepository.findByEmail(request.getEmail());
+        Optional<Customer> customerOpt = customerRepository.findByEmail(request.getEmail());
 
-        if (userOpt.isEmpty()) {
+        if (customerOpt.isEmpty()) {
             return new AuthResponse(false, "Customer not found");
         }
 
-        Customer customer = userOpt.get();
+        Customer customer = customerOpt.get();
 
         // Already verified?
         if (customer.isVerified()) {
@@ -94,40 +95,16 @@ public class AuthService {
         return new AuthResponse(true, "Email verified successfully! You can now login.");
     }
 
-    @Autowired
-    private VendorRepository vendorRepository;
-
-    // ── Login ──────────────────────────────────
+    // ── Login with JWT ────────────────────────
     public AuthResponse login(LoginRequest request) {
 
-        String loginInput = request.getUsername();
+        Optional<Customer> customerOpt = customerRepository.findByUsername(request.getUsername());
 
-        // 1. Try by Username
-        Optional<Customer> userOpt = customerRepository.findByUsername(loginInput);
-        
-        // 2. Try by Email
-        if (userOpt.isEmpty()) {
-            userOpt = customerRepository.findByEmail(loginInput);
-        }
-
-        // 3. Try by Owner/Full Name
-        if (userOpt.isEmpty()) {
-            userOpt = customerRepository.findByName(loginInput);
-        }
-
-        // 4. Try by Vendor Shop Name
-        if (userOpt.isEmpty()) {
-            Optional<Vendor> vendorOpt = vendorRepository.findByShopName(loginInput);
-            if (vendorOpt.isPresent()) {
-                userOpt = customerRepository.findById((long) vendorOpt.get().getVendorId());
-            }
-        }
-
-        if (userOpt.isEmpty()) {
+        if (customerOpt.isEmpty()) {
             return new AuthResponse(false, "Customer not found");
         }
 
-        Customer customer = userOpt.get();
+        Customer customer = customerOpt.get();
 
         // Block login if not verified
         if (!customer.isVerified()) {
@@ -138,33 +115,45 @@ public class AuthService {
             return new AuthResponse(false, "Incorrect password");
         }
 
-        // Changed part: sending Role and Customer ID
-        return new AuthResponse(true, "Login Successful", customer.getRole().name(), customer.getId().intValue());
+        // ✅ Generate JWT tokens
+        String accessToken = jwtService.generateToken(customer.getId(), customer.getUsername(), customer.getRole().name());
+        String refreshToken = jwtService.generateRefreshToken(customer.getId(), customer.getUsername());
+
+        // Return response with tokens
+        AuthResponse response = new AuthResponse(true, "Login successful");
+        response.setAccessToken(accessToken);
+        response.setRefreshToken(refreshToken);
+        response.setRole(customer.getRole().name());
+        response.setUserId(customer.getId().intValue());
+        
+        return response;
     }
 
     // ── Resend Code ────────────────────────────
     public AuthResponse resendCode(String email) {
 
-        Optional<Customer> userOpt = customerRepository.findByEmail(email);
+        Optional<Customer> customerOpt = customerRepository.findByEmail(email);
 
-        if (userOpt.isEmpty()) {
-            return new AuthResponse(false, "Customer not found");
+        if (customerOpt.isEmpty()) {
+            return new AuthResponse(false, "Email not registered");
         }
 
-        Customer customer = userOpt.get();
+        Customer customer = customerOpt.get();
 
         if (customer.isVerified()) {
             return new AuthResponse(false, "Email already verified");
         }
 
         // Generate new code
-        String newCode = String.format("%06d", new Random().nextInt(999999));
-        customer.setVerificationCode(newCode);
+        String code = String.format("%06d", new Random().nextInt(999999));
+        customer.setVerificationCode(code);
         customer.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10));
+
         customerRepository.save(customer);
 
-        emailService.sendVerificationCode(email, newCode);
+        // Send email
+        emailService.sendVerificationCode(email, code);
 
-        return new AuthResponse(true, "New verification code sent!");
+        return new AuthResponse(true, "Verification code resent. Check your email.");
     }
 }
