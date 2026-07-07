@@ -522,12 +522,12 @@ html, body {
 
 /* ── Section typography ── */
 .section-label {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2.5px;
   color: var(--gold);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .section-label.center { text-align: center; }
@@ -933,8 +933,6 @@ html, body {
   max-width: 720px;
   margin: 0 auto;
 }
-
-.builder-cta__emoji { font-size: 56px; margin-bottom: 24px; }
 
 .builder-cta__title {
   font-family: var(--font-display);
@@ -1931,7 +1929,7 @@ html, body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   GIFT BOX SHOWCASE V2  —  chamacomputers.lk style
+   GIFT BOX SHOWCASE V2
    ═══════════════════════════════════════════════════════════════════════ */
 
 .scv2 {
@@ -1965,9 +1963,9 @@ html, body {
 
 .scv2__title {
   font-family: var(--font-display);
-  font-size: 50px;
+  font-size: 60px;
   font-weight: 700;
-  color: var(--white);
+  color: var(--deep);
   line-height: 1.05;
   margin-top: 8px;
 }
@@ -2024,7 +2022,7 @@ html, body {
 
 .scv2__desc {
   font-size: 14px;
-  color: rgba(255,255,255,0.52);
+  color: var(--gold-light);
   line-height: 1.8;
   margin-bottom: 22px;
   max-width: 300px;
@@ -2052,7 +2050,7 @@ html, body {
 
 .scv2__rating-count {
   font-size: 12px;
-  color: rgba(255,255,255,0.35);
+  color: var(--gold-light);
 }
 
 /* Items inside the box */
@@ -2060,7 +2058,7 @@ html, body {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: rgba(255,255,255,0.35);
+  color: var(--gold-light);
   margin-bottom: 12px;
 }
 
@@ -2091,7 +2089,7 @@ html, body {
 
 .scv2__item-label {
   font-size: 13px;
-  color: rgba(255,255,255,0.72);
+  color: var(--gold-light);
   font-weight: 500;
 }
 
@@ -2129,7 +2127,7 @@ html, body {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255,255,255,0.18);
+  background: var(--gold-light);
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -3049,7 +3047,7 @@ html, body {
 
 .trending__section-title {
   font-family: var(--font-display);
-  font-size: 44px;
+  font-size: 60px;
   font-weight: 700;
   color: var(--navy);
   line-height: 1.08;
@@ -3179,10 +3177,11 @@ html, body {
 }
 
 .custom-promo__title {
-  font-family: var(--font-body);
-  font-size: 80px;
+  font-family: var(--font-display);
+  font-size: 90px;
   font-weight: 300;
-  color: var(--white);
+  color: var(--deep);
+  font-weight: bold;
   line-height: 1;
   letter-spacing: -2px;
   text-transform: uppercase;
@@ -3364,6 +3363,21 @@ html, body {
   color: var(--muted) !important;
 }
 
+/* Builder CTA specific overrides for dark mode */
+.unified-light-bg section.builder-cta {
+  background-color: var(--navy) !important;
+  background: var(--navy) !important;
+  margin-top: 40px;
+}
+
+.unified-light-bg .builder-cta__title {
+  color: var(--gold) !important;
+}
+
+.unified-light-bg .builder-cta__desc {
+  color: rgba(255,255,255,0.7) !important;
+}
+
 /* Card Overrides (Light Theme Cards) */
 .unified-light-bg .occ-card,
 .unified-light-bg .custom-step,
@@ -3386,13 +3400,133 @@ html, body {
 }
 
 /* Specific component tweaks */
-.unified-light-bg .builder-cta__emoji {
-  background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
-}
-
 .unified-light-bg .testimonial-card__avatar {
   background: var(--surface) !important;
   color: var(--navy) !important;
   border: 1px solid var(--border) !important;
+}
+
+/* "How It Works" (Image 2) */
+.promo-how-it-works-img {
+  width: 600px; 
+  max-width: 100%; 
+  height: auto;
+  padding-right: 80px; 
+}
+/* Vendor Steps & Step Card (Imported from Customer Home for Vendor Landing) */
+.how-it-works__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 48px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .how-it-works__steps {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.step-card {
+  flex: 1;
+  text-align: center;
+  padding: 40px 32px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.35s var(--ease-out);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-6px);
+  border-color: rgba(201, 169, 97, 0.25);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.step-card__badge {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-pale) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0.2;
+  margin-bottom: -15px;
+  user-select: none;
+}
+
+.step-card__icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, rgba(201, 169, 97, 0.15), rgba(201, 169, 97, 0.05));
+  border: 1px solid rgba(201, 169, 97, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 8px 20px rgba(201, 169, 97, 0.15);
+}
+
+.step-card__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.unified-light-bg .step-card__title {
+  color: var(--navy) !important;
+}
+
+.unified-light-bg .step-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.unified-light-bg .step-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  border-color: var(--gold);
+}
+
+.unified-light-bg .step-card__desc {
+  color: var(--muted) !important;
+}
+
+.step-card__desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.step-connector {
+  width: 2px;
+  height: 40px;
+  background: linear-gradient(180deg, rgba(201, 169, 97, 0.4), transparent);
+}
+
+@media (min-width: 768px) {
+  .step-connector {
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(201, 169, 97, 0.4), transparent);
+    margin-top: 80px; 
+  }
 }

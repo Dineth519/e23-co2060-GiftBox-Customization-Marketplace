@@ -140,7 +140,7 @@ const VendorHero = () => {
 const VendorBenefits = () => {
   const [ref, visible] = useReveal();
   return (
-    <section className={`how-it-works section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
+    <section className={`how-it-works unified-light-bg section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
       <div className="how-it-works__bg-accent" />
       <div className="section-inner">
         <div className="section-label center">Benefits</div>

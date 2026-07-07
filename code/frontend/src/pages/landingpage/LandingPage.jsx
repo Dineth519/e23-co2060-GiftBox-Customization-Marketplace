@@ -109,7 +109,7 @@ const SHOWCASE_BOXES = [
       { icon: '🍪', label: 'Macarons' },
     ],
     image: '/boxes/birthday_box.png',
-    accent: '#5DADE2',
+    accent: '#C9A961',
     tag: 'Most Popular',
   },
   {
@@ -818,7 +818,7 @@ const FeaturedProducts = () => {
                 style={{ animationDelay: `${i * 0.09}s` }}
               >
                 <div className="product-card__image">
-                  <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={p.imageUrl} alt={p.name} className="featured-product-image" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div className="product-card__hover-actions">
                     <button className="product-action-btn">🛒 Add to Cart</button>
                     <button className="product-action-btn product-action-btn--outline">Quick View</button>
@@ -931,7 +931,7 @@ const TrendingGrid = () => {
 
             {/* Image */}
             <div className="t-card__image">
-              <img src={p.imageUrl} alt={p.name} loading="lazy" />
+              <img src={p.imageUrl} alt={p.name} className="trending-product-image" loading="lazy" />
               {/* Quick View overlay */}
               <div className="t-card__overlay" onClick={() => setQuickView(p)}>
                 <span className="t-card__qv-btn">Quick View</span>
@@ -1056,7 +1056,7 @@ const TrendingGrid = () => {
           <div className="qv-modal" onClick={e => e.stopPropagation()}>
             <button className="qv-close" onClick={() => setQuickView(null)}>✕</button>
             <div className="qv-image">
-              <img src={quickView.imageUrl} alt={quickView.name} />
+              <img src={quickView.imageUrl} alt={quickView.name} className="quick-view-image" />
             </div>
             <div className="qv-body">
               <span className="t-card__category">{CATEGORY_MAP[quickView.categoryId] || 'Gift Item'}</span>
@@ -1171,7 +1171,6 @@ const BuilderCTA = () => {
       <div className="builder-cta__orb builder-cta__orb--1" />
       <div className="builder-cta__orb builder-cta__orb--2" />
       <div className="builder-cta__inner">
-        <div className="builder-cta__emoji">🎁</div>
         <h2 className="builder-cta__title">Design Your Dream Gift Box</h2>
         <p className="builder-cta__desc">
           Mix items from different vendors, add a personal message, choose your ribbon color — then we'll turn it into something unforgettable.
@@ -1215,7 +1214,7 @@ const CustomPromotionBanner = () => {
           </button>
         </div>
         <div className="custom-promo__image-wrapper">
-          <img src={landingPage1Img} alt="Gift Customization" className="custom-promo__image" />
+          <img src={landingPage1Img} alt="Gift Customization" className="custom-promo__image promo-curate-img" />
         </div>
       </div>
     </section>
@@ -1236,7 +1235,7 @@ const CustomHowItWorks = () => {
     <section className={`custom-promo custom-promo--reversed section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
       <div className="custom-promo__inner">
         <div className="custom-promo__image-wrapper">
-          <img src={landingPage2Img} alt="How It Works" className="custom-promo__image" />
+          <img src={landingPage2Img} alt="How It Works" className="custom-promo__image promo-how-it-works-img" />
         </div>
         <div className="custom-promo__content">
           <h2 className="custom-promo__title" style={{ fontSize: '64px' }}>How it Works</h2>
@@ -1268,13 +1267,13 @@ const LandingPage = () => (
       <HeroSection />
       {/* Wrap everything below Hero in a unified light background */}
       <div className="unified-light-bg">
-        <OccasionSelector />
-        <PromoBanner />
+        {/* <OccasionSelector /> */}
+        {/* <PromoBanner /> */}
         <CustomPromotionBanner />
         <CustomHowItWorks />
         <GiftBoxShowcase />
         <TrendingGrid />
-        <WhyGiftora />
+        {/* <WhyGiftora /> */}
         <Testimonials />
         <BuilderCTA />
       </div>
