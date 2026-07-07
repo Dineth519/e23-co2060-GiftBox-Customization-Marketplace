@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, User, LogOut } from 'lucide-react';
 import './TopBar.css';
-import logo from '../../assets/logo-removebg-preview.png';
+import logo from '../../assets/logo.png';
 
 const TopBar = () => {
   const navigate = useNavigate();

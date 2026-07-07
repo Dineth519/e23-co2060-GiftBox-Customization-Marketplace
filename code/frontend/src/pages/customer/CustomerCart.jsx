@@ -15,27 +15,6 @@ const CustomerCart = () => {
 
   useEffect(() => { loadCart(); }, []);
 
-  // ── Empty State ──────────────────────────────────────────────────────────
-  if (cartItems.length === 0) {
-    return (
-      <div className="cc-page">
-        <div className="cc-empty">
-          <div className="cc-empty__icon">🛒</div>
-          <h2 className="cc-empty__title">Your cart is empty</h2>
-          <p className="cc-empty__desc">Browse our collection and add something special</p>
-          <div className="cc-empty__actions">
-            <button className="cc-btn-gold" onClick={() => navigate('/home')}>
-              Browse Gifts →
-            </button>
-            <button className="cc-btn-outline" onClick={() => navigate('/customer/build-box')}>
-              Build a Box
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // ── Cart ─────────────────────────────────────────────────────────────────
   return (
     <div className="cc-page">
@@ -48,6 +27,23 @@ const CustomerCart = () => {
         </div>
       </div>
 
+      {cartItems.length === 0 ? (
+        <div className="cc-empty-container">
+          <div className="cc-empty">
+            <div className="cc-empty__icon">🛒</div>
+            <h2 className="cc-empty__title">Your cart is empty</h2>
+            <p className="cc-empty__desc">Browse our collection and add something special</p>
+            <div className="cc-empty__actions">
+              <button className="cc-btn-gold" onClick={() => navigate('/home')}>
+                Browse Gifts →
+              </button>
+              <button className="cc-btn-outline" onClick={() => navigate('/customer/build-box')}>
+                Build a Box
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
       <div className="cc-body">
 
         {/* ── Items list ── */}
@@ -166,6 +162,7 @@ const CustomerCart = () => {
         </div>
 
       </div>
+      )}
     </div>
   );
 };
