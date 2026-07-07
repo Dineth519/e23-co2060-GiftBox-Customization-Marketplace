@@ -54,7 +54,6 @@ const Header = () => {
       <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         {[
           { label: 'Build a Box',  route: '/customer/build-box' },
-          { label: 'How It Works', route: '/customer/how-it-works' },
           { label: 'About Us',     route: '/customer/about-us' },
         ].map(item => (
           <button

@@ -522,7 +522,7 @@ html, body {
 
 /* ── Section typography ── */
 .section-label {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2.5px;
@@ -3156,8 +3156,6 @@ html, body {
   padding: 80px 0;
   position: relative;
   overflow: hidden;
-  border-top: 1px solid rgba(201,169,97,0.15);
-  border-bottom: 1px solid rgba(201,169,97,0.15);
 }
 
 .custom-promo__inner {
@@ -3246,10 +3244,7 @@ html, body {
    CUSTOM HOW IT WORKS (ZIGZAG LAYOUT)
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* Remove top border if it directly follows another custom-promo */
-.custom-promo + .custom-promo {
-  border-top: none;
-}
+
 
 /* Optional: change background slightly for contrast */
 .custom-promo--reversed {

@@ -1093,7 +1093,7 @@ const TrendingGrid = () => {
   );
 };
 
-// ─── NEW: Why Giftora — Value Props Strip ────────────────────────────────────
+// ─── Why Giftora — Value Props Strip ────────────────────────────────────
 
 const StatCounter = ({ num, suffix, start }) => {
   const count = useCountUp(num, 2000, start);
@@ -1138,7 +1138,7 @@ const Testimonials = () => {
       <div className="testimonials__bg" />
       <div className="section-inner">
         <div className="section-label center">Love Notes</div>
-        <h2 className="section-title center">What Our Customers Say</h2>
+        <h2 className="section-title center" style={{ fontSize: '50px'}}>What Our Customers Say</h2>
 
         <div className="testimonials__grid">
           {TESTIMONIALS.map((t, i) => (
@@ -1193,7 +1193,7 @@ const BuilderCTA = () => {
   );
 };
 
-// ─── Custom Promotion Banner (Knight Inspired) ───────────────────────────
+// ─── Custom Promotion Banner ───────────────────────────
 
 const CustomPromotionBanner = () => {
   const navigate = useNavigate();
