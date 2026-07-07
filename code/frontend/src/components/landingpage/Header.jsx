@@ -30,7 +30,6 @@ const Header = () => {
         <nav className="header-nav">
           {[
             { label: 'Products',    route: '/products' },
-            { label: 'How It Works', route: '/how-it-works' },
             { label: 'About Us',    route: '/about-us' },
             { label: 'Build a Box', route: '/build-box' },
             { label: 'Join as Vendor', route: '/vendor-landing' },

@@ -8,6 +8,7 @@ import Footer from '../../components/landingpage/Footer';
 
 // We can reuse the exact same CSS file as the landingpage to keep the theme identical!
 import './LandingPage.css'; 
+import './AboutUsPage.css'; // For the dark navy hero section
 
 // ─── Data for Vendors ────────────────────────────────────────────────────────
 
@@ -94,46 +95,42 @@ const VendorHero = () => {
   useEffect(() => { setTimeout(() => setMounted(true), 80); }, []);
 
   return (
-    <section className="hero">
-      {/* Reusing the orb aesthetic, no video needed here */}
-      <div className="hero-orb hero-orb--gold hero-orb--prominent" />
-      <div className="hero-orb hero-orb--blue hero-orb--prominent" />
-      <div className="hero-orb hero-orb--mid" />
-      <div className="hero-grain" />
+    <section className="about-hero">
+      <div className="about-hero__orb about-hero__orb--1" />
+      <div className="about-hero__orb about-hero__orb--2" />
+      <div className="about-hero__orb about-hero__orb--3" />
+      <div className="about-hero__grid" />
 
-      <div className={`hero__inner ${mounted ? 'hero--mounted' : ''}`}>
-        <div className="hero__content" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          
-          <div className="hero__eyebrow" style={{ justifyContent: 'center' }}>
-            <span className="eyebrow-dot" />
-            <span>Partner With Giftora</span>
-          </div>
+      <div className={`about-hero__inner ${mounted ? 'about-hero--visible' : ''}`} style={{ textAlign: 'center', paddingBottom: '100px' }}>
+        <div className="about-hero__label" style={{ justifyContent: 'center', display: 'flex', gap: '8px' }}>
+          <span className="eyebrow-dot" style={{ width: '6px', height: '6px', background: 'var(--gold)', borderRadius: '50%', display: 'inline-block', alignSelf: 'center' }} />
+          <span>Partner With Giftora</span>
+        </div>
 
-          <h1 className="hero__title" style={{ fontSize: '3.5rem' }}>
-            Grow Your Brand.<br />
-            <span className="hero__title-accent">Zero Hassle.</span>
-          </h1>
+        <h1 className="about-hero__title" style={{ fontSize: '4.5rem' }}>
+          Grow Your Brand.<br />
+          <span className="about-hero__title-accent">Zero Hassle.</span>
+        </h1>
 
-          <p className="hero__subtitle" style={{ textAlign: 'center' }}>
-            Join Sri Lanka's fastest-growing premium gifting marketplace. You focus on creating amazing products, and we'll handle the marketing, luxury packaging, and delivery.
-          </p>
+        <p className="about-hero__sub" style={{ margin: '0 auto 40px' }}>
+          Join Sri Lanka's fastest-growing premium gifting marketplace. You focus on creating amazing products, and we'll handle the marketing, luxury packaging, and delivery.
+        </p>
 
-          <div className="hero__cta-group" style={{ justifyContent: 'center' }}>
-            <button className="btn-hero-primary" onClick={() => navigate('/vendor-register')}>
-              <span className="btn-icon">🏪</span>
-              <span>Register Your Shop</span>
-              <span className="btn-arrow">→</span>
-            </button>
-          </div>
+        <div className="about-hero__actions" style={{ justifyContent: 'center', marginBottom: '50px' }}>
+          <button className="btn-hero-primary" onClick={() => navigate('/vendor-register')}>
+            <span className="btn-icon">🏪</span>
+            <span>Register Your Shop</span>
+            <span className="btn-arrow">→</span>
+          </button>
+        </div>
 
-          <div className="hero__stats" style={{ justifyContent: 'center', marginTop: '40px' }}>
-            {VENDOR_STATS.map((s, i) => (
-              <div className="hero__stat" key={i}>
-                <div className="hero__stat-value">{s.value}</div>
-                <div className="hero__stat-label">{s.label}</div>
-              </div>
-            ))}
-          </div>
+        <div className="hero__stats" style={{ justifyContent: 'center', gap: '60px', marginTop: '40px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '40px' }}>
+          {VENDOR_STATS.map((s, i) => (
+            <div className="hero__stat" key={i} style={{ alignItems: 'center', textAlign: 'center' }}>
+              <div className="hero__stat-value" style={{ color: 'var(--white)' }}>{s.value}</div>
+              <div className="hero__stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

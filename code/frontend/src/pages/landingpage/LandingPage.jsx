@@ -1266,15 +1266,18 @@ const LandingPage = () => (
     <Header />
     <main>
       <HeroSection />
-      <OccasionSelector />
-      <PromoBanner />
-      <CustomPromotionBanner />
-      <CustomHowItWorks />
-      <GiftBoxShowcase />
-      <TrendingGrid />
-      <WhyGiftora />
-      <Testimonials />
-      <BuilderCTA />
+      {/* Wrap everything below Hero in a unified light background */}
+      <div className="unified-light-bg">
+        <OccasionSelector />
+        <PromoBanner />
+        <CustomPromotionBanner />
+        <CustomHowItWorks />
+        <GiftBoxShowcase />
+        <TrendingGrid />
+        <WhyGiftora />
+        <Testimonials />
+        <BuilderCTA />
+      </div>
     </main>
     <Footer />
   </div>

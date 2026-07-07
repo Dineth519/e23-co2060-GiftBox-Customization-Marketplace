@@ -3312,3 +3312,87 @@ html, body {
   color: rgba(255,255,255,0.6);
   line-height: 1.5;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UNIFIED LIGHT BACKGROUND THEME OVERRIDES
+   ═══════════════════════════════════════════════════════════════════════ */
+.unified-light-bg {
+  background-color: var(--surface);
+  width: 100%;
+  color: var(--text);
+}
+
+.unified-light-bg section {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+.why-giftora__bg, .testimonials__bg {
+  display: none !important;
+}
+
+/* Typography Overrides */
+.unified-light-bg .section-label,
+.unified-light-bg .cg-label {
+  color: var(--gold) !important;
+}
+
+.unified-light-bg h2, 
+.unified-light-bg h3, 
+.unified-light-bg h4, 
+.unified-light-bg .section-title,
+.unified-light-bg .cg-title,
+.unified-light-bg .custom-step__title,
+.unified-light-bg .occ-card-title,
+.unified-light-bg .testimonial-card__name,
+.unified-light-bg .why-card h3,
+.unified-light-bg .builder-cta__title,
+.unified-light-bg .custom-promotion h2,
+.unified-light-bg .testimonial-card__quote-icon {
+  color: var(--navy) !important;
+}
+
+.unified-light-bg p,
+.unified-light-bg .section-subtitle,
+.unified-light-bg .section-desc,
+.unified-light-bg .custom-step__desc,
+.unified-light-bg .testimonial-card__text,
+.unified-light-bg .why-card p,
+.unified-light-bg .testimonial-card__location,
+.unified-light-bg .builder-cta__desc,
+.unified-light-bg .custom-promotion p {
+  color: var(--muted) !important;
+}
+
+/* Card Overrides (Light Theme Cards) */
+.unified-light-bg .occ-card,
+.unified-light-bg .custom-step,
+.unified-light-bg .testimonial-card,
+.unified-light-bg .why-card,
+.unified-light-bg .cg-card,
+.unified-light-bg .custom-promotion {
+  background: var(--white) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important;
+}
+
+.unified-light-bg .occ-card:hover,
+.unified-light-bg .custom-step:hover,
+.unified-light-bg .testimonial-card:hover,
+.unified-light-bg .why-card:hover,
+.unified-light-bg .cg-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important;
+  border-color: var(--gold) !important;
+}
+
+/* Specific component tweaks */
+.unified-light-bg .builder-cta__emoji {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.unified-light-bg .testimonial-card__avatar {
+  background: var(--surface) !important;
+  color: var(--navy) !important;
+  border: 1px solid var(--border) !important;
+}
