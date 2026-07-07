@@ -1,14 +1,11 @@
 // Core libraries and routing
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './VendorLanding.css';
 
 // Layout components
 import Header from '../../components/landingpage/Header';
 import Footer from '../../components/landingpage/Footer';
-
-// We can reuse the exact same CSS file as the landingpage to keep the theme identical!
-import './LandingPage.css'; 
-import './AboutUsPage.css'; // For the dark navy hero section
 
 // ─── Data for Vendors ────────────────────────────────────────────────────────
 
@@ -29,12 +26,6 @@ const VENDOR_TESTIMONIALS = [
   { name: 'Sarah L.',       shop: 'Sweet Delights', quote: 'Joining Giftora changed our bakery. We went from 10 orders a week to 50+ just from people adding our brownies to custom gift boxes!', stars: 5, initial: 'S' },
   { name: 'Malik F.',       shop: 'Glow Candles',   quote: 'The fact that I don’t have to worry about the final luxury packaging or island-wide delivery is a lifesaver. Highly recommended.', stars: 5, initial: 'M' },
   { name: 'Nethmi de Silva',shop: 'Blossom Co.',    quote: 'The dashboard is so easy to use. I can track my inventory and see exactly what is trending right now.', stars: 5, initial: 'N' },
-];
-
-const VENDOR_STATS = [
-  { value: '10K+',  label: 'Active Buyers' },
-  { value: '150+',  label: 'Premium Brands' },
-  { value: '0 LKR', label: 'Signup Fee' },
 ];
 
 const VALUE_STATS = [
@@ -101,8 +92,8 @@ const VendorHero = () => {
       <div className="about-hero__orb about-hero__orb--3" />
       <div className="about-hero__grid" />
 
-      <div className={`about-hero__inner ${mounted ? 'about-hero--visible' : ''}`} style={{ textAlign: 'center', paddingBottom: '100px' }}>
-        <div className="about-hero__label" style={{ justifyContent: 'center', display: 'flex', gap: '8px' }}>
+      <div className={`about-hero__inner ${mounted ? 'about-hero--visible' : ''}`} style={{ textAlign: 'left', paddingBottom: '0px' }}>
+        <div className="about-hero__label" style={{display: 'flex', gap: '8px' , justifyContent: 'flex-start', alignItems: 'center'}}>
           <span className="eyebrow-dot" style={{ width: '6px', height: '6px', background: 'var(--gold)', borderRadius: '50%', display: 'inline-block', alignSelf: 'center' }} />
           <span>Partner With Giftora</span>
         </div>
@@ -112,25 +103,16 @@ const VendorHero = () => {
           <span className="about-hero__title-accent">Zero Hassle.</span>
         </h1>
 
-        <p className="about-hero__sub" style={{ margin: '0 auto 40px' }}>
+        <p className="about-hero__sub" style={{ margin: '0 0 40px 0', textAlign: 'left' }}>
           Join Sri Lanka's fastest-growing premium gifting marketplace. You focus on creating amazing products, and we'll handle the marketing, luxury packaging, and delivery.
         </p>
 
-        <div className="about-hero__actions" style={{ justifyContent: 'center', marginBottom: '50px' }}>
+        <div className="about-hero__actions" style={{marginBottom: '50px' }}>
           <button className="btn-hero-primary" onClick={() => navigate('/vendor-register')}>
             <span className="btn-icon">🏪</span>
             <span>Register Your Shop</span>
             <span className="btn-arrow">→</span>
           </button>
-        </div>
-
-        <div className="hero__stats" style={{ justifyContent: 'center', gap: '60px', marginTop: '40px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '40px' }}>
-          {VENDOR_STATS.map((s, i) => (
-            <div className="hero__stat" key={i} style={{ alignItems: 'center', textAlign: 'center' }}>
-              <div className="hero__stat-value" style={{ color: 'var(--white)' }}>{s.value}</div>
-              <div className="hero__stat-label" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</div>
-            </div>
-          ))}
         </div>
       </div>
     </section>
@@ -140,11 +122,11 @@ const VendorHero = () => {
 const VendorBenefits = () => {
   const [ref, visible] = useReveal();
   return (
-    <section className={`how-it-works unified-light-bg section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
+    <section className={`how-it-works section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
       <div className="how-it-works__bg-accent" />
       <div className="section-inner">
-        <div className="section-label center">Benefits</div>
-        <h2 className="section-title center">Why Sell on Giftora?</h2>
+        <div className="section-label center" style={{ fontSize: '15px' }}>Benefits</div>
+        <h2 className="section-title center" style={{ fontSize: '45px' }}>Why Sell on Giftora?</h2>
         
         <div className="how-it-works__steps" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', marginTop: '40px' }}>
           {VENDOR_FEATURES.map((f, i) => (
@@ -163,7 +145,7 @@ const VendorBenefits = () => {
 const VendorHowItWorks = () => {
   const [ref, visible] = useReveal();
   return (
-    <section className={`how-it-works section-reveal ${visible ? 'visible' : ''}`} ref={ref} style={{ background: '#141522' }}>
+    <section className={`how-it-works section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
       <div className="section-inner">
         <div className="section-label center">Process</div>
         <h2 className="section-title center">How Becoming a Partner Works</h2>
@@ -271,11 +253,13 @@ const VendorLanding = () => (
     <Header />
     <main>
       <VendorHero />
-      <VendorStats />
-      <VendorBenefits />
-      <VendorHowItWorks />
-      <VendorTestimonials />
-      <VendorCTA />
+      <div className="unified-light-bg">
+        <VendorStats />
+        <VendorBenefits />
+        <VendorHowItWorks />
+        <VendorTestimonials />
+        <VendorCTA />
+      </div>
     </main>
     <Footer />
   </div>
