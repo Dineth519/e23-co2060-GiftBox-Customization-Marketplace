@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 
 // Public and user pages
 import LandingPage from './pages/landingpage/LandingPage.jsx';
-import HowItWorksPage from './pages/landingpage/HowItWorksPage.jsx';
 import AboutUsPage from './pages/landingpage/AboutUsPage.jsx';
 import CustomerHome from './pages/customer/CustomerHome.jsx';
 import Verify from './pages/customer/Verify.jsx';
@@ -18,7 +17,6 @@ import CustomerLayout from './layouts/CustomerLayout.jsx';
 import CustomerCart from './pages/customer/CustomerCart.jsx';
 import CustomerProfile from './pages/customer/Profile.jsx'
 import AboutUs from './pages/customer/AboutUsPage.jsx';
-import HowItWorks from './pages/customer/HowItWorksPage.jsx';
 import BoxBuilder from './pages/customer/BoxBuilderPage.jsx'
 import Checkout from './pages/customer/Checkout.jsx';
 
@@ -95,7 +93,6 @@ function App() {
           {/* Public and user routes */}
           <Route path="/" element={<LayoutWrapper><LandingPage /></LayoutWrapper>} />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/how-it-works" element={<LayoutWrapper><HowItWorksPage /></LayoutWrapper>} />
           <Route path="/about-us" element={<LayoutWrapper><AboutUsPage /></LayoutWrapper>} />
           <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
@@ -117,7 +114,6 @@ function App() {
             <Route path="cart" element={<CustomerCart />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="about-us" element={<AboutUs />} />
-            <Route path="how-it-works" element={<HowItWorks />} />
             <Route path="build-box" element={<BoxBuilder />} />
 
           </Route>

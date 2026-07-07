@@ -11,6 +11,8 @@ import { useCart } from '../../context/CartContext';
 
 // Stylesheet
 import './LandingPage.css';
+import landingPage1Img from '../../assets/landingpage/landing_page_1.png';
+import landingPage2Img from '../../assets/landingpage/landing_page_2.png';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -18,13 +20,6 @@ const FEATURES = [
   { icon: '🎨', title: 'Fully Custom',   desc: 'Build your own box from scratch' },
   { icon: '🚀', title: 'Fast Delivery',  desc: 'Same day delivery available'     },
   { icon: '💝', title: 'Luxury Packing', desc: 'Premium gift wrapping included'  },
-];
-
-const STEPS = [
-  { icon: '🛍️', title: 'Browse & Pick',  desc: 'Choose items from any of our trusted local vendors'    },
-  { icon: '📦', title: 'We Pack It',      desc: 'We hand-assemble everything into a beautiful gift box' },
-  { icon: '🎀', title: 'Add a Message',   desc: 'Personalise with a handwritten card or ribbon'         },
-  { icon: '🚚', title: 'Fast Delivery',   desc: "Delivered to your loved one's door island-wide"        },
 ];
 
 const TESTIMONIALS = [
@@ -606,7 +601,7 @@ const OccasionSelector = () => {
   );
 };
 
-// ─── Gift Box Showcase (chamacomputers.lk layout) ─────────────────────────────
+// ─── Gift Box Showcase ─────────────────────────────
 
 const GiftBoxShowcase = () => {
   const navigate = useNavigate();
@@ -1134,36 +1129,6 @@ const WhyGiftora = () => {
   );
 };
 
-// ─── How It Works ─────────────────────────────────────────────────────────────
-
-const HowItWorks = () => {
-  const [ref, visible] = useReveal();
-  return (
-    <section className={`how-it-works section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
-      <div className="how-it-works__bg-accent" />
-      <div className="section-inner">
-        <div className="section-label center">Process</div>
-        <h2 className="section-title center">How Giftora Works</h2>
-        <p className="section-subtitle">From browsing to doorstep in four simple steps</p>
-
-        <div className="how-it-works__steps">
-          {STEPS.map((step, i) => (
-            <React.Fragment key={i}>
-              <div className="step-card" style={{ animationDelay: `${i * 0.13}s` }}>
-                <div className="step-card__badge">{i + 1}</div>
-                <div className="step-card__icon">{step.icon}</div>
-                <div className="step-card__title">{step.title}</div>
-                <p className="step-card__desc">{step.desc}</p>
-              </div>
-              {i < STEPS.length - 1 && <div className="step-connector" />}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
 // ─── Testimonials ─────────────────────────────────────────────────────────────
 
 const Testimonials = () => {
@@ -1229,6 +1194,71 @@ const BuilderCTA = () => {
   );
 };
 
+// ─── Custom Promotion Banner (Knight Inspired) ───────────────────────────
+
+const CustomPromotionBanner = () => {
+  const navigate = useNavigate();
+  const [ref, visible] = useReveal(0.1);
+
+  return (
+    <section className={`custom-promo section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
+      <div className="custom-promo__inner">
+        <div className="custom-promo__content">
+          <h2 className="custom-promo__title">Curate</h2>
+          <h3 className="custom-promo__subtitle">your masterpiece</h3>
+          <p className="custom-promo__desc">
+            Mix and match premium items from multiple vendors to build an unforgettable gift box.
+          </p>
+          <button className="btn-hero-primary large" onClick={() => navigate('/build-box')}>
+            <span>Build your own box</span>
+            <span className="btn-arrow">→</span>
+          </button>
+        </div>
+        <div className="custom-promo__image-wrapper">
+          <img src={landingPage1Img} alt="Gift Customization" className="custom-promo__image" />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const CustomHowItWorks = () => {
+  const [ref, visible] = useReveal(0.1);
+
+  const steps = [
+    { title: "Select Your Box", desc: "Choose from our premium packaging options to set the perfect stage." },
+    { title: "Handpick the Gifts", desc: "Mix and match items from top local vendors for a unique curation." },
+    { title: "Add a Personal Touch", desc: "Include a heartfelt message and signature gold ribbon." },
+    { title: "Delivered with Care", desc: "We assemble and deliver it straight to your loved one's door." },
+  ];
+
+  return (
+    <section className={`custom-promo custom-promo--reversed section-reveal ${visible ? 'visible' : ''}`} ref={ref}>
+      <div className="custom-promo__inner">
+        <div className="custom-promo__image-wrapper">
+          <img src={landingPage2Img} alt="How It Works" className="custom-promo__image" />
+        </div>
+        <div className="custom-promo__content">
+          <h2 className="custom-promo__title" style={{ fontSize: '64px' }}>How it Works</h2>
+          <h3 className="custom-promo__subtitle" style={{ fontSize: '32px' }}>Simple. Elegant. Yours.</h3>
+          
+          <div className="custom-steps">
+            {steps.map((step, i) => (
+              <div key={i} className="custom-step">
+                <div className="custom-step__number">{i + 1}</div>
+                <div className="custom-step__text">
+                  <div className="custom-step__title">{step.title}</div>
+                  <div className="custom-step__desc">{step.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const LandingPage = () => (
@@ -1238,10 +1268,11 @@ const LandingPage = () => (
       <HeroSection />
       <OccasionSelector />
       <PromoBanner />
+      <CustomPromotionBanner />
+      <CustomHowItWorks />
       <GiftBoxShowcase />
       <TrendingGrid />
       <WhyGiftora />
-      <HowItWorks />
       <Testimonials />
       <BuilderCTA />
     </main>
