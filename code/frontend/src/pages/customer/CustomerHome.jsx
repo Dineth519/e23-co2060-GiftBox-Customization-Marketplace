@@ -125,35 +125,56 @@ const CustomerHome = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="featured-grid">
+        <div className="pp-grid" style={{ maxWidth: '1400px', margin: '0 auto' }}>
           {loading && <div className="home-state">Loading your collections...</div>}
           {error && <div className="home-state error">⚠️ {error}</div>}
           
-          {!loading && !error && displayProducts.map((p, i) => (
-            <div key={p.id} className="featured-card" style={{ animationDelay: `${Math.min(i, 8) * 0.1}s` }}>
-              <div className="featured-image">
-                <img src={p.imageUrl} alt={p.name} />
-                <div className="card-overlay">
-                  <button className="overlay-btn primary" onClick={() => addToCart(p)}>
-                    {addedId === p.id ? '✓ Added' : '🛒 Add to Cart'}
-                  </button>
-                  <button className="overlay-btn ghost" onClick={() => setQuickView(p)}>Quick View</button>
+          {!loading && !error && displayProducts.map((p, i) => {
+            const catName  = CATEGORY_MAP[p.categoryId] || 'Gift';
+            const catIcon  = CAT_ICONS[catName] || '🎁';
+            const justAdded = addedId === p.id;
+            
+            return (
+              <div key={p.id} className="ppc" style={{ animationDelay:`${Math.min(i,8)*0.05}s` }}>
+                {/* Image */}
+                <div className="ppc-img">
+                  <img src={p.imageUrl} alt={p.name} loading="lazy" />
+                  <div className="ppc-overlay">
+                    <button
+                      className="ppc-action ppc-action--primary"
+                      onClick={() => addToCart(p)}
+                    >
+                      {justAdded ? '✓ Added!' : '🛒 Add to Cart'}
+                    </button>
+                    <button className="ppc-action ppc-action--ghost" onClick={() => setQuickView(p)}>Quick View</button>
+                  </div>
+                </div>
+
+                {/* Body */}
+                <div className="ppc-body">
+                  <div className="ppc-name">{p.name}</div>
+                  <div className="ppc-vendor">by Giftora Exclusive</div>
+                  <div className="ppc-stars-row">
+                    <span className="ppc-stars">★★★★★</span>
+                    <span className="ppc-rating">5.0</span>
+                  </div>
+                  <div className="ppc-footer">
+                    <span className="ppc-price">LKR {Number(p.price).toLocaleString()}</span>
+                    <button
+                      className={`ppc-add ${justAdded ? 'ppc-add--added' : ''}`}
+                      onClick={() => addToCart(p)}
+                      title="Add to cart"
+                    >
+                      {justAdded
+                        ? <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                        : <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                      }
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="featured-content">
-                <h3 className="featured-name">{p.name}</h3>
-                <div className="featured-rating">
-                  <FaStar className="star-icon" /> <span>5.0</span>
-                </div>
-                <div className="featured-footer">
-                  <div className="price-tag">LKR {Number(p.price).toLocaleString()}</div>
-                  <button className={`wish-btn ${addedId === p.id ? 'active' : ''}`} onClick={() => addToCart(p)}>
-                    <FaHeart />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -189,16 +210,30 @@ const CustomerHome = () => {
         <div className="qv-backdrop" onClick={() => setQuickView(null)}>
           <div className="qv-modal" onClick={e => e.stopPropagation()}>
             <button className="qv-close" onClick={() => setQuickView(null)}><FaTimes /></button>
-            <div className="qv-grid">
-              <img src={quickView.imageUrl} alt={quickView.name} className="qv-img" />
-              <div className="qv-details">
-                <span className="qv-cat">{CATEGORY_MAP[quickView.categoryId]}</span>
-                <h2 className="qv-title">{quickView.name}</h2>
-                <div className="qv-price">LKR {Number(quickView.price).toLocaleString()}</div>
-                <p className="qv-desc">Premium curated gift from Giftora's exclusive collection. Hand-packed with love and ready to create a lasting memory.</p>
-                <button className="btn-primary" onClick={() => { addToCart(quickView); setQuickView(null); }}>
+            <div className="qv-img-side">
+              <img src={quickView.imageUrl} alt={quickView.name} />
+              <div className="qv-img-grad" />
+            </div>
+            <div className="qv-info-side">
+              <div className="qv-cat-tag">
+                {CAT_ICONS[CATEGORY_MAP[quickView.categoryId]] || '🎁'} {CATEGORY_MAP[quickView.categoryId] || 'Gift'}
+              </div>
+              <h3 className="qv-name">{quickView.name}</h3>
+              <div className="qv-stars-row">★★★★★ <span>5.0 · Premium Quality</span></div>
+              <div className="qv-price">LKR {Number(quickView.price).toLocaleString()}</div>
+              <div className="qv-sep" />
+              <p className="qv-desc">A premium curated gift from Giftora's exclusive collection. Hand-packed with love, beautifully presented, and ready to create a lasting memory.</p>
+              <div className="qv-features">
+                {['🎀 Gift Wrapped','✍️ Personal Note','🚚 Island-wide Delivery'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
+              </div>
+              <div className="qv-actions">
+                <button
+                  className="qv-cta qv-cta--primary"
+                  onClick={() => { addToCart(quickView); setQuickView(null); }}
+                >
                   🛒 Add to Cart
                 </button>
+                <button className="qv-cta qv-cta--outline" onClick={() => { setQuickView(null); document.getElementById('marketplace').scrollIntoView({behavior:'smooth'}); }}>View All →</button>
               </div>
             </div>
           </div>
@@ -206,7 +241,6 @@ const CustomerHome = () => {
       )}
 
       {/* Testimonials & CTA remain as they are... */}
-      <Footer />
     </div>
   );
 };
