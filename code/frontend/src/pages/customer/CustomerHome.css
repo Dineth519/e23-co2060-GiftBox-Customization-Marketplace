@@ -39,9 +39,9 @@ body {
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 80px 60px;
-  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 50%, #FFF9F0 100%);
+  justify-content: flex-start;
+  padding: 80px 8%;
+  background: linear-gradient(rgba(24, 20, 18, 0.55), rgba(24, 20, 18, 0.75)), url('../../assets/customer/customerhome.jpeg') center/cover no-repeat;
   overflow: hidden;
 }
 
@@ -63,9 +63,10 @@ body {
 }
 
 .hero-content {
-  max-width: 700px;
+  max-width: 900px;
   z-index: 2;
   animation: fadeInUp 1s ease-out;
+  text-align: left;
 }
 
 @keyframes fadeInUp {
@@ -83,13 +84,14 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  background: linear-gradient(135deg, rgba(201, 169, 97, 0.1) 0%, rgba(93, 173, 226, 0.1) 100%);
-  border: 1px solid rgba(201, 169, 97, 0.3);
+  padding: 12px 24px;
+  background: rgba(24, 20, 18, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(201, 169, 97, 0.5);
   border-radius: 50px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--gold);
+  color: #FFFFFF;
   margin-bottom: 32px;
   animation: fadeInUp 1s ease-out 0.2s both;
 }
@@ -109,27 +111,30 @@ body {
 
 .hero-title {
   font-family: 'Playfair Display', serif;
-  font-size: 72px;
+  font-size: 100px;
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 24px;
-  color: var(--dark-navy);
+  color: #FFFFFF;
   letter-spacing: -2px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
   animation: fadeInUp 1s ease-out 0.3s both;
 }
 
 .title-accent {
-  background: linear-gradient(135deg, var(--gold) 0%, var(--cyan) 100%);
+  background: linear-gradient(135deg, var(--light-gold) 0%, var(--gold) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: inline-block;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.8));
 }
 
 .hero-subtitle {
-  font-size: 18px;
+  font-size: 24px;
   line-height: 1.7;
-  color: var(--text-gray);
+  color: #FFFFFF;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
   margin-bottom: 40px;
   font-weight: 400;
   animation: fadeInUp 1s ease-out 0.4s both;
@@ -196,7 +201,8 @@ body {
 
 .btn-secondary {
   padding: 18px 36px;
-  background: white;
+  background: rgba(24, 20, 18, 0.4);
+  backdrop-filter: blur(4px);
   color: var(--gold);
   border: 2px solid var(--gold);
   border-radius: 50px;
@@ -207,10 +213,11 @@ body {
 }
 
 .btn-secondary:hover {
-  background: var(--gold);
-  color: white;
+  background: rgba(201, 169, 97, 0.1);
+  color: var(--light-gold);
+  border-color: var(--light-gold);
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(201, 169, 97, 0.3);
+  box-shadow: 0 8px 24px rgba(201, 169, 97, 0.2);
 }
 
 .hero-stats {
