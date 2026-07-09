@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, User, ChevronDown, LogOut } from 'lucide-react'; // Added LogOut icon
 import CartBadge from './CartBadge.jsx';
@@ -6,12 +6,38 @@ import './Header.css';
 
 const Header = () => {
   const navigate = useNavigate();
+  const [displayName, setDisplayName] = useState('');
+
+  const userId = localStorage.getItem('userId');
+  const username = localStorage.getItem('username') || 'Customer';
+
+  useEffect(() => {
+    async function fetchName() {
+      if (!userId) {
+        setDisplayName(username.includes('@') ? username.split('@')[0] : username);
+        return;
+      }
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setDisplayName(data.name || (username.includes('@') ? username.split('@')[0] : username));
+        } else {
+          setDisplayName(username.includes('@') ? username.split('@')[0] : username);
+        }
+      } catch (err) {
+        setDisplayName(username.includes('@') ? username.split('@')[0] : username);
+      }
+    }
+    fetchName();
+  }, [userId, username]);
+
 
   // Handle logout logic
   const handleExit = () => {
-    // Add any session clearing logic here (e.g., localStorage.clear())
+    localStorage.clear();
     console.log("User logged out");
-    navigate('/'); // Redirect to landing page or login
+    navigate('/login'); 
   };
 
   return (
@@ -28,7 +54,6 @@ const Header = () => {
       <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         {[
           { label: 'Build a Box',  route: '/customer/build-box' },
-          { label: 'How It Works', route: '/customer/how-it-works' },
           { label: 'About Us',     route: '/customer/about-us' },
         ].map(item => (
           <button
@@ -72,8 +97,8 @@ const Header = () => {
 
         <div className="profile-section" onClick={() => navigate('/customer/profile')}>
           <div className="profile-info">
-            <span className="profile-name">Dineth Sanjuna</span>
-            <span className="profile-role">Premium Member</span>
+            <span className="profile-name" style={{ textTransform: 'capitalize' }}>{displayName}</span>
+            <span className="profile-role">Customer</span>
           </div>
           <div className="profile-avatar">
             <User size={18} />

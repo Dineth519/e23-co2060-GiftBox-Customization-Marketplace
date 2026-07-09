@@ -12,7 +12,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // ── Save or update address for a user ────────────────────────────────
+    // ── Save or update address for a customer ────────────────────────────────
     public boolean saveAddress(String username, AddressDTO addressDTO) {
         User user = userRepository.findByUsername(username)
                 .orElse(null);
@@ -31,7 +31,7 @@ public class UserService {
         return true;
     }
 
-    // ── Get address for a user ────────────────────────────────────────────
+    // ── Get address for a customer ────────────────────────────────────────────
     public AddressDTO getAddress(String username) {
         User user = userRepository.findByUsername(username)
                 .orElse(null);

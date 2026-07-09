@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaUsers, FaBoxOpen, FaShoppingCart, FaDollarSign, FaTruck, FaStar } from 'react-icons/fa';
 import './Dashboard.css';
 
@@ -8,13 +8,48 @@ import './Dashboard.css';
  * Shows statistics cards, recent orders, and top vendors
  */
 const Dashboard = () => {
-  
-  // Static dashboard statistics data with icons and trends
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalCustomers: 0,
+    giftBoxesCreated: 0,
+    totalOrders: 0,
+    totalRevenue: 0.0,
+    recentOrders: [],
+    topVendors: []
+  });
+
+  const adminUsername = localStorage.getItem('username') || 'Administrator';
+  const API_BASE = `${process.env.REACT_APP_API_URL || 'https://nexus-backend-axbdfzd2g4c0fwbf.austriaeast-01.azurewebsites.net'}/api`;
+
+  useEffect(() => {
+    fetch(`${API_BASE}/admin/dashboard`)
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch dashboard data");
+        return res.json();
+      })
+      .then(data => {
+        setStats({
+          totalCustomers: data.totalCustomers ?? 0,
+          giftBoxesCreated: data.giftBoxesCreated ?? 0,
+          totalOrders: data.totalOrders ?? 0,
+          totalRevenue: data.totalRevenue ?? 0.0,
+          recentOrders: data.recentOrders ?? [],
+          topVendors: data.topVendors ?? []
+        });
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Dashboard error:", err);
+        setLoading(false);
+      });
+  }, [API_BASE]);
+
+  // Statistics cards data structure mapping live DB stats
   const statsData = [
-    { icon: <FaUsers />, title: 'Total Customers', value: '2,847', change: '+12.5%', trend: 'up' },
-    { icon: <FaBoxOpen />, title: 'Gift Boxes Created', value: '1,234', change: '+8.2%', trend: 'up' },
-    { icon: <FaShoppingCart />, title: 'Orders Today', value: '89', change: '+23.1%', trend: 'up' },
-    { icon: <FaDollarSign />, title: 'Revenue (LKR)', value: '485,600', change: '+15.3%', trend: 'up' },
+    { icon: <FaUsers />, title: 'Total Customers', value: stats.totalCustomers.toLocaleString() },
+    { icon: <FaBoxOpen />, title: 'Gift Boxes Created', value: stats.giftBoxesCreated.toLocaleString() },
+    { icon: <FaShoppingCart />, title: 'Orders Today', value: stats.totalOrders.toLocaleString() },
+    { icon: <FaDollarSign />, title: 'Revenue (LKR)', value: stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }) },
   ];
 
   return (
@@ -23,12 +58,12 @@ const Dashboard = () => {
       {/* Welcome header section with greeting message */}
       <div className="dashboard-header">
         <div className="header-content">
-          <h1 className="dashboard-title">Welcome back, Mathew! 👋</h1>
+          <h1 className="dashboard-title">Welcome back, {adminUsername}! 👋</h1>
           <p className="dashboard-subtitle">Here's what's happening with your gift marketplace today.</p>
         </div>
       </div>
 
-      {/* Statistics grid displaying key metrics with icons and trend indicators */}
+      {/* Statistics grid displaying key metrics with icons */}
       <div className="stats-grid">
         {statsData.map((stat, index) => (
           <div className="stat-card" key={index}>
@@ -38,7 +73,6 @@ const Dashboard = () => {
             <div className="stat-details">
               <p className="stat-title">{stat.title}</p>
               <h3 className="stat-value">{stat.value}</h3>
-              <span className={`stat-change ${stat.trend}`}>{stat.change}</span>
             </div>
           </div>
         ))}
@@ -53,18 +87,30 @@ const Dashboard = () => {
             <button className="view-all-btn">View All</button>
           </div>
           <div className="card-content">
-            {[1, 2, 3, 4].map((item) => (
-              <div className="activity-item" key={item}>
-                <div className="activity-icon">
-                  <FaTruck />
+            {loading ? (
+              <div className="loading-placeholder">Loading recent orders...</div>
+            ) : stats.recentOrders.length === 0 ? (
+              <div className="empty-placeholder">No orders placed yet.</div>
+            ) : (
+              stats.recentOrders.map((order) => (
+                <div className="activity-item" key={order.orderId}>
+                  <div className="activity-icon">
+                    <FaTruck />
+                  </div>
+                  <div className="activity-info">
+                    <p className="activity-text">
+                      Order #{order.orderId} - {order.recipientName || 'Premium Gift Box'}
+                    </p>
+                    <span className="activity-time">
+                      LKR {Number(order.totalAmount).toLocaleString()} • {order.wrapStyle || 'Classic Wrapping'}
+                    </span>
+                  </div>
+                  <span className={`activity-badge ${order.status?.toLowerCase() || 'processing'}`}>
+                    {order.status || 'Processing'}
+                  </span>
                 </div>
-                <div className="activity-info">
-                  <p className="activity-text">Order #GB{1000 + item} - Premium Gift Box</p>
-                  <span className="activity-time">2 hours ago</span>
-                </div>
-                <span className="activity-badge">Processing</span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -75,19 +121,27 @@ const Dashboard = () => {
             <button className="view-all-btn">View All</button>
           </div>
           <div className="card-content">
-            {['Sweet Delights', 'Flower Paradise', 'Choco Heaven', 'Gift Gallery'].map((vendor, idx) => (
-              <div className="activity-item" key={idx}>
-                <div className="vendor-avatar">{vendor.charAt(0)}</div>
-                <div className="activity-info">
-                  <p className="activity-text">{vendor}</p>
-                  <span className="activity-time">{150 - idx * 10} products</span>
+            {loading ? (
+              <div className="loading-placeholder">Loading top vendors...</div>
+            ) : stats.topVendors.length === 0 ? (
+              <div className="empty-placeholder">No vendors registered yet.</div>
+            ) : (
+              stats.topVendors.map((vendor, idx) => (
+                <div className="activity-item" key={vendor.id}>
+                  <div className="vendor-avatar">
+                    {vendor.shopName ? vendor.shopName.charAt(0).toUpperCase() : 'V'}
+                  </div>
+                  <div className="activity-info">
+                    <p className="activity-text">{vendor.shopName || 'Unnamed Vendor'}</p>
+                    <span className="activity-time">{vendor.productCount} products</span>
+                  </div>
+                  <div className="rating">
+                    <FaStar className="star-icon" />
+                    <span>4.{9 - (idx % 5)}</span>
+                  </div>
                 </div>
-                <div className="rating">
-                  <FaStar className="star-icon" />
-                  <span>4.{9 - idx}</span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>

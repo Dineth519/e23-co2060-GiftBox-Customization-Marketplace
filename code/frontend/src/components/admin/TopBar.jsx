@@ -1,16 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, User, LogOut } from 'lucide-react';
 import './TopBar.css';
-import logo from '../../assets/logo-removebg-preview.png';
+import logo from '../../assets/logo.png';
 
 const TopBar = () => {
   const navigate = useNavigate();
+  const [displayName, setDisplayName] = useState('');
+
+  const userId = localStorage.getItem('userId');
+  const username = localStorage.getItem('username') || 'Admin';
+
+  useEffect(() => {
+    async function fetchName() {
+      if (!userId) {
+        setDisplayName(username.includes('@') ? username.split('@')[0] : username);
+        return;
+      }
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setDisplayName(data.name || (username.includes('@') ? username.split('@')[0] : username));
+        } else {
+          setDisplayName(username.includes('@') ? username.split('@')[0] : username);
+        }
+      } catch (err) {
+        setDisplayName(username.includes('@') ? username.split('@')[0] : username);
+      }
+    }
+    fetchName();
+  }, [userId, username]);
 
   const handleLogout = () => {
-    // Clear authentication tokens if applicable
-    // localStorage.removeItem('token');
-    navigate('/');
+    localStorage.clear();
+    navigate('/login');
   };
 
   return (
@@ -37,7 +61,7 @@ const TopBar = () => {
         {/* Profile Section */}
         <div className="profile-section">
           <div className="profile-info">
-            <span className="profile-name">Mathew Anderson</span>
+            <span className="profile-name" style={{ textTransform: 'capitalize' }}>{displayName}</span>
             <span className="profile-role">Administrator</span>
           </div>
           <div className="profile-avatar">

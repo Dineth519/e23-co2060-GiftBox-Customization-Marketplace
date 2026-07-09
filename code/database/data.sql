@@ -42,7 +42,7 @@ INSERT INTO orders (customer_id, partner_id, status, total_amount, created_at, d
 (6, 2, 'DELIVERED', 12000.00, DATE_SUB(NOW(), INTERVAL 5 DAY), 'Kandy'),
 (7, 2, 'SHIPPED',   8500.00,  DATE_SUB(NOW(), INTERVAL 4 DAY), 'Galle'),
 (8, 2, 'DELIVERED', 15000.00, DATE_SUB(NOW(), INTERVAL 3 DAY), 'Jaffna'),
-(9, 2, 'CONFIRMED', 7200.00,  DATE_SUB(NOW(), INTERVAL 2 DAY), 'Negombo'), -- 'PROCESSING' වෙනුවට 'CONFIRMED'
+(9, 2, 'CONFIRMED', 7200.00,  DATE_SUB(NOW(), INTERVAL 2 DAY), 'Negombo'), -- 'CONFIRMED' instead of 'PROCESSING'
 (5, 2, 'PENDING',   5400.00,  DATE_SUB(NOW(), INTERVAL 1 DAY), 'Matara'),
 (6, 2, 'DELIVERED', 9800.00,  CURDATE(), 'Colombo'),
 

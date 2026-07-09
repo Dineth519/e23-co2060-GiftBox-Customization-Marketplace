@@ -6,13 +6,14 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Long id;
+    private Integer id;
 
     private String name;
 
@@ -35,7 +36,7 @@ public class User {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // Address fields
+    // Address fields (kept on User for global access, or to map V7 schema)
     private String addressLine1;
     private String addressLine2;
     private String city;

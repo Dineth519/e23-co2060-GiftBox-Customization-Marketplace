@@ -21,9 +21,9 @@ public class Order {
     @JsonProperty("customer_id")
     private Integer customerId;
 
-    @Column(name = "partner_id")
-    @JsonProperty("partner_id")
-    private Integer partnerId;
+    @Column(name = "vendor_id")
+    @JsonProperty("vendor_id")
+    private Integer vendorId;
 
     @Column(name = "assembler_id")
     @JsonProperty("assembler_id")
@@ -62,6 +62,10 @@ public class Order {
     @Column(name = "wrapping_style")
     @JsonProperty("wrapping_style")
     private String wrappingStyle;
+
+    @Column(name = "order_type")
+    @JsonProperty("order_type")
+    private String orderType;
 
     @Column(name = "created_at", insertable = false, updatable = false)
     @JsonProperty("created_at")
