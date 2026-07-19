@@ -24,7 +24,7 @@ const VendorLayout = ({ children }) => {
 
   // Route Guard: Redirect to login if user is not authorized as a vendor
   if (!userId || (userRole !== 'VENDOR' && userRole !== 'SELLER' && userRole !== 'PARTNER')) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (

@@ -16,7 +16,7 @@
   --light-gold: #D4AF37;
   --deep-blue: #16213E;
   --white: #FFFFFF;
-  --light-gray: #F9FAFB;
+  --light-gray: #F9F8F6;
   --text-dark: #1F2937;
   --text-gray: #6B7280;
 }
@@ -24,7 +24,7 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--text-dark);
-  background: var(--white);
+  background: var(--light-gray);
   overflow-x: hidden;
 }
 

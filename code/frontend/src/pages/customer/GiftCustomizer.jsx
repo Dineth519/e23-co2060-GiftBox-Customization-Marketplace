@@ -164,16 +164,19 @@ export default function GiftCustomizer() {
   return (
     <div className="gc-page">
  
-      {/* ── Page Header ── */}
-      <div className="gc-header">
-        <span className="gc-badge">🎁 Build Your Box</span>
-        <h1 className="gc-title">Curate the <em>Perfect Gift</em></h1>
-        <p className="gc-subtitle">
-          Choose items from our local vendors — we hand-pack and deliver island-wide.
-        </p>
+      {/* ── Hero Banner ── */}
+      <div className="ct-hero">
+        <div className="ct-hero__orb ct-hero__orb--1" />
+        <div className="ct-hero__orb ct-hero__orb--2" />
+        <div className="ct-hero__inner">
+          <div className="ct-hero__label">Gift Customizer</div>
+          <h1 className="ct-hero__title">Curate the <em style={{color:'#C9A961',fontStyle:'italic'}}>Perfect Gift</em></h1>
+          <p className="ct-hero__sub">Choose items from our local vendors — we hand-pack and deliver island-wide.</p>
+        </div>
       </div>
- 
+
       {/* ── Main Layout: Steps (left) + Summary (right) ── */}
+      <div className="ct-body">
       <div className="gc-layout">
  
         {/* ════ LEFT PANEL — 4 steps ════ */}
@@ -424,7 +427,8 @@ export default function GiftCustomizer() {
           )}
         </div>
  
-      </div>{/* end gc-layout */}
+      </div> {/* end gc-layout */}
+      </div> {/* end gc-body */}
     </div>
   );
 }
