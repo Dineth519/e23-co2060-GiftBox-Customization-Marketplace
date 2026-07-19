@@ -439,6 +439,102 @@ section {
   margin: 0 auto;
 }
 
+/* ── Home Toolbar (Search & Filters) ── */
+.home-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 100px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  margin-bottom: 40px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.home-search-bar {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #F9F9FB;
+  padding: 12px 20px;
+  border-radius: 50px;
+  border: 1px solid transparent;
+  transition: all 0.3s;
+}
+
+.home-search-bar:focus-within {
+  background: white;
+  border-color: var(--gold);
+  /* Removed thick box shadow so it looks cleaner when typing */
+}
+
+.home-search-bar .search-icon {
+  color: #9CA3AF;
+  font-size: 16px;
+}
+
+.home-search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: #1F2937;
+}
+
+.home-search-bar .clear-search {
+  color: #9CA3AF;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.home-search-bar .clear-search:hover {
+  color: #EF4444;
+}
+
+.home-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-filters select {
+  appearance: none;
+  background: #F9F9FB url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 16px center;
+  background-size: 14px;
+  border: 1px solid transparent;
+  border-radius: 50px;
+  padding: 12px 48px 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.home-filters select:hover {
+  background-color: #F3F4F6;
+}
+
+.home-filters select:focus-visible {
+  background-color: white;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.15);
+  outline: none;
+}
+
+
+
 .featured-card {
   background: white;
   border-radius: 24px;

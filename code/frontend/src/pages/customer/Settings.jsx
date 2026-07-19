@@ -15,7 +15,7 @@ export default function Settings() {
   const [loading,   setLoading]   = useState(true);
   const [activeTab, setActiveTab] = useState(location.state?.tab || 'info');
 
-  const [infoForm,  setInfoForm]  = useState({ name: '', email: '', phone: '' });
+  const [infoForm,  setInfoForm]  = useState({ name: '', email: '', phone: '', profileImageUrl: '' });
   const [infoSaved, setInfoSaved] = useState(false);
   const [infoError, setInfoError] = useState('');
 
@@ -49,6 +49,7 @@ export default function Settings() {
             name: data.name || '',
             email: data.email || '',
             phone: data.phoneNumber || '',
+            profileImageUrl: data.profileImageUrl || '',
           });
           setAddrForm({
             line1: data.addressLine1 || '',
@@ -69,6 +70,18 @@ export default function Settings() {
   }, [userId, username]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setInfoForm({ ...infoForm, profileImageUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+
   async function handleSaveInfo() {
     if (!infoForm.name || !infoForm.email) {
       setInfoError('Please fill in name and email.');
@@ -85,7 +98,8 @@ export default function Settings() {
         body: JSON.stringify({
           name: infoForm.name,
           email: infoForm.email,
-          phoneNumber: infoForm.phone
+          phoneNumber: infoForm.phone,
+          profileImageUrl: infoForm.profileImageUrl
         }),
       });
       if (res.ok) {
@@ -247,7 +261,23 @@ export default function Settings() {
           <div className="st-card">
             <div className="st-card-header">
               <h3 className="st-card-title">Personal Information</h3>
-              <p className="st-card-desc">Update your name, email and phone number.</p>
+              <p className="st-card-desc">Update your name, email, phone number and profile photo.</p>
+            </div>
+
+            <div className="st-form-row">
+              <div className="st-form-group" style={{ flex: '1 1 100%', marginBottom: '16px' }}>
+                <label className="st-label">Profile Photo</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  {infoForm.profileImageUrl ? (
+                    <img src={infoForm.profileImageUrl} alt="Profile" style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'var(--gold, #C9A961)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#16213E', fontSize: '24px', fontWeight: 'bold' }}>
+                      {infoForm.name ? infoForm.name.charAt(0).toUpperCase() : '?'}
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ color: '#E8E8E8', fontSize: '14px' }} />
+                </div>
+              </div>
             </div>
 
             <div className="st-form-row">

@@ -124,7 +124,13 @@ export default function Profile() {
         {/* ── PROFILE SUMMARY CARD ── */}
         <div className="pf-summary-card">
           <div className="pf-summary-left">
-            <div className="pf-summary-avatar">{initials}</div>
+            {profile.profileImageUrl ? (
+              <div className="pf-summary-avatar" style={{ padding: 0, overflow: 'hidden', background: 'transparent' }}>
+                <img src={profile.profileImageUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              </div>
+            ) : (
+              <div className="pf-summary-avatar">{initials}</div>
+            )}
             <div className="pf-summary-info">
               <h1 className="pf-summary-name">{profile.name || 'My Account'}</h1>
               <p className="pf-summary-handle">@{username || 'user'}</p>
