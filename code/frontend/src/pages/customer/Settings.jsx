@@ -39,7 +39,7 @@ export default function Settings() {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:8080/api/users/${userId}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         if (res.ok) {
@@ -76,7 +76,7 @@ export default function Settings() {
     }
     setInfoError('');
     try {
-      const res = await fetch(`http://localhost:8080/api/users/${userId}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ export default function Settings() {
     }
     setPassError('');
     try {
-      const res = await fetch(`http://localhost:8080/api/users/${userId}/password`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ export default function Settings() {
     }
     setAddrError('');
     try {
-      const res = await fetch(`http://localhost:8080/api/users/${username}/address`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${username}/address`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ export default function Settings() {
 
       if (res.ok) {
         // Also update the main customer record just in case
-        await fetch(`http://localhost:8080/api/users/${userId}`, {
+        await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -208,15 +208,20 @@ export default function Settings() {
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
   return (
-    <div className="st-page">
-
+    <>
       {/* ── HEADER ── */}
-      <div className="st-header">
-        <button className="st-back-btn" onClick={() => navigate('/profile')}>&larr; Back to Profile</button>
-        <h1 className="st-header-title">Account Settings</h1>
+      <div className="ct-hero">
+        <div className="ct-hero__orb ct-hero__orb--1"></div>
+        <div className="ct-hero__orb ct-hero__orb--2"></div>
+        <div className="ct-hero__inner">
+          <button className="st-back-btn" onClick={() => navigate('/customer/profile')}>&larr; Back to Profile</button>
+          <h1 className="ct-hero__title" style={{ marginTop: '16px' }}>Account Settings</h1>
+          <p className="ct-hero__subtitle">Update your personal information, security, and addresses.</p>
+        </div>
       </div>
 
-      {/* ── TABS ── */}
+      <div className="ct-body">
+        {/* ── TABS ── */}
       <div className="st-tabs">
         {[
           { key: 'info',      label: 'Personal Info', icon: '👤' },
@@ -431,6 +436,7 @@ export default function Settings() {
         )}
 
       </div>
-    </div>
+      </div>
+    </>
   );
 }

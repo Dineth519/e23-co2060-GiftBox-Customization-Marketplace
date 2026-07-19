@@ -75,7 +75,8 @@ const statusConfig = {
   'Pending':          { color: '#EF9F27', bg: 'rgba(239,159,39,0.1)',  emoji: '🕐' },
   'Processing':       { color: '#378ADD', bg: 'rgba(55,138,221,0.1)',  emoji: '⚙️' },
   'Out for Delivery': { color: '#7F77DD', bg: 'rgba(127,119,221,0.1)', emoji: '🚚' },
-  'Delivered':        { color: '#1D9E75', bg: 'rgba(29,158,117,0.1)',  emoji: '✅' },
+  'Delivered':        { color: '#1D9E75', bg: 'rgba(29,158,117,0.1)',  emoji: '📦' },
+  'Received':         { color: '#1D9E75', bg: 'rgba(29,158,117,0.1)',  emoji: '✅' },
   'Cancelled':        { color: '#E24B4A', bg: 'rgba(226,75,74,0.1)',   emoji: '❌' },
 };
 
@@ -93,6 +94,11 @@ export default function Orders() {
 
   // navigate — used to go to OrderDetail page when order is clicked
   const navigate = useNavigate();
+
+  // State to track which order is expanded and its items
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [expandedItems, setExpandedItems] = useState([]);
+  const [itemsLoading, setItemsLoading] = useState(false);
 
   // ── Fetch orders from Spring Boot API ──────────────────────────────────────
   // useEffect runs once when the page first loads.
@@ -145,7 +151,7 @@ export default function Orders() {
       const map = {
         'PENDING':    'Pending',
         'CONFIRMED':  'Processing',
-        'RECEIVED':   'Processing',
+        'RECEIVED':   'Received',
         'ASSEMBLING': 'Processing',
         'READY':      'Processing',
         'SHIPPED':    'Out for Delivery',
@@ -169,11 +175,64 @@ export default function Orders() {
   // ── Format date nicely ─────────────────────────────────────────────────────
   // Converts '2026-04-20' → 'April 20, 2026'
   function formatDate(dateStr) {
+    if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
+  }
+
+  // ── Handle order expansion ────────────────────────────────────────────────
+  async function handleExpandOrder(order) {
+    // If already expanded, collapse it
+    if (expandedOrderId === order.id) {
+      setExpandedOrderId(null);
+      return;
+    }
+    
+    // Otherwise expand and fetch items
+    setExpandedOrderId(order.id);
+    setItemsLoading(true);
+    setExpandedItems([]);
+
+    try {
+      const rawId = order.id.replace('ORD-', '');
+      const res = await apiCall(`/api/orders/${rawId}/items`);
+      if (res.ok) {
+        const items = await res.json();
+        setExpandedItems(items);
+      }
+    } catch (e) {
+      console.error('Failed to fetch order items', e);
+    } finally {
+      setItemsLoading(false);
+    }
+  }
+
+      // ── Handle mark as received ───────────────────────────────────────────────
+  async function handleMarkReceived(order, e) {
+    e.stopPropagation(); // prevent collapsing the card
+    try {
+      const rawId = order.id.replace('ORD-', '');
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/orders/${rawId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: JSON.stringify({ status: 'RECEIVED' })
+      });
+      if (res.ok) {
+        // Update local order list status
+        setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'Received' } : o));
+      } else {
+        alert('Could not update order status.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating order status.');
+    }
   }
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
@@ -198,18 +257,12 @@ export default function Orders() {
         <div>
           <p className="orders-subtitle">Showing {orders.length} order{orders.length !== 1 ? 's' : ''}</p>
         </div>
-        <button
-          className="ct-btn-gold"
-          onClick={() => navigate('/customer/build-box')}
-        >
-          🎁 Build New Box
-        </button>
       </div>
 
       {/* ── Filter Tabs ── */}
       {/* These tabs let customer filter by order status */}
       <div className="orders-tabs">
-        {['All', 'Pending', 'Processing', 'Out for Delivery', 'Delivered', 'Cancelled'].map((tab) => (
+        {['All', 'Pending', 'Processing', 'Out for Delivery', 'Delivered', 'Received', 'Cancelled'].map((tab) => (
           <button
             key={tab}
             className={`orders-tab ${filter === tab ? 'active' : ''}`}
@@ -264,10 +317,9 @@ export default function Orders() {
             return (
               <div
                 key={order.id}
-                className="order-card"
-                // Clicking the card navigates to OrderDetail page
-                // passing the order id in the URL: /orders/ORD-1001
-                onClick={() => navigate(`/orders/${order.id}`)}
+                className={`order-card ${expandedOrderId === order.id ? 'expanded' : ''}`}
+                onClick={() => handleExpandOrder(order)}
+                style={{ cursor: 'pointer' }}
               >
 
                 {/* ── Card Top Row: Order ID + Status ── */}
@@ -288,28 +340,46 @@ export default function Orders() {
                   </span>
                 </div>
 
-                {/* ── Card Middle: Items list ── */}
-                <div className="order-items-row">
-                  {order.items.map((item, idx) => (
-                    <span key={idx} className="order-item-pill">
-                      {item.emoji} {item.name}
-                      {item.qty > 1 && <span className="order-item-qty">×{item.qty}</span>}
-                    </span>
-                  ))}
-                </div>
-
-                {/* ── Card Bottom: Box details + Total ── */}
-                <div className="order-card-bottom">
-                  <div className="order-meta">
-                    <span className="order-meta-item">📦 {order.boxSize}</span>
-                    <span className="order-meta-item">🎀 {order.ribbonColor}</span>
-                    {order.message && (
-                      <span className="order-meta-item">
-                        💬 "{order.message.slice(0, 25)}{order.message.length > 25 ? '…' : ''}"
-                      </span>
+                {/* ── Expanded Content: Items list ── */}
+                {expandedOrderId === order.id && (
+                  <div className="order-expanded-content" style={{ marginTop: '16px', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '16px' }}>
+                    <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--ct-text)' }}>Order Items</h4>
+                    {itemsLoading ? (
+                      <p style={{ fontSize: '13px', color: 'var(--ct-text-muted)' }}>Loading items...</p>
+                    ) : expandedItems.length === 0 ? (
+                      <p style={{ fontSize: '13px', color: 'var(--ct-text-muted)' }}>No items found.</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {expandedItems.map((item, idx) => (
+                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              {item.imageUrl ? <img src={item.imageUrl} alt="" style={{width: 24, height: 24, borderRadius: 4, objectFit: 'cover'}}/> : '📦'}
+                              {item.name} <span style={{ color: 'var(--ct-text-muted)' }}>× {item.quantity}</span>
+                            </span>
+                            <span>Rs {(item.unitPrice * item.quantity).toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {order.status === 'Delivered' && (
+                      <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+                        <button 
+                          className="ct-btn-gold" 
+                          onClick={(e) => handleMarkReceived(order, e)}
+                          style={{ padding: '8px 16px', fontSize: '13px' }}
+                        >
+                          Mark as Received
+                        </button>
+                      </div>
                     )}
                   </div>
-                  <div className="order-total">
+                )}
+
+                {/* ── Card Bottom: Total ── */}
+                <div className="order-card-bottom" style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: expandedOrderId === order.id ? 'none' : '1px solid rgba(0,0,0,0.05)', paddingTop: expandedOrderId === order.id ? '0' : '16px' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--ct-gold)' }}>Total Amount</span>
+                  <div className="order-total" style={{ fontWeight: 700, fontSize: '16px', color: 'var(--ct-gold)' }}>
                     Rs {order.total.toLocaleString()}
                   </div>
                 </div>

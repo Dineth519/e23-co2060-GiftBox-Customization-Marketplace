@@ -69,16 +69,15 @@ const Header = () => {
       </div>
 
       {/* Center — Nav Links */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', marginRight: '32px' }}>
         {[
           { label: 'Build a Box',  route: '/customer/build-box' },
           { label: 'About Us',     route: '/customer/about-us' },
-          { label: 'Order History', route: '/customer/orders' },
         ].map(item => (
           <button
             key={item.label}
             onClick={() => navigate(item.route)}
-            className="nav-link-btn" // Recommended: move inline styles to CSS
+            className="nav-link-btn" 
             style={{
               background: 'none',
               border: 'none',

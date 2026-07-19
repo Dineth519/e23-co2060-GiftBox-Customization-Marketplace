@@ -1079,7 +1079,6 @@ section {
 .qv-close:hover {
   background: var(--gold);
   color: white;
-  transform: rotate(90deg);
 }
 
 .qv-img-side {
@@ -1397,7 +1396,7 @@ section {
   cursor: pointer;
 }
 
-.ppc-add:hover { transform: scale(1.15) rotate(90deg); }
+.ppc-add:hover { transform: scale(1.15); }
 .ppc-add--added { background: linear-gradient(135deg, #10B981, #059669); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); }
 
 /* Responsive adjustments */
