@@ -16,4 +16,7 @@ public class Assembler extends User {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column(name = "status")
+    private String status = "ACTIVE";
 }
