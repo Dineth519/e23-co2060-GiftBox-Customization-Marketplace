@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiCall } from '../../utils/api';
 import './Orders.css';
 
 // ─── STATIC DATA ─────────────────────────────────────────────────────────────
@@ -111,12 +112,7 @@ export default function Orders() {
         }
 
         // GET /api/customers/{customerId}/orders — fetches ONLY this customer's orders
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/customers/${customerId}/orders`,
-          {
-            headers: { 'Content-Type': 'application/json' },
-          }
-        );
+        const response = await apiCall(`/api/customers/${customerId}/orders`);
 
         if (response.ok) {
           const data = await response.json();
