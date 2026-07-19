@@ -68,9 +68,6 @@ public class OrderController {
             if (request.getCustomerId() == null) {
                 return ResponseEntity.badRequest().body("Validation Error: customerId is required.");
             }
-            if (request.getVendorId() == null) {
-                return ResponseEntity.badRequest().body("Validation Error: vendorId is required for custom boxes.");
-            }
             if (request.getDeliveryAddress() == null || request.getDeliveryAddress().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("Validation Error: deliveryAddress is required.");
             }
@@ -107,7 +104,7 @@ public class OrderController {
             // Create and save the Order
             Order order = new Order();
             order.setCustomerId(request.getCustomerId());
-            order.setVendorId(request.getVendorId());
+            order.setVendorId(null); // Multi-vendor order, no specific vendor assigned
             order.setDeliveryAddress(request.getDeliveryAddress());
             order.setOccasion(request.getOccasion());
             order.setBoxSize(request.getBoxSize());

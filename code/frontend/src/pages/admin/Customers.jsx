@@ -76,7 +76,7 @@ const Customers = () => {
           </div>
           <div className="stat-content">
             <h3 className="stat-number">
-              {customers.filter(c => c.address).length}
+              {customers.filter(c => c.address || c.addressLine1).length}
             </h3>
             <p className="stat-label">With Address</p>
           </div>
@@ -97,33 +97,40 @@ const Customers = () => {
               <p className="empty-text">No customers found.</p>
             </div>
           ) : (
-            filteredCustomers.map((customer) => (
-              <div key={customer.user_id} className="customer-card">
-                
-                {/* Customer avatar section */}
-                <div className="card-avatar">
-                  <div className="avatar-circle">
-                    <FaUser size={22} />
-                  </div>
-                </div>
+            filteredCustomers.map((customer) => {
+              const fullAddress = customer.address || 
+                [customer.addressLine1, customer.addressLine2, customer.city, customer.district, customer.province, customer.postalCode]
+                  .filter(Boolean)
+                  .join(', ') || 
+                "No Address Provided";
 
-                {/* Customer information display */}
-                <div className="card-body">
-                  <h3 className="customer-name">{customer.username}</h3>
-                  <div className="role-badge">Customer</div>
+              return (
+                <div key={customer.user_id || customer.id} className="customer-card">
                   
-                  <div className="info-row">
-                    <FaEnvelope className="info-icon" />
-                    <span className="info-text">{customer.email}</span>
+                  {/* Customer avatar section */}
+                  <div className="card-avatar">
+                    <div className="avatar-circle">
+                      <FaUser size={22} />
+                    </div>
                   </div>
-                  
-                  <div className="info-row">
-                    <FaMapMarkerAlt className="info-icon" />
-                    <span className="info-text">
-                      {customer.address || "No Address Provided"}
-                    </span>
+
+                  {/* Customer information display */}
+                  <div className="card-body">
+                    <h3 className="customer-name">{customer.username}</h3>
+                    <div className="role-badge">Customer</div>
+                    
+                    <div className="info-row">
+                      <FaEnvelope className="info-icon" />
+                      <span className="info-text">{customer.email}</span>
+                    </div>
+                    
+                    <div className="info-row">
+                      <FaMapMarkerAlt className="info-icon" />
+                      <span className="info-text">
+                        {fullAddress}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
                 {/* View profile action button */}
                 <div className="card-footer">
@@ -132,8 +139,9 @@ const Customers = () => {
                   </button>
                 </div>
 
-              </div>
-            ))
+                </div>
+              );
+            })
           )}
         </div>
       )}

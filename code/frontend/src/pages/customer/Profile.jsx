@@ -43,7 +43,7 @@ export default function Profile() {
       }
       try {
         // Fetch profile
-        const res = await fetch(`http://localhost:8080/api/customers/${userId}`);
+        const res = await fetch(`http://localhost:8080/api/users/${userId}`);
         if (res.ok) {
           const data = await res.json();
           setProfile(data);
@@ -83,7 +83,7 @@ export default function Profile() {
     }
     setInfoError('');
     try {
-      const res = await fetch(`http://localhost:8080/api/customers/${userId}`, {
+      const res = await fetch(`http://localhost:8080/api/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -120,7 +120,7 @@ export default function Profile() {
     }
     setPassError('');
     try {
-      const res = await fetch(`http://localhost:8080/api/customers/${userId}/password`, {
+      const res = await fetch(`http://localhost:8080/api/users/${userId}/password`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword: passForm.current, newPassword: passForm.newPass }),
@@ -145,7 +145,7 @@ export default function Profile() {
     }
     setAddrError('');
     try {
-      const res = await fetch(`http://localhost:8080/api/customers/${username}/address`, {
+      const res = await fetch(`http://localhost:8080/api/users/${username}/address`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -161,7 +161,7 @@ export default function Profile() {
       
       if (res.ok) {
         // Also update the main customer record just in case
-        await fetch(`http://localhost:8080/api/customers/${userId}`, {
+        await fetch(`http://localhost:8080/api/users/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

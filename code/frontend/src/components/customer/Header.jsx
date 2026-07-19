@@ -18,7 +18,7 @@ const Header = () => {
         return;
       }
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/customers/${userId}`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`);
         if (res.ok) {
           const data = await res.json();
           setDisplayName(data.name || (username.includes('@') ? username.split('@')[0] : username));
@@ -54,7 +54,6 @@ const Header = () => {
       <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         {[
           { label: 'Build a Box',  route: '/customer/build-box' },
-          { label: 'How It Works', route: '/customer/how-it-works' },
           { label: 'About Us',     route: '/customer/about-us' },
         ].map(item => (
           <button
