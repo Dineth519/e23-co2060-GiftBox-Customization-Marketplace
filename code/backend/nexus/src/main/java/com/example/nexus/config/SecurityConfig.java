@@ -40,11 +40,13 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints — no authentication required
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/categories").permitAll()
                 .requestMatchers("/api/products/**", "/api/items", "/api/boxes/**", "/api/cart/**", "/api/partners/public/**", "/api/vendors/register").permitAll()
                 
                 // Protected endpoints — require authentication
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/seller/**").hasRole("VENDOR")
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/categories").hasRole("ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 
                 // Other endpoints require JWT authentication

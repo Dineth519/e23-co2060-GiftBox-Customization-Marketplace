@@ -45,6 +45,9 @@ public class User {
     private String postalCode;
     private String phoneNumber;
 
+    @Column(columnDefinition = "LONGTEXT")
+    private String profileImageUrl;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

@@ -7,6 +7,7 @@ import './Header.css';
 const Header = () => {
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState('');
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -40,6 +41,7 @@ const Header = () => {
         if (res.ok) {
           const data = await res.json();
           setDisplayName(data.name || (username.includes('@') ? username.split('@')[0] : username));
+          setProfileImageUrl(data.profileImageUrl || null);
         } else {
           setDisplayName(username.includes('@') ? username.split('@')[0] : username);
         }
@@ -69,16 +71,15 @@ const Header = () => {
       </div>
 
       {/* Center — Nav Links */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', marginRight: '32px' }}>
         {[
           { label: 'Build a Box',  route: '/customer/build-box' },
           { label: 'About Us',     route: '/customer/about-us' },
-          { label: 'Order History', route: '/customer/orders' },
         ].map(item => (
           <button
             key={item.label}
             onClick={() => navigate(item.route)}
-            className="nav-link-btn" // Recommended: move inline styles to CSS
+            className="nav-link-btn" 
             style={{
               background: 'none',
               border: 'none',
@@ -120,8 +121,12 @@ const Header = () => {
               <span className="profile-name" style={{ textTransform: 'capitalize' }}>{displayName}</span>
               <span className="profile-role">Customer</span>
             </div>
-            <div className="profile-avatar">
-              <User size={18} />
+            <div className="profile-avatar" style={profileImageUrl ? { padding: 0, overflow: 'hidden', background: 'transparent' } : {}}>
+              {profileImageUrl ? (
+                <img src={profileImageUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              ) : (
+                <User size={18} />
+              )}
             </div>
             <ChevronDown size={14} style={{ color: '#FFFFFF', transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
           </div>
