@@ -23,24 +23,24 @@ public class JwtService {
     private long refreshTokenExpiration;
 
     // ── Generate Access Token ─────────────────────────────────────
-    public String generateToken(Long userId, String username, String role) {
+    public String generateToken(Integer userId, String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("userId", userId)
                 .claim("role", role)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hours
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     // ── Generate Refresh Token ────────────────────────────────────
-    public String generateRefreshToken(Long userId, String username) {
+    public String generateRefreshToken(Integer userId, String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("userId", userId)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // 7 days
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -51,8 +51,8 @@ public class JwtService {
     }
 
     // ── Extract user ID from token ────────────────────────────────
-    public Long extractUserId(String token) {
-        return getClaims(token).get("userId", Long.class);
+    public Integer extractUserId(String token) {
+        return getClaims(token).get("userId", Integer.class);
     }
 
     // ── Extract role from token ───────────────────────────────────

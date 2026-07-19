@@ -31,7 +31,10 @@ export const CartProvider = ({ children }) => {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/add`, {
         method:      'POST',
         credentials: 'include',           // session cookie
-        headers:     { 'Content-Type': 'application/json' },
+        headers:     { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
         body: JSON.stringify({
           productId: product.id,
           name:      product.name,
@@ -57,7 +60,11 @@ export const CartProvider = ({ children }) => {
     try {
       const res = await fetch(
         `${process.env.REACT_APP_API_URL}/api/cart/remove/${productId}`,
-        { method: 'DELETE', credentials: 'include' }
+        { 
+          method: 'DELETE', 
+          credentials: 'include',
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+        }
       );
       const data = await res.json();
       setCartItems(data.items);
@@ -73,7 +80,10 @@ export const CartProvider = ({ children }) => {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/update`, {
         method:      'PUT',
         credentials: 'include',
-        headers:     { 'Content-Type': 'application/json' },
+        headers:     { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
         body: JSON.stringify({ productId, quantity }),
       });
       const data = await res.json();
@@ -88,7 +98,11 @@ export const CartProvider = ({ children }) => {
   const clearCart = useCallback(async () => {
     try {
       await fetch(`${process.env.REACT_APP_API_URL}/api/cart/clear`,
-        { method: 'DELETE', credentials: 'include' }
+        { 
+          method: 'DELETE', 
+          credentials: 'include',
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+        }
       );
       setCartItems([]);
       setItemCount(0);
@@ -102,7 +116,10 @@ export const CartProvider = ({ children }) => {
   const loadCart = useCallback(async () => {
     try {
       const res  = await fetch(`${process.env.REACT_APP_API_URL}/api/cart`,
-        { credentials: 'include' }
+        { 
+          credentials: 'include',
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+        }
       );
       const data = await res.json();
       setCartItems(data.items  || []);

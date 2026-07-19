@@ -1,8 +1,8 @@
 package com.example.nexus.controller;
 
 import com.example.nexus.dto.*;
-import com.example.nexus.model.Customer;
-import com.example.nexus.repository.CustomerRepository;
+import com.example.nexus.model.User;
+import com.example.nexus.repository.UserRepository;
 import com.example.nexus.service.AuthService;
 import com.example.nexus.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class AuthController {
     private JwtService jwtService;
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private UserRepository userRepository;
 
     // ── Register ──────────────────────────────────────────
     @PostMapping("/register")
@@ -70,25 +70,25 @@ public class AuthController {
                 return ResponseEntity.status(401).body(new AuthResponse(false, "Invalid or expired refresh token"));
             }
 
-            Long customerId = jwtService.extractUserId(refreshToken);
+            Integer userId = jwtService.extractUserId(refreshToken);
             String username = jwtService.extractUsername(refreshToken);
             
-            Optional<Customer> customerOpt = customerRepository.findById(customerId);
-            if (customerOpt.isEmpty()) {
-                return ResponseEntity.status(401).body(new AuthResponse(false, "Customer not found"));
+            Optional<User> userOpt = userRepository.findById(userId);
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(401).body(new AuthResponse(false, "User not found"));
             }
 
-            Customer customer = customerOpt.get();
+            User user = userOpt.get();
             String newAccessToken = jwtService.generateToken(
-                customer.getId(), 
-                customer.getUsername(), 
-                customer.getRole().name()
+                user.getId(), 
+                user.getUsername(), 
+                user.getRole().name()
             );
 
             AuthResponse response = new AuthResponse(true, "Token refreshed");
             response.setAccessToken(newAccessToken);
-            response.setRole(customer.getRole().name());
-            response.setUserId(customer.getId().intValue());
+            response.setRole(user.getRole().name());
+            response.setUserId(user.getId().intValue());
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -110,22 +110,22 @@ public class AuthController {
                 return ResponseEntity.status(401).body(new AuthResponse(false, "Invalid or expired token"));
             }
 
-            Long customerId = jwtService.extractUserId(token);
-            Optional<Customer> customerOpt = customerRepository.findById(customerId);
+            Integer userId = jwtService.extractUserId(token);
+            Optional<User> userOpt = userRepository.findById(userId);
 
-            if (customerOpt.isEmpty()) {
-                return ResponseEntity.status(404).body(new AuthResponse(false, "Customer not found"));
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(404).body(new AuthResponse(false, "User not found"));
             }
 
-            Customer customer = customerOpt.get();
+            User user = userOpt.get();
             
             java.util.Map<String, Object> userInfo = new java.util.LinkedHashMap<>();
-            userInfo.put("id", customer.getId());
-            userInfo.put("username", customer.getUsername());
-            userInfo.put("email", customer.getEmail());
-            userInfo.put("name", customer.getName());
-            userInfo.put("role", customer.getRole().name());
-            userInfo.put("verified", customer.isVerified());
+            userInfo.put("id", user.getId());
+            userInfo.put("username", user.getUsername());
+            userInfo.put("email", user.getEmail());
+            userInfo.put("name", user.getName());
+            userInfo.put("role", user.getRole().name());
+            userInfo.put("verified", user.isVerified());
 
             return ResponseEntity.ok(userInfo);
         } catch (Exception e) {

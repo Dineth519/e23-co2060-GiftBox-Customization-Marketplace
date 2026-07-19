@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && jwtService.isTokenValid(token)) {
             String username = jwtService.extractUsername(token);
             String role = jwtService.extractRole(token);
-            Long userId = jwtService.extractUserId(token);
+            Integer userId = jwtService.extractUserId(token);
 
             // Create authorities from role
             List<GrantedAuthority> authorities = new ArrayList<>();

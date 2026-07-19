@@ -1,9 +1,7 @@
 package com.example.nexus.service;
 
 import com.example.nexus.dto.*;
-import com.example.nexus.model.Customer;
 import com.example.nexus.model.Role;
-import com.example.nexus.repository.CustomerRepository;
 import com.example.nexus.model.User;
 import com.example.nexus.repository.UserRepository;
 import com.example.nexus.model.Vendor;
@@ -143,7 +141,7 @@ public class AuthService {
             return new AuthResponse(false, "Incorrect password");
         }
 
-        // ✅ Generate JWT tokens
+        // Generate JWT tokens
         String accessToken = jwtService.generateToken(user.getId(), user.getUsername(), user.getRole().name());
         String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername());
 
