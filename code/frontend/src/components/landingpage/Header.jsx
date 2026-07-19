@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
 import CartBadge from './CartBadge.jsx';
-import logoImg from '../../assets/logo.png';
+import logoMarkImg from '../../assets/logo_mark.png';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const Header = () => {
 
         {/* ── Logo ── */}
         <div className="header-logo" onClick={() => navigate('/')}>
-          <img src={logoImg} alt="Giftora Logo" className="logo-img" />
+          <img src={logoMarkImg} alt="Giftora Logo" className="logo-mark-img" />
           <span className="logo-text">Giftora</span>
         </div>
 

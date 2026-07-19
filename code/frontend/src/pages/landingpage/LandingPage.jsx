@@ -1,5 +1,6 @@
 // Core libraries and routing
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 
 // Layout components
@@ -11,6 +12,7 @@ import { useCart } from '../../context/CartContext';
 
 // Stylesheet
 import './LandingPage.css';
+import './ProductsPage.css'; // For Quick View modal styles
 import landingPage1Img from '../../assets/landingpage/landing_page_1.png';
 import landingPage2Img from '../../assets/landingpage/landing_page_2.png';
 
@@ -862,6 +864,21 @@ const CATEGORY_MAP = {
   30: "Flowers & Botanicals", 31: "Fresh Flowers", 32: "Preserved & Dried Flowers", 33: "Mini Succulents"
 };
 
+const CAT_ICONS = { 
+  All: '🛍️', 
+  'Drinks & Beverages': '🍷', Watches: '⌚', 'Perfume & Fragrance': '🌸', 
+  'Teddy Bears & Plushes': '🧸', 'Jewelry & Accessories': '💍', 'Chocolates & Sweets': '🍫',
+  "Men's Watches": '⌚', "Ladies' Watches": '⌚', "Minimalist Watches": '⌚',
+  "Premium Truffles": '🍫', "Bakery & Cookies": '🍪', "Macarons & Cupcakes": '🧁',
+  "Men's Fragrances": '🌸', "Ladies' Perfumes": '🌸',
+  "Plush Toys": '🧸', "Newborn Plushes": '🧸',
+  "Bangles & Bracelets": '💍', "Necklaces & Pendants": '💍', Earrings: '💍',
+  "Non-Alcoholic Wines": '🍷', "Gourmet Coffee & Teas": '☕',
+  "Self-Care & Wellness": '🧼', "Scented Candles": '🕯️', "Organic Soaps & Bath": '🧼', "Lotions & Skincare": '🧴',
+  "Gift Boxes & Packaging": '📦', "Wooden Keepsake Boxes": '📦', "Magnetic Cardboard Boxes": '📦', "Velvet Gift Boxes": '🎁',
+  "Flowers & Botanicals": '💐', "Fresh Flowers": '💐', "Preserved & Dried Flowers": '🥀', "Mini Succulents": '🌵'
+};
+
 const TrendingGrid = () => {
   const navigate = useNavigate();
   const { addToCart, addedId } = useCart();
@@ -1051,43 +1068,39 @@ const TrendingGrid = () => {
       </div>
 
       {/* Quick View Modal */}
-      {quickView && (
-        <div className="qv-overlay" onClick={() => setQuickView(null)}>
+      {quickView && createPortal(
+        <div className="qv-backdrop" onClick={() => setQuickView(null)}>
           <div className="qv-modal" onClick={e => e.stopPropagation()}>
             <button className="qv-close" onClick={() => setQuickView(null)}>✕</button>
-            <div className="qv-image">
-              <img src={quickView.imageUrl} alt={quickView.name} className="quick-view-image" />
+            <div className="qv-img-side">
+              <img src={quickView.imageUrl} alt={quickView.name} />
+              <div className="qv-img-grad" />
             </div>
-            <div className="qv-body">
-              <span className="t-card__category">{CATEGORY_MAP[quickView.categoryId] || 'Gift Item'}</span>
-              <h3 className="qv-name">{quickView.name}</h3>
-              <div className="qv-stars">
-                {Array.from({ length: 5 }, (_, idx) => (
-                  <span key={idx} style={{ color: idx < Math.round(Number(quickView.rating || 5)) ? 'var(--gold)' : 'rgba(0,0,0,0.15)' }}>★</span>
-                ))}
-                <span> {quickView.rating ? Number(quickView.rating).toFixed(1) : '5.0'} rating</span>
+            <div className="qv-info-side">
+              <div className="qv-cat-tag">
+                {CAT_ICONS[CATEGORY_MAP[quickView.categoryId]] || '🎁'} {CATEGORY_MAP[quickView.categoryId] || 'Gift'}
               </div>
-              <div className="qv-price" style={{ margin: '12px 0' }}>LKR {Number(quickView.price).toLocaleString()}</div>
-              <p className="qv-desc">{quickView.description || 'A premium curated gift item from Giftora\'s partners. Beautifully packaged and ready to delight.'}</p>
-              
-              <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+              <h3 className="qv-name">{quickView.name}</h3>
+              <div className="qv-stars-row">★★★★★ <span>5.0 · Premium Quality</span></div>
+              <div className="qv-price">LKR {Number(quickView.price).toLocaleString()}</div>
+              <div className="qv-sep" />
+              <p className="qv-desc">{quickView.description || "A premium curated gift from Giftora's exclusive collection. Hand-packed with love, beautifully presented, and ready to create a lasting memory."}</p>
+              <div className="qv-features">
+                {['🎀 Gift Wrapped','✍️ Personal Note','🚚 Island-wide Delivery'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
+              </div>
+              <div className="qv-actions">
                 <button
-                  className="qv-view-btn"
-                  onClick={() => {
-                    addToCart(quickView);
-                    setQuickView(null);
-                  }}
-                  style={{ flex: 1, background: 'linear-gradient(135deg, var(--gold), var(--gold-light))', color: '#fff' }}
+                  className="qv-cta qv-cta--primary"
+                  onClick={() => { addToCart(quickView); setQuickView(null); }}
                 >
-                  Add to Cart
+                  🛒 Add to Cart
                 </button>
-                <button className="qv-view-btn qv-view-btn--outline" onClick={() => { setQuickView(null); navigate('/products'); }} style={{ flex: 1 }}>
-                  View All Products →
-                </button>
+                <button className="qv-cta qv-cta--outline" onClick={() => { setQuickView(null); navigate('/products'); }}>View All →</button>
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

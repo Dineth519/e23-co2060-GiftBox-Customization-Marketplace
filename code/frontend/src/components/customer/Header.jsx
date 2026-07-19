@@ -18,7 +18,11 @@ const Header = () => {
         return;
       }
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
         if (res.ok) {
           const data = await res.json();
           setDisplayName(data.name || (username.includes('@') ? username.split('@')[0] : username));
@@ -37,7 +41,7 @@ const Header = () => {
   const handleExit = () => {
     localStorage.clear();
     console.log("User logged out");
-    navigate('/login'); 
+    navigate('/'); 
   };
 
   return (
@@ -55,6 +59,7 @@ const Header = () => {
         {[
           { label: 'Build a Box',  route: '/customer/build-box' },
           { label: 'About Us',     route: '/customer/about-us' },
+          { label: 'Order History', route: '/customer/orders' },
         ].map(item => (
           <button
             key={item.label}

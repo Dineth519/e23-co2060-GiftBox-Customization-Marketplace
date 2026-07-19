@@ -43,7 +43,9 @@ export default function Profile() {
       }
       try {
         // Fetch profile
-        const res = await fetch(`http://localhost:8080/api/users/${userId}`);
+        const res = await fetch(`http://localhost:8080/api/users/${userId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+        });
         if (res.ok) {
           const data = await res.json();
           setProfile(data);
@@ -85,7 +87,10 @@ export default function Profile() {
     try {
       const res = await fetch(`http://localhost:8080/api/users/${userId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
         body: JSON.stringify({
           name: infoForm.name,
           email: infoForm.email,
@@ -122,7 +127,10 @@ export default function Profile() {
     try {
       const res = await fetch(`http://localhost:8080/api/users/${userId}/password`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
         body: JSON.stringify({ currentPassword: passForm.current, newPassword: passForm.newPass }),
       });
       const data = await res.json();
@@ -147,7 +155,10 @@ export default function Profile() {
     try {
       const res = await fetch(`http://localhost:8080/api/users/${username}/address`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
         body: JSON.stringify({
           addressLine1: addrForm.line1,
           addressLine2: addrForm.line2,
@@ -163,7 +174,10 @@ export default function Profile() {
         // Also update the main customer record just in case
         await fetch(`http://localhost:8080/api/users/${userId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
             body: JSON.stringify({
               addressLine1: addrForm.line1,
               addressLine2: addrForm.line2,

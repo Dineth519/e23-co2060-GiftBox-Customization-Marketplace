@@ -19,12 +19,18 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+  
+    @Autowired
+    private VendorRepository vendorRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private JwtService jwtService;
 
     // ── Register ───────────────────────────────
     public AuthResponse register(RegisterRequest request) {
@@ -94,10 +100,7 @@ public class AuthService {
         return new AuthResponse(true, "Email verified successfully! You can now login.");
     }
 
-    @Autowired
-    private VendorRepository vendorRepository;
-
-    // ── Login ──────────────────────────────────
+    // ── Login with JWT ────────────────────────
     public AuthResponse login(LoginRequest request) {
 
         String loginInput = request.getUsername();
@@ -138,8 +141,18 @@ public class AuthService {
             return new AuthResponse(false, "Incorrect password");
         }
 
-        // Changed part: sending Role and User ID
-        return new AuthResponse(true, "Login Successful", user.getRole().name(), user.getId().intValue());
+        // Generate JWT tokens
+        String accessToken = jwtService.generateToken(user.getId(), user.getUsername(), user.getRole().name());
+        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername());
+
+        // Return response with tokens
+        AuthResponse response = new AuthResponse(true, "Login successful");
+        response.setAccessToken(accessToken);
+        response.setRefreshToken(refreshToken);
+        response.setRole(user.getRole().name());
+        response.setUserId(user.getId().intValue());
+        
+        return response;
     }
 
     // ── Resend Code ────────────────────────────
@@ -163,8 +176,9 @@ public class AuthService {
         user.setCodeExpiresAt(LocalDateTime.now().plusMinutes(10));
         userRepository.save(user);
 
+        // Send email
         emailService.sendVerificationCode(email, newCode);
 
-        return new AuthResponse(true, "New verification code sent!");
+        return new AuthResponse(true, "Verification code resent. Check your email.");
     }
 }
