@@ -63,116 +63,67 @@ public class OrderController {
     @PostMapping("/orders/custom-box")
     @Transactional
     public ResponseEntity<?> placeCustomBoxOrder(@RequestBody CreateOrderRequest request) {
-        // Validate request
-        if (request.getCustomerId() == null || request.getVendorId() == null || request.getItems() == null || request.getItems().isEmpty()) {
-            return ResponseEntity.badRequest().body("Invalid order request. Missing required fields.");
-        }
-
-        BigDecimal totalAmount = BigDecimal.ZERO;
-
-        // Calculate box fee
-        BigDecimal boxFee = getBoxFee(request.getBoxSize());
-        totalAmount = totalAmount.add(boxFee);
-
-        // Fetch products and calculate total items price, check stock
-        for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
-            Product product = productRepository.findById(itemReq.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemReq.getProductId()));
-            
-            if (product.getStockQuantity() < itemReq.getQuantity()) {
-                return ResponseEntity.badRequest().body("Insufficient stock for product: " + product.getName());
+        try {
+            // Validate request
+            if (request.getCustomerId() == null) {
+                return ResponseEntity.badRequest().body("Validation Error: customerId is required.");
             }
-
-            BigDecimal itemSubtotal = product.getPrice().multiply(new BigDecimal(itemReq.getQuantity()));
-            totalAmount = totalAmount.add(itemSubtotal);
-        }
-
-        // Create and save the Order
-        Order order = new Order();
-        order.setCustomerId(request.getCustomerId());
-        order.setVendorId(request.getVendorId());
-        order.setDeliveryAddress(request.getDeliveryAddress());
-        order.setOccasion(request.getOccasion());
-        order.setBoxSize(request.getBoxSize());
-        order.setGiftMessage(request.getGiftMessage());
-        order.setRecipientName(request.getRecipientName());
-        order.setWrappingStyle(request.getWrappingStyle());
-        order.setStatus("PENDING");
-        order.setTotalAmount(totalAmount);
-
-        Order savedOrder = orderRepository.save(order);
-
-        // Save OrderItems and update product stock
-        for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
-            Product product = productRepository.findById(itemReq.getProductId()).get();
-            
-            // Decrement stock
-            product.setStockQuantity(product.getStockQuantity() - itemReq.getQuantity());
-            productRepository.save(product);
-
-            // Create OrderItem
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrderId(savedOrder.getOrderId());
-            orderItem.setProductId(product.getId());
-            orderItem.setQuantity(itemReq.getQuantity());
-            orderItem.setUnitPrice(product.getPrice());
-            
-            orderItemRepository.save(orderItem);
-        }
-
-        return ResponseEntity.ok(savedOrder);
-    }
-
-    // 4. Place standard cart order (multi-vendor split)
-    @PostMapping("/orders/standard")
-    @Transactional
-    public ResponseEntity<?> placeStandardOrder(@RequestBody CreateOrderRequest request) {
-        if (request.getCustomerId() == null || request.getItems() == null || request.getItems().isEmpty()) {
-            return ResponseEntity.badRequest().body("Invalid order request. Missing required fields.");
-        }
-
-        // Group items by vendorId
-        java.util.Map<Integer, java.util.List<CreateOrderRequest.OrderItemRequest>> itemsByVendor = new java.util.HashMap<>();
-        for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
-            Product product = productRepository.findById(itemReq.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemReq.getProductId()));
-            
-            if (product.getStockQuantity() < itemReq.getQuantity()) {
-                return ResponseEntity.badRequest().body("Insufficient stock for product: " + product.getName());
+            if (request.getDeliveryAddress() == null || request.getDeliveryAddress().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Validation Error: deliveryAddress is required.");
             }
-            
-            itemsByVendor.computeIfAbsent(product.getVendorId(), k -> new java.util.ArrayList<>()).add(itemReq);
-        }
-
-        java.util.List<Order> savedOrders = new java.util.ArrayList<>();
-
-        // Create one order per vendor
-        for (java.util.Map.Entry<Integer, java.util.List<CreateOrderRequest.OrderItemRequest>> entry : itemsByVendor.entrySet()) {
-            Integer vendorId = entry.getKey();
-            java.util.List<CreateOrderRequest.OrderItemRequest> vendorItems = entry.getValue();
+            if (request.getBoxSize() == null || request.getBoxSize().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Validation Error: boxSize is required for custom boxes.");
+            }
+            if (request.getRecipientName() == null || request.getRecipientName().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Validation Error: recipientName is required for custom boxes.");
+            }
+            if (request.getItems() == null || request.getItems().isEmpty()) {
+                return ResponseEntity.badRequest().body("Validation Error: items list cannot be empty.");
+            }
 
             BigDecimal totalAmount = BigDecimal.ZERO;
-            for (CreateOrderRequest.OrderItemRequest itemReq : vendorItems) {
-                Product product = productRepository.findById(itemReq.getProductId()).get();
+
+            // Calculate box fee
+            BigDecimal boxFee = getBoxFee(request.getBoxSize());
+            totalAmount = totalAmount.add(boxFee);
+
+            // Fetch products and calculate total items price, check stock
+            for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
+                Product product = productRepository.findById(itemReq.getProductId())
+                        .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemReq.getProductId()));
+                
+                int stock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+                if (stock < itemReq.getQuantity()) {
+                    return ResponseEntity.badRequest().body("Insufficient stock for product: " + product.getName());
+                }
+
                 BigDecimal itemSubtotal = product.getPrice().multiply(new BigDecimal(itemReq.getQuantity()));
                 totalAmount = totalAmount.add(itemSubtotal);
             }
 
+            // Create and save the Order
             Order order = new Order();
             order.setCustomerId(request.getCustomerId());
-            order.setVendorId(vendorId);
+            order.setVendorId(null); // Multi-vendor order, no specific vendor assigned
             order.setDeliveryAddress(request.getDeliveryAddress());
+            order.setOccasion(request.getOccasion());
+            order.setBoxSize(request.getBoxSize());
+            order.setGiftMessage(request.getGiftMessage());
+            order.setRecipientName(request.getRecipientName());
+            order.setWrappingStyle(request.getWrappingStyle());
             order.setStatus("PENDING");
+            order.setOrderType("CUSTOM_BOX");
             order.setTotalAmount(totalAmount);
 
             Order savedOrder = orderRepository.save(order);
-            savedOrders.add(savedOrder);
 
-            for (CreateOrderRequest.OrderItemRequest itemReq : vendorItems) {
+            // Save OrderItems and update product stock
+            for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
                 Product product = productRepository.findById(itemReq.getProductId()).get();
                 
-                // Decrement stock
-                product.setStockQuantity(product.getStockQuantity() - itemReq.getQuantity());
+                // Decrement stock gracefully
+                int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+                product.setStockQuantity(currentStock - itemReq.getQuantity());
                 productRepository.save(product);
 
                 // Create OrderItem
@@ -184,9 +135,113 @@ public class OrderController {
                 
                 orderItemRepository.save(orderItem);
             }
-        }
+            
+            // Build a safe response map to prevent Jackson serialization issues
+            java.util.Map<String, Object> orderDto = new java.util.HashMap<>();
+            orderDto.put("orderId", savedOrder.getOrderId());
+            orderDto.put("vendorId", savedOrder.getVendorId());
+            orderDto.put("orderType", savedOrder.getOrderType());
+            orderDto.put("totalAmount", savedOrder.getTotalAmount());
+            orderDto.put("status", savedOrder.getStatus());
+            orderDto.put("createdAt", savedOrder.getCreatedAt());
 
-        return ResponseEntity.ok(savedOrders);
+            return ResponseEntity.ok(orderDto);
+        } catch (Exception e) {
+            java.io.StringWriter sw = new java.io.StringWriter();
+            e.printStackTrace(new java.io.PrintWriter(sw));
+            return ResponseEntity.status(500).body("Error: " + e.getMessage() + "\n" + sw.toString());
+        }
+    }
+
+    // 4. Place standard cart order (multi-vendor split)
+    @PostMapping("/orders/standard")
+    @Transactional
+    public ResponseEntity<?> placeStandardOrder(@RequestBody CreateOrderRequest request) {
+        try {
+            // Validate request
+            if (request.getCustomerId() == null) {
+                return ResponseEntity.badRequest().body("Validation Error: customerId is required.");
+            }
+            if (request.getDeliveryAddress() == null || request.getDeliveryAddress().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Validation Error: deliveryAddress is required.");
+            }
+            if (request.getItems() == null || request.getItems().isEmpty()) {
+                return ResponseEntity.badRequest().body("Validation Error: items list cannot be empty.");
+            }
+
+            // Group items by vendorId
+            java.util.Map<Integer, java.util.List<CreateOrderRequest.OrderItemRequest>> itemsByVendor = new java.util.HashMap<>();
+            for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
+                Product product = productRepository.findById(itemReq.getProductId())
+                        .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemReq.getProductId()));
+                
+                int stock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+                if (stock < itemReq.getQuantity()) {
+                    return ResponseEntity.badRequest().body("Insufficient stock for product: " + product.getName());
+                }
+                
+                itemsByVendor.computeIfAbsent(product.getVendorId(), k -> new java.util.ArrayList<>()).add(itemReq);
+            }
+
+            java.util.List<java.util.Map<String, Object>> responseList = new java.util.ArrayList<>();
+
+            // Create one order per vendor
+            for (java.util.Map.Entry<Integer, java.util.List<CreateOrderRequest.OrderItemRequest>> entry : itemsByVendor.entrySet()) {
+                Integer vendorId = entry.getKey();
+                java.util.List<CreateOrderRequest.OrderItemRequest> vendorItems = entry.getValue();
+
+                BigDecimal totalAmount = BigDecimal.ZERO;
+                for (CreateOrderRequest.OrderItemRequest itemReq : vendorItems) {
+                    Product product = productRepository.findById(itemReq.getProductId()).get();
+                    BigDecimal itemSubtotal = product.getPrice().multiply(new BigDecimal(itemReq.getQuantity()));
+                    totalAmount = totalAmount.add(itemSubtotal);
+                }
+
+                Order order = new Order();
+                order.setCustomerId(request.getCustomerId());
+                order.setVendorId(vendorId);
+                order.setDeliveryAddress(request.getDeliveryAddress());
+                order.setStatus("PENDING");
+                order.setOrderType("STANDARD");
+                order.setTotalAmount(totalAmount);
+
+                Order savedOrder = orderRepository.save(order);
+
+                for (CreateOrderRequest.OrderItemRequest itemReq : vendorItems) {
+                    Product product = productRepository.findById(itemReq.getProductId()).get();
+                    
+                    // Decrement stock gracefully
+                    int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+                    product.setStockQuantity(currentStock - itemReq.getQuantity());
+                    productRepository.save(product);
+
+                    // Create OrderItem
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setOrderId(savedOrder.getOrderId());
+                    orderItem.setProductId(product.getId());
+                    orderItem.setQuantity(itemReq.getQuantity());
+                    orderItem.setUnitPrice(product.getPrice());
+                    
+                    orderItemRepository.save(orderItem);
+                }
+                
+                // Build a safe response map to prevent Jackson serialization issues
+                java.util.Map<String, Object> orderDto = new java.util.HashMap<>();
+                orderDto.put("orderId", savedOrder.getOrderId());
+                orderDto.put("vendorId", savedOrder.getVendorId());
+                orderDto.put("orderType", savedOrder.getOrderType());
+                orderDto.put("totalAmount", savedOrder.getTotalAmount());
+                orderDto.put("status", savedOrder.getStatus());
+                orderDto.put("createdAt", savedOrder.getCreatedAt());
+                responseList.add(orderDto);
+            }
+
+            return ResponseEntity.ok(responseList);
+        } catch (Exception e) {
+            java.io.StringWriter sw = new java.io.StringWriter();
+            e.printStackTrace(new java.io.PrintWriter(sw));
+            return ResponseEntity.status(500).body("Error: " + e.getMessage() + "\n" + sw.toString());
+        }
     }
 
     private BigDecimal getBoxFee(String boxSize) {

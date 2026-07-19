@@ -23,25 +23,14 @@ public class CategoryController {
     @Transactional(readOnly = true)
     public ResponseEntity<?> getCategoryTree() {
         try {
-            List<Category> roots = categoryRepository.findByParentIsNull();
+            List<Category> allCategories = categoryRepository.findAll();
             List<Map<String, Object>> result = new ArrayList<>();
 
-            for (Category root : roots) {
-                Map<String, Object> parentMap = new LinkedHashMap<>();
-                parentMap.put("id", root.getId());
-                parentMap.put("name", root.getName());
-
-                List<Map<String, Object>> subs = new ArrayList<>();
-                if (root.getSubcategories() != null) {
-                    for (Category sub : root.getSubcategories()) {
-                        Map<String, Object> subMap = new LinkedHashMap<>();
-                        subMap.put("id", sub.getId());
-                        subMap.put("name", sub.getName());
-                        subs.add(subMap);
-                    }
-                }
-                parentMap.put("subcategories", subs);
-                result.add(parentMap);
+            for (Category cat : allCategories) {
+                Map<String, Object> map = new LinkedHashMap<>();
+                map.put("id", cat.getId());
+                map.put("name", cat.getName());
+                result.add(map);
             }
 
             return ResponseEntity.ok(result);

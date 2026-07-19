@@ -4,6 +4,8 @@ import com.example.nexus.dto.*;
 import com.example.nexus.model.Role;
 import com.example.nexus.model.User;
 import com.example.nexus.repository.UserRepository;
+import com.example.nexus.model.Vendor;
+import com.example.nexus.repository.VendorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -92,12 +94,33 @@ public class AuthService {
         return new AuthResponse(true, "Email verified successfully! You can now login.");
     }
 
+    @Autowired
+    private VendorRepository vendorRepository;
+
     // ── Login ──────────────────────────────────
     public AuthResponse login(LoginRequest request) {
 
-        Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
+        String loginInput = request.getUsername();
+
+        // 1. Try by Username
+        Optional<User> userOpt = userRepository.findByUsername(loginInput);
+        
+        // 2. Try by Email
         if (userOpt.isEmpty()) {
-            userOpt = userRepository.findByEmail(request.getUsername());
+            userOpt = userRepository.findByEmail(loginInput);
+        }
+
+        // 3. Try by Owner/Full Name
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByName(loginInput);
+        }
+
+        // 4. Try by Vendor Shop Name
+        if (userOpt.isEmpty()) {
+            Optional<Vendor> vendorOpt = vendorRepository.findByShopName(loginInput);
+            if (vendorOpt.isPresent()) {
+                userOpt = userRepository.findById(vendorOpt.get().getVendorId());
+            }
         }
 
         if (userOpt.isEmpty()) {
@@ -115,7 +138,7 @@ public class AuthService {
             return new AuthResponse(false, "Incorrect password");
         }
 
-        // 👈 වෙනස් කරපු තැන: Role එක සහ User ID එක යවනවා
+        // Changed part: sending Role and User ID
         return new AuthResponse(true, "Login Successful", user.getRole().name(), user.getId().intValue());
     }
 

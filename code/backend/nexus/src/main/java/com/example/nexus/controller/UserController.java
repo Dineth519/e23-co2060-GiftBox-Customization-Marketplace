@@ -20,7 +20,7 @@ public class UserController {
 
     // Get single user by ID
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
         return userRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -28,7 +28,7 @@ public class UserController {
 
     // Update user profile details
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
         return userRepository.findById(id).map(user -> {
             if (updatedUser.getName() != null) user.setName(updatedUser.getName());
             if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
@@ -46,7 +46,7 @@ public class UserController {
 
     // Update user password
     @PutMapping("/{id}/password")
-    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody java.util.Map<String, String> request) {
+    public ResponseEntity<?> updatePassword(@PathVariable Integer id, @RequestBody java.util.Map<String, String> request) {
         return userRepository.findById(id).map(user -> {
             String currentPassword = request.get("currentPassword");
             String newPassword = request.get("newPassword");
@@ -102,7 +102,7 @@ public class UserController {
     }
 
     // Temporary test — add a dummy user (delete this after testing)
-    @GetMapping("/add-test-user")
+    @GetMapping("/add-test-customer")
     public String addTestUser() {
         User newUser = new User();
         newUser.setUsername("giftbox_fan");

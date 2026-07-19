@@ -272,7 +272,7 @@ const VendorDashboard = () => {
                 </thead>
                 <tbody>
                   {recent.map((o) => (
-                    <tr key={o.order_id}>
+                    <tr key={o.order_id} className={o.status === 'PENDING' ? 'sd-tr-pending-special' : ''}>
                       <td className="sd-td-id">#{o.order_id}</td>
                       <td>{o.delivery_address}</td>
                       <td className="sd-td-time">{timeAgo(o.created_at)}</td>

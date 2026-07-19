@@ -1,7 +1,6 @@
 package com.example.nexus.controller;
 
 import com.example.nexus.model.Vendor;
-import com.example.nexus.model.User;
 import com.example.nexus.model.Role;
 import com.example.nexus.dto.VendorRegisterRequest;
 import com.example.nexus.repository.VendorRepository;
@@ -45,25 +44,28 @@ public class VendorController {
      */
     @PutMapping("/{id}/status")
     public ResponseEntity<Vendor> updateStatus(
-            @PathVariable Integer id, 
+            @PathVariable Integer id,
             @RequestParam String status) {
-        
+
         // 1. Retrieve the vendor record by ID, or throw an error if not found
         Vendor vendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found with id: " + id));
 
         // 2. Modify the status field
         vendor.setStatus(status);
-        
+
         // 3. Save the updated record back to the database
         Vendor updatedVendor = vendorRepository.save(vendor);
-        
+
         // 4. Return the updated object with a 200 OK response
         return ResponseEntity.ok(updatedVendor);
     }
 
     /**
      * Registers a new vendor application.
+     * Vendor extends User under the hood, so a single Vendor instance carries
+     * both the account fields and the shop details. Saving it once persists
+     * both sides through the shared id.
      */
     @PostMapping("/register")
     public ResponseEntity<?> registerVendor(@RequestBody VendorRegisterRequest request) {
@@ -75,20 +77,17 @@ public class VendorController {
                 return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email already registered"));
             }
 
-            // 1. Create User
-            User user = new User();
-            user.setName(request.getOwnerName());
-            user.setUsername(request.getEmail()); // Use email as username for vendor login
-            user.setEmail(request.getEmail());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setRole(Role.VENDOR);
-            user.setVerified(true); // Auto-verify email for vendor registration convenience
-
-            userRepository.save(user);
-
-            // 2. Create Vendor
             Vendor vendor = new Vendor();
-            vendor.setVendorId(user.getId().intValue());
+
+            // Account fields
+            vendor.setName(request.getOwnerName());
+            vendor.setUsername(request.getEmail()); // Use email as username for vendor login
+            vendor.setEmail(request.getEmail());
+            vendor.setPassword(passwordEncoder.encode(request.getPassword()));
+            vendor.setRole(Role.VENDOR);
+            vendor.setVerified(true); // Auto-verify email for vendor registration convenience
+
+            // Shop details
             vendor.setShopName(request.getShopName());
             vendor.setFullName(request.getOwnerName());
             vendor.setPhoneNumber(request.getPhone());

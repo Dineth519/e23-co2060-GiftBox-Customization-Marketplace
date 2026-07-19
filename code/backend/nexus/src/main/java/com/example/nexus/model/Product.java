@@ -22,6 +22,7 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
@@ -45,6 +46,10 @@ public class Product {
     @JsonProperty("isActive")
     @Column(name = "is_active")
     private Integer isActive; // 1 = Active, 0 = Inactive
+
+    @JsonProperty("subCategory")
+    @Column(name = "sub_category", length = 100)
+    private String subCategory;
 
     private BigDecimal rating;
 
@@ -86,4 +91,7 @@ public class Product {
 
     public BigDecimal getRating() { return rating; }
     public void setRating(BigDecimal rating) { this.rating = rating; }
+
+    public String getSubCategory() { return subCategory; }
+    public void setSubCategory(String subCategory) { this.subCategory = subCategory; }
 }

@@ -52,9 +52,10 @@
   margin-right: auto;
 }
 
-.logo-icon {
-  font-size: 28px;
-  filter: drop-shadow(0 2px 6px rgba(201, 169, 97, 0.4));
+.logo-img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
 }
 
 .logo-text {

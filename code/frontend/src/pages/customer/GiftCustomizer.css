@@ -1,0 +1,631 @@
+/* GiftCustomizer.css
+   Matches Giftora's dark theme — dark navy background, gold accents.
+   All styles are scoped with "gc-" prefix to avoid conflicts with
+   your teammates' CSS files. */
+
+/* ── Google Fonts import ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── CSS Variables (Giftora colour tokens) ───────────────────────────────── */
+:root {
+  --gc-bg:          #12122A;   /* deep navy — main background             */
+  --gc-surface:     #1C1C38;   /* slightly lighter navy — cards/panels    */
+  --gc-surface2:    #23234A;   /* even lighter — hover states             */
+  --gc-border:      #2E2E5A;   /* subtle border colour                    */
+  --gc-gold:        #D4A843;   /* primary gold accent                     */
+  --gc-gold-light:  #F0C96A;   /* lighter gold for hover                  */
+  --gc-text:        #E8E8F0;   /* primary text                            */
+  --gc-text-muted:  #8888AA;   /* secondary/muted text                    */
+  --gc-green:       #1D9E75;   /* success green                           */
+  --gc-radius:      12px;
+  --gc-radius-sm:   8px;
+}
+
+/* ── Page wrapper ────────────────────────────────────────────────────────── */
+/* This is the outermost div — full width, dark background */
+.gc-page {
+  min-height: 100vh;
+  background: var(--gc-bg);
+  color: var(--gc-text);
+  font-family: 'DM Sans', sans-serif;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* ── Page Header ─────────────────────────────────────────────────────────── */
+.gc-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+/* Small pill badge above the title */
+.gc-badge {
+  display: inline-block;
+  background: rgba(212, 168, 67, 0.12);
+  color: var(--gc-gold);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  border-radius: 20px;
+  padding: 4px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Main heading — uses Playfair Display like the homepage */
+.gc-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 600;
+  color: var(--gc-text);
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+/* The italic "Perfect Gift" part */
+.gc-title em {
+  font-style: italic;
+  color: var(--gc-gold);
+  font-weight: 400;
+}
+
+.gc-subtitle {
+  color: var(--gc-text-muted);
+  font-size: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Main Layout ─────────────────────────────────────────────────────────── */
+/* Two columns: steps on the left, summary on the right.
+   On mobile (<768px) they stack vertically (see media query at bottom). */
+.gc-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Steps Panel (left column) ───────────────────────────────────────────── */
+.gc-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Each step is a collapsible card */
+.gc-step {
+  background: var(--gc-surface);
+  border: 1px solid var(--gc-border);
+  border-radius: var(--gc-radius);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+/* When step is open/active, highlight the border with gold */
+.gc-step.open {
+  border-color: rgba(212, 168, 67, 0.4);
+}
+
+/* Step header — the clickable row with number + label */
+.gc-step-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  color: var(--gc-text);
+  cursor: pointer;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.gc-step-header:hover {
+  background: var(--gc-surface2);
+}
+
+/* Circular step number badge */
+.gc-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gc-gold);
+  color: #12122A;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gc-step-label {
+  font-size: 15px;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* Small summary text shown when a step is completed */
+.gc-step-done {
+  font-size: 12px;
+  color: var(--gc-gold);
+  background: rgba(212, 168, 67, 0.1);
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+/* Content area inside each step */
+.gc-step-body {
+  padding: 0 1.25rem 1.25rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Step 1: Box Size Cards ───────────────────────────────────────────────── */
+.gc-size-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.gc-size-card {
+  background: var(--gc-surface2);
+  border: 1px solid var(--gc-border);
+  border-radius: var(--gc-radius-sm);
+  padding: 14px 12px;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--gc-text);
+}
+
+.gc-size-card:hover {
+  border-color: var(--gc-gold);
+  background: rgba(212, 168, 67, 0.06);
+}
+
+/* Selected size card — gold border + subtle glow */
+.gc-size-card.active {
+  border-color: var(--gc-gold);
+  background: rgba(212, 168, 67, 0.1);
+  box-shadow: 0 0 0 2px rgba(212, 168, 67, 0.2);
+}
+
+.gc-size-name  { font-size: 14px; font-weight: 500; }
+.gc-size-items { font-size: 11px; color: var(--gc-text-muted); }
+.gc-size-price { font-size: 13px; color: var(--gc-gold); font-weight: 500; }
+
+/* ── Step 2: Ribbon Color Dots ───────────────────────────────────────────── */
+.gc-color-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.gc-color-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s;
+  position: relative;
+}
+
+.gc-color-dot:hover {
+  transform: scale(1.15);
+}
+
+/* Ring around the selected colour dot */
+.gc-color-dot.active::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--gc-gold);
+}
+
+.gc-color-label {
+  font-size: 13px;
+  color: var(--gc-text-muted);
+}
+
+.gc-color-label strong {
+  color: var(--gc-gold);
+}
+
+/* ── Step 3: Items Grid ───────────────────────────────────────────────────── */
+
+/* Capacity progress bar */
+.gc-capacity {
+  margin-bottom: 1rem;
+}
+
+.gc-capacity-text {
+  font-size: 12px;
+  color: var(--gc-text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.gc-capacity-bar {
+  height: 4px;
+  background: var(--gc-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.gc-capacity-fill {
+  height: 100%;
+  background: var(--gc-gold);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.gc-hint {
+  font-size: 13px;
+  color: var(--gc-text-muted);
+  margin-bottom: 1rem;
+}
+
+/* 3-column grid of item cards */
+.gc-items-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.gc-item-card {
+  background: var(--gc-surface2);
+  border: 1px solid var(--gc-border);
+  border-radius: var(--gc-radius-sm);
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.15s;
+}
+
+.gc-item-card:hover:not(.disabled) {
+  border-color: var(--gc-gold);
+  background: rgba(212, 168, 67, 0.06);
+}
+
+/* When item is added to box */
+.gc-item-card.selected {
+  border-color: var(--gc-green);
+  background: rgba(29, 158, 117, 0.08);
+}
+
+/* When box is full and item is not selected */
+.gc-item-card.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Small badge showing quantity on top-right of card */
+.gc-qty-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--gc-green);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gc-item-emoji  { font-size: 26px; }
+.gc-item-name   { font-size: 11px; font-weight: 500; color: var(--gc-text); }
+.gc-item-vendor { font-size: 10px; color: var(--gc-text-muted); }
+.gc-item-price  { font-size: 11px; color: var(--gc-gold); font-weight: 500; }
+
+/* Minus button to reduce item quantity */
+.gc-item-minus {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--gc-border);
+  color: var(--gc-text);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.gc-item-minus:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* Continue button after selecting items */
+.gc-next-btn {
+  margin-top: 1rem;
+  padding: 10px 20px;
+  background: var(--gc-gold);
+  color: #12122A;
+  border: none;
+  border-radius: var(--gc-radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+}
+
+.gc-next-btn:hover {
+  background: var(--gc-gold-light);
+}
+
+/* ── Step 4: Message Textarea ─────────────────────────────────────────────── */
+.gc-message-input {
+  width: 100%;
+  background: var(--gc-surface2);
+  border: 1px solid var(--gc-border);
+  border-radius: var(--gc-radius-sm);
+  color: var(--gc-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 12px;
+  resize: none;
+  min-height: 90px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.gc-message-input:focus {
+  border-color: rgba(212, 168, 67, 0.5);
+}
+
+.gc-message-input::placeholder {
+  color: var(--gc-text-muted);
+}
+
+.gc-char-count {
+  font-size: 11px;
+  color: var(--gc-text-muted);
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* ── Right Panel: Order Summary ───────────────────────────────────────────── */
+.gc-summary {
+  background: var(--gc-surface);
+  border: 1px solid var(--gc-border);
+  border-radius: var(--gc-radius);
+  padding: 1.25rem;
+  height: fit-content;
+  position: sticky;    /* stays visible as user scrolls through steps */
+  top: 1.5rem;
+}
+
+.gc-summary-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--gc-text);
+  margin-bottom: 1rem;
+}
+
+/* Box preview area */
+.gc-preview {
+  background: var(--gc-surface2);
+  border: 1px solid var(--gc-border);
+  border-radius: var(--gc-radius-sm);
+  padding: 1.25rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.gc-preview-emoji {
+  font-size: 52px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.gc-preview-ribbon {
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+/* Summary key-value rows */
+.gc-summary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.gc-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--gc-text-muted);
+}
+
+.gc-summary-row span:last-child {
+  color: var(--gc-text);
+  font-weight: 500;
+  text-align: right;
+  max-width: 160px;
+}
+
+/* Individual selected item rows (indented) */
+.gc-summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--gc-text-muted);
+  padding-left: 12px;
+}
+
+.gc-summary-divider {
+  border: none;
+  border-top: 1px solid var(--gc-border);
+  margin: 0.75rem 0;
+}
+
+/* Total row — larger text */
+.gc-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--gc-text);
+  margin-bottom: 1rem;
+}
+
+/* Add to Cart button */
+.gc-cart-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--gc-gold);
+  color: #12122A;
+  border: none;
+  border-radius: var(--gc-radius-sm);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+
+.gc-cart-btn:hover:not(:disabled) {
+  background: var(--gc-gold-light);
+}
+
+/* Disabled state — grey out button */
+.gc-cart-btn:disabled {
+  background: var(--gc-surface2);
+  color: var(--gc-text-muted);
+  cursor: not-allowed;
+}
+
+/* Success state — green when added */
+.gc-cart-btn.success {
+  background: var(--gc-green);
+  color: white;
+  cursor: default;
+}
+
+.gc-cart-hint {
+  font-size: 12px;
+  color: var(--gc-text-muted);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ── Responsive: Mobile ───────────────────────────────────────────────────── */
+/* On small screens, stack summary below the steps */
+@media (max-width: 768px) {
+  .gc-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .gc-summary {
+    position: static;
+  }
+
+  .gc-items-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gc-size-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Toolbar Styles */
+.home-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.home-search-bar {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+}
+
+.home-search-bar input {
+  width: 100%;
+  padding: 12px 45px;
+  border-radius: 50px;
+  border: 1px solid rgba(201, 169, 97, 0.2);
+  background: white;
+  font-family: inherit;
+}
+
+.search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--gold); }
+.clear-search { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); }
+
+.home-filters { display: flex; gap: 12px; }
+.home-filters select {
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1px solid rgba(26, 26, 46, 0.1);
+  background: white;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+}
+
+/* Card Overlays */
+.featured-image { position: relative; overflow: hidden; }
+.card-overlay {
+  position: absolute; inset: 0;
+  background: rgba(26, 26, 46, 0.6);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  gap: 10px; opacity: 0; transition: 0.3s;
+}
+.featured-card:hover .card-overlay { opacity: 1; }
+
+.overlay-btn {
+  padding: 10px 20px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+.overlay-btn.primary { background: var(--gold); color: white; }
+.overlay-btn.ghost { background: white; color: var(--navy); }
+
+/* Quick View Modal Styles */
+.qv-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+  z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.qv-modal {
+  background: white; border-radius: 20px; max-width: 800px; width: 100%;
+  position: relative; overflow: hidden;
+}
+.qv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.qv-img { width: 100%; height: 100%; object-fit: cover; }
+.qv-details { padding: 40px; }
+.qv-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; }

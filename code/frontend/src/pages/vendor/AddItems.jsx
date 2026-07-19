@@ -4,17 +4,7 @@ import axios from 'axios';
 import { FaArrowLeft, FaPlus, FaUpload, FaBoxOpen, FaDollarSign, FaImage, FaCheck } from 'react-icons/fa';
 import './AddItems.css';
 
-// Category icons mapping (emoji based — no extra dependency)
-const CATEGORY_ICONS = {
-  'Chocolates & Sweets':        '🍫',
-  'Candles & Fragrance':        '🕯️',
-  'Skincare & Beauty':          '💄',
-  'Stationery & Lifestyle':     '📝',
-  'Plush & Keepsakes':          '🧸',
-  'Gourmet Food & Drinks':      '☕',
-  'Gift Packaging & Fillers':   '🎀',
-  'Dried Botanicals & Decor':   '🪴',
-};
+// Category icons mapping removed as requested
 
 // ── Reusable field components ──────────────────────────────────
 const Label = ({ children, required }) => (
@@ -42,92 +32,41 @@ const SectionCard = ({ icon, title, children }) => (
   </div>
 );
 
-// ── 2-Step Category Picker ──────────────────────────────────────
-const CategoryPicker = ({ categoriesTree, selectedSubId, onSelect }) => {
-  const [selectedMain, setSelectedMain] = useState(null);
-
-  // Auto-expand main category if a subcategory is already selected
-  useEffect(() => {
-    if (selectedSubId && categoriesTree.length > 0) {
-      const parent = categoriesTree.find(c =>
-        c.subcategories?.some(s => s.id === Number(selectedSubId))
-      );
-      if (parent) setSelectedMain(parent);
-    }
-  }, [selectedSubId, categoriesTree]);
-
-  const handleMainClick = (cat) => {
-    setSelectedMain(cat);
-    onSelect(''); // clear sub selection when main changes
-  };
-
-  const handleSubClick = (subId) => {
-    onSelect(subId);
-  };
+// ── Custom Dropdown Component ─────────────────────────────────
+const CustomSelect = ({ options, value, onChange, placeholder }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOption = options.find(o => String(o.id) === String(value));
 
   return (
-    <div className="ai-cat-picker">
-      {/* Step 1 — Main Category Cards */}
-      <p className="ai-cat-step-label">Step 1 — Choose main category</p>
-      <div className="ai-cat-main-grid">
-        {categoriesTree.map(cat => (
-          <button
-            key={cat.id}
-            type="button"
-            className={`ai-cat-main-card ${selectedMain?.id === cat.id ? 'selected' : ''}`}
-            onClick={() => handleMainClick(cat)}
-          >
-            <span className="ai-cat-emoji">
-              {CATEGORY_ICONS[cat.name] || '🎁'}
-            </span>
-            <span className="ai-cat-name">{cat.name}</span>
-          </button>
-        ))}
+    <div className="custom-select-container">
+      <div 
+        className={`ai-input custom-select-header ${isOpen ? 'open' : ''}`} 
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {selectedOption ? selectedOption.name : placeholder}
+        <span className="dropdown-arrow">▼</span>
       </div>
-
-      {/* Step 2 — Sub-category Pills (appears after main selected) */}
-      {selectedMain && (
-        <div className="ai-cat-sub-wrap">
-          <p className="ai-cat-step-label">
-            Step 2 — Choose sub-category under <strong>{selectedMain.name}</strong>
-          </p>
-          <div className="ai-cat-sub-pills">
-            {selectedMain.subcategories?.length > 0 ? (
-              selectedMain.subcategories.map(sub => (
-                <button
-                  key={sub.id}
-                  type="button"
-                  className={`ai-cat-sub-pill ${Number(selectedSubId) === sub.id ? 'selected' : ''}`}
-                  onClick={() => handleSubClick(sub.id)}
-                >
-                  {Number(selectedSubId) === sub.id && <FaCheck size={10} style={{ marginRight: 5 }} />}
-                  {sub.name}
-                </button>
-              ))
-            ) : (
-              <p className="ai-cat-no-sub">No sub-categories yet for this category.</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Selection Summary */}
-      {selectedSubId && selectedMain && (
-        <div className="ai-cat-summary">
-          <span>✅</span>
-          <span>
-            <strong>{selectedMain.name}</strong>
-            {' → '}
-            <strong>
-              {selectedMain.subcategories?.find(s => s.id === Number(selectedSubId))?.name}
-            </strong>
-          </span>
+      {isOpen && (
+        <div className="custom-select-list">
+          {options.map(opt => (
+            <div 
+              key={opt.id} 
+              className={`custom-select-item ${String(value) === String(opt.id) ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(opt.id);
+                setIsOpen(false);
+              }}
+            >
+              {opt.name}
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 };
 
+// ── 2-Step Category Picker Removed in favor of simple select ──
 // ── Main Component ─────────────────────────────────────────────
 const AddItems = () => {
   const navigate = useNavigate();
@@ -144,7 +83,7 @@ const AddItems = () => {
   }, []);
 
   const [form, setForm] = useState({
-    name: '', category: '', price: '', discountPrice: '',
+    name: '', category: '', subCategory: '', price: '', discountPrice: '',
     stock: '', sku: '', description: '',
     is_active: true,
   });
@@ -204,7 +143,8 @@ const AddItems = () => {
         sku: form.sku ? form.sku : null,
         isActive: form.is_active ? 1 : 0,
         imageUrl: uploadedImageUrl || 'https://via.placeholder.com/220x150?text=No+Image',
-        categoryId: Number(form.category)
+        categoryId: Number(form.category),
+        subCategory: form.subCategory
       };
 
       const SELLER_ID = localStorage.getItem('userId');
@@ -260,14 +200,21 @@ const AddItems = () => {
               <Textarea name="description" value={form.description} onChange={handleChange} placeholder="Describe your product — what's included, occasion, packaging…" />
             </div>
 
-            {/* 2-Step Category Picker */}
-            <div className="ai-field">
-              <Label required>Category</Label>
-              <CategoryPicker
-                categoriesTree={categoriesTree}
-                selectedSubId={form.category}
-                onSelect={(subId) => setForm(f => ({ ...f, category: subId }))}
-              />
+            {/* Category Dropdown */}
+            <div className="ai-row ai-row-2">
+              <div className="ai-field">
+                <Label required>Main Category</Label>
+                <CustomSelect
+                  options={categoriesTree}
+                  value={form.category}
+                  onChange={(val) => setForm(f => ({ ...f, category: val }))}
+                  placeholder="Select a category..."
+                />
+              </div>
+              <div className="ai-field">
+                <Label required>Product Type (Sub-category)</Label>
+                <Input name="subCategory" value={form.subCategory} onChange={handleChange} placeholder="e.g. Watch, Chocolate, Teddy" />
+              </div>
             </div>
 
             {/* Active Toggle */}

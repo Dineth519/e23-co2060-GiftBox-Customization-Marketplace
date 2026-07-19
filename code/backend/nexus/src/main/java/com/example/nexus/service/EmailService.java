@@ -16,7 +16,7 @@ public class EmailService {
         message.setTo(toEmail);
         message.setSubject("Giftora - Email Verification Code");
         message.setText(
-            "Dear User,\n\n" +
+            "Dear Customer,\n\n" +
             "Thank you for joining Giftora! To complete your registration and verify your email address, please use the verification code provided below:\n\n" +
             "Verification Code: " + code + "\n\n" +
             "Please note that this code is valid for 10 minutes only. For security reasons, do not share this code with anyone.\n\n" +

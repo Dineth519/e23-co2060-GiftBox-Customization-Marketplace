@@ -43,14 +43,14 @@ public class AdminDashboardController {
 
             // 5. Recent Orders (Latest 5 orders)
             List<Map<String, Object>> recentOrders = jdbcTemplate.queryForList(
-                "SELECT order_id AS orderId, recipient_name AS recipientName, wrap_style AS wrapStyle, status, total_amount AS totalAmount, created_at AS createdAt " +
+                "SELECT order_id AS orderId, recipient_name AS recipientName, wrapping_style AS wrapStyle, status, total_amount AS totalAmount, created_at AS createdAt " +
                 "FROM orders ORDER BY order_id DESC LIMIT 5"
             );
             response.put("recentOrders", recentOrders);
 
             // 6. Top Vendors (with product count)
             List<Map<String, Object>> topVendors = jdbcTemplate.queryForList(
-                "SELECT v.vendor_id AS id, v.shop_name AS shopName, COUNT(p.product_id) AS productCount " +
+                "SELECT v.vendor_id AS id, v.shop_name AS shopName, COUNT(p.id) AS productCount " +
                 "FROM vendors v " +
                 "LEFT JOIN products p ON v.vendor_id = p.vendor_id " +
                 "GROUP BY v.vendor_id, v.shop_name " +
