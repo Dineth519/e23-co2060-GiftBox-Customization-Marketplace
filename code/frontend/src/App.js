@@ -19,6 +19,7 @@ import CustomerProfile from './pages/customer/Profile.jsx'
 import AboutUs from './pages/customer/AboutUsPage.jsx';
 import BoxBuilder from './pages/customer/BoxBuilderPage.jsx'
 import Checkout from './pages/customer/Checkout.jsx';
+import CustomerSettings from './pages/customer/Settings.jsx';
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
@@ -115,6 +116,7 @@ function App() {
             <Route path="checkout" element={<Checkout />} />
             <Route path="about-us" element={<AboutUs />} />
             <Route path="build-box" element={<BoxBuilder />} />
+            <Route path="settings" element={<CustomerSettings />} />
 
           </Route>
 

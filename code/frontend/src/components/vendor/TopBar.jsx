@@ -37,7 +37,7 @@ const TopBar = () => {
   // Function to handle session termination
   const handleLogout = () => {
     localStorage.clear();
-    navigate('/'); 
+    navigate('/', { replace: true }); 
   };
 
   return (

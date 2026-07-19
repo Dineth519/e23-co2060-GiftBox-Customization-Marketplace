@@ -24,7 +24,7 @@ const AdminLayout = ({ children }) => {
 
   // Route Guard: Redirect to login if user is not authorized as an admin
   if (!userId || userRole !== 'ADMIN') {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (

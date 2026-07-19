@@ -180,19 +180,27 @@ export default function Orders() {
   return (
     <div className="orders-page">
 
+      {/* ── Hero Banner ── */}
+      <div className="ct-hero">
+        <div className="ct-hero__orb ct-hero__orb--1" />
+        <div className="ct-hero__orb ct-hero__orb--2" />
+        <div className="ct-hero__inner">
+          <div className="ct-hero__label">Your Orders</div>
+          <h1 className="ct-hero__title">My Orders</h1>
+          <p className="ct-hero__sub">Track and manage your gift box orders</p>
+        </div>
+      </div>
+
+      <div className="orders-body">
+
       {/* ── Page Header ── */}
       <div className="orders-header">
         <div>
-          <h1 className="orders-title">My Orders</h1>
-          <p className="orders-subtitle">
-            Track and manage your gift box orders
-          </p>
+          <p className="orders-subtitle">Showing {orders.length} order{orders.length !== 1 ? 's' : ''}</p>
         </div>
-
-        {/* Button to go start a new order */}
         <button
-          className="orders-new-btn"
-          onClick={() => navigate('/customize')}
+          className="ct-btn-gold"
+          onClick={() => navigate('/customer/build-box')}
         >
           🎁 Build New Box
         </button>
@@ -237,8 +245,8 @@ export default function Orders() {
               : `No orders with status "${filter}".`}
           </p>
           <button
-            className="orders-new-btn"
-            onClick={() => navigate('/customize')}
+            className="ct-btn-gold"
+            onClick={() => navigate('/customer/build-box')}
           >
             Start Your First Box
           </button>
@@ -312,6 +320,7 @@ export default function Orders() {
         </div>
       )}
 
+      </div>{/* end orders-body */}
     </div>
   );
 }
