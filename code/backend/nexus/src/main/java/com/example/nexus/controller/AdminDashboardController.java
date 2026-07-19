@@ -58,6 +58,19 @@ public class AdminDashboardController {
             );
             response.put("topVendors", topVendors);
 
+            // 7. Order Status Distribution (For Pie Chart)
+            List<Map<String, Object>> orderStatusDistribution = jdbcTemplate.queryForList(
+                "SELECT status AS name, COUNT(*) AS value FROM orders GROUP BY status"
+            );
+            response.put("orderStatusDistribution", orderStatusDistribution);
+
+            // 8. Monthly Revenue (For Bar Chart) - Last 6 months
+            List<Map<String, Object>> monthlyRevenue = jdbcTemplate.queryForList(
+                "SELECT DATE_FORMAT(created_at, '%b') AS month, COALESCE(SUM(total_amount), 0) AS revenue " +
+                "FROM orders GROUP BY DATE_FORMAT(created_at, '%b'), DATE_FORMAT(created_at, '%Y-%m') ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC LIMIT 6"
+            );
+            response.put("monthlyRevenue", monthlyRevenue);
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "error", e.getMessage()));

@@ -49,7 +49,10 @@ const Checkout = () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/standard`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
         body: JSON.stringify(orderPayload)
       });
 

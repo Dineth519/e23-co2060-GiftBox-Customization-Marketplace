@@ -18,7 +18,9 @@ const TopBar = () => {
         return;
       }
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+        });
         if (res.ok) {
           const data = await res.json();
           setDisplayName(data.name || (username.includes('@') ? username.split('@')[0] : username));
@@ -35,7 +37,7 @@ const TopBar = () => {
   // Function to handle session termination
   const handleLogout = () => {
     localStorage.clear();
-    navigate('/login'); 
+    navigate('/'); 
   };
 
   return (

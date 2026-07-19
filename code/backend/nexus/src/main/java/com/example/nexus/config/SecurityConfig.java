@@ -40,7 +40,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints — no authentication required
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/products/**", "/api/items", "/api/boxes/**", "/api/cart/**", "/api/partners/public/**").permitAll()
+                .requestMatchers("/api/products/**", "/api/items", "/api/boxes/**", "/api/cart/**", "/api/partners/public/**", "/api/vendors/register").permitAll()
                 
                 // Protected endpoints — require authentication
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")

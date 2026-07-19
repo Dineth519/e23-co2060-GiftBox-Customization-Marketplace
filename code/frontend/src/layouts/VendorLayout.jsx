@@ -11,7 +11,7 @@ import './AdminLayout.css';
 
 // Vendor layout wrapper component providing sidebar and top navigation
 const VendorLayout = ({ children }) => {
-  const userRole = localStorage.getItem('userRole');
+  const userRole = localStorage.getItem('role');
   const userId = localStorage.getItem('userId');
   const location = useLocation();
   const mainContentRef = useRef(null);

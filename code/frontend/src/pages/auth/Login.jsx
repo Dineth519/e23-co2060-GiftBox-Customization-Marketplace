@@ -153,9 +153,9 @@ const Login = () => {
           const userRole = data.role;
           
           if (userRole === 'ADMIN') {
-            navigate('/admin/dashboard');
+            navigate('/admin');
           } else if (userRole === 'VENDOR' || userRole === 'SELLER' || userRole === 'PARTNER') {
-            navigate('/seller/dashboard');
+            navigate('/vendor');
           } else if (userRole === 'CUSTOMER') {
             navigate('/customer/home');
           } else if (userRole === 'ASSEMBLER') {
