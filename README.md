@@ -1,177 +1,221 @@
 # 🎁 Giftora — Personalized Gift Box Marketplace
 
-> A centralized multi-vendor platform where customers can browse products from multiple independent vendors, assemble fully customized gift boxes, and have the selected items quality-checked, professionally packaged, and delivered as a single, cohesive parcel.
+> A centralized multi-vendor platform where customers can browse items from multiple vendors, assemble customized gift boxes, and have them quality-checked, professionally packaged, and delivered — all through one seamless experience.
 
 ![React](https://img.shields.io/badge/React-v18+-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-v3+-6DB33F?style=flat-square&logo=springboot&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-v8+-4479A1?style=flat-square&logo=mysql&logoColor=white)
 ![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens)
-![Azure](https://img.shields.io/badge/Azure-App%20Service-0089D6?style=flat-square&logo=microsoftazure&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel&logoColor=white)
-![Aiven](https://img.shields.io/badge/Aiven-MySQL-FF3554?style=flat-square&logo=aiven&logoColor=white)
+![Status](https://img.shields.io/badge/Status-In%20Development-F0C96A?style=flat-square)
 
 ---
-
 ## 📌 Table of Contents
-- [Team Details](#-team-details)
-- [Background & Motivation](#-background--motivation)
+- [The Problem](#-the-problem)
 - [Our Solution](#-our-solution)
-- [System Architecture & Methodology](#-system-architecture--methodology)
-- [Technology Stack](#-technology-stack)
-- [Software Design & Roles](#-software-design--roles)
+- [Key Features](#-key-features)
+- [Tech Stack](#-technology-stack)
+- [System Architecture](#-system-architecture)
 - [Project Structure](#-project-structure)
-- [Implementation & Challenges](#-implementation--challenges)
-- [Testing Strategy](#-testing-strategy)
 - [Getting Started](#-getting-started)
 - [API Endpoints](#-api-endpoints)
 - [Git Workflow](#-git-workflow)
-- [Individual Contributions](#-individual-contributions)
-- [Project Timeline & Future Work](#-project-timeline--future-work)
+- [Project Timeline](#-project-timeline)
+- [Team](#-team)
 - [Links](#-links)
-
----
-
-## 👥 Team Details
-
-**Group No:** E23 GR33  
-**Module:** CO2060 — Software Systems Design Project  
-**Department:** Computer Engineering, University of Peradeniya  
-**Year:** 2026  
+  
+## 👥 Team Nexus
 
 | Student ID | Name | Email |
 |------------|------|-------|
-| **E/23/167** | Karunarathna A. V. P. J. P. | [e23167@eng.pdn.ac.lk](mailto:e23167@eng.pdn.ac.lk) |
-| **E/23/351** | Sanjuna K. D. | [e23351@eng.pdn.ac.lk](mailto:e23351@eng.pdn.ac.lk) |
-| **E/23/412** | Vidanya A. P. S. | [e23412@eng.pdn.ac.lk](mailto:e23412@eng.pdn.ac.lk) |
-| **E/23/416** | Vishwaka A. G. S. | [e23416@eng.pdn.ac.lk](mailto:e23416@eng.pdn.ac.lk) |
+| E/23/167 | Karunarathna A. V. P. J. P. | [e23167@eng.pdn.ac.lk](mailto:e23167@eng.pdn.ac.lk) |
+| E/23/351 | Sanjuna K. D. | [e23351@eng.pdn.ac.lk](mailto:e23351@eng.pdn.ac.lk) |
+| E/23/412 | Vidanya A. P. S. | [e23412@eng.pdn.ac.lk](mailto:e23412@eng.pdn.ac.lk) |
+| E/23/416 | Vishwaka A. G. S. | [e23416@eng.pdn.ac.lk](mailto:e23416@eng.pdn.ac.lk) |
+
+**Module:** CO2060 — Software Design Project  
+**Department:** Computer Engineering, University of Peradeniya
 
 ---
 
-## 🚩 Background & Motivation
+## 🚩 The Problem
 
-### The Problem
-Online gift-giving remains a fragmented experience. A customer who wants to send a multi-item, personalized gift is typically forced to place separate orders on different vendor websites, coordinate delivery timing manually, and hope that each item arrives in acceptable packaging. 
+Online gift-giving is broken. When someone wants to send a thoughtful, multi-item gift, they're forced to:
 
-Existing local platforms such as Wishque and RealGift provide curated gift catalogues, but they largely operate on a single-seller or drop-shipping model rather than allowing genuine multi-vendor customization at the item level. Furthermore, existing platforms use rigid, one-size-fits-all product forms that cannot capture attributes specific to a gift category (e.g., box size or occasion).
+- Place **separate orders** across multiple vendor websites
+- **Manually coordinate** delivery timelines
+- Hope that packaging quality is consistent
+- Deal with **multiple tracking systems** for one gift
+
+This is especially painful when gifts are time-sensitive and non-returnable.
 
 ---
 
 ## 💡 Our Solution
 
-Giftora introduces a **centralized assembly workflow** supported by an **Entity–Attribute–Value (EAV)** inspired schema that allows category-specific product attributes without rigid database tables. 
+Giftora introduces a **centralized assembly workflow**:
 
-### The End-to-End Workflow:
-1. **Browse**: Customers browse a unified catalogue aggregating products from all registered vendors.
-2. **Assemble**: Customers assemble a custom gift box, selecting slots and items in a single session and placing a single order.
-3. **Split Order**: The platform's order-splitting logic automatically generates per-vendor sub-orders from the single customer order.
-4. **Dispatch**: Vendors dispatch their portion of the order to a centralized assembly point.
-5. **Quality Check**: Items are quality-checked and professionally packaged into one unified gift box before final dispatch.
-6. **Track**: The customer tracks the entire order, including component-level status, through a single interface.
+1. Customer browses a unified catalogue from multiple vendors
+2. Customer builds a custom gift box in a single session
+3. Vendors are notified and dispatch their items to our assembly hub
+4. Assembly team **quality-checks, packages, and dispatches** the complete gift box
+5. Customer tracks every milestone — from order placement to doorstep delivery
 
 ---
 
-## 🏗️ System Architecture & Methodology
+## ✨ Key Features
 
-The project follows an iterative, **Agile-inspired development process** organized into short, weekly sprints. Continuous integration is enforced through Git and GitHub Actions.
-
-### Deployment Architecture
-- **Frontend (Client)**: Hosted on **Vercel** with auto-deployments linked to the repository.
-- **Backend (API)**: Hosted on **Azure App Service** utilizing the GitHub Student Developer Pack.
-- **Database**: Managed **Aiven MySQL** instance, secured with TLS-encrypted connections.
-- **CI/CD Pipeline**: A dedicated GitHub Actions workflow synchronizes the organization's `develop` branch with a personal fork's deployment branch, triggering redeployment across environments seamlessly.
-
-```text
-[React.js Frontend (Vercel)]  ←→  [Spring Boot REST API (Azure)]  ←→  [MySQL Database (Aiven)]
-             ↕                                   ↕
-   [Customer / Vendor GUI]       [JWT Auth | RBAC | Order Splitting Engine]
-```
+- **Multi-Vendor Gift Box Builder** — select items from different vendors into one box
+- **Role-Based Access Control** — separate portals for Customers, Vendors, and Admins
+- **Order Splitting Engine** — one checkout auto-splits into per-vendor sub-orders
+- **Centralized Assembly Workflow** — quality inspection and professional packaging
+- **Milestone-Based Order Tracking** — 5+ trackable stages with real-time updates
+- **Vendor Portal** — product listing, inventory management, and order queue
+- **Admin Dashboard** — vendor approval, operational monitoring, and reporting
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Layer | Technology / Tool |
+| Layer | Technology |
 |-------|-----------|
-| **Frontend UI** | React.js (v18+), CSS3 |
-| **Backend API** | Spring Boot (Java 17, Maven) |
-| **Database** | MySQL (v8+) |
-| **Authentication** | JWT (JSON Web Tokens), BCrypt Hashing |
-| **Hosting & CI/CD**| Vercel, Azure App Service, Aiven, GitHub Actions |
-| **Testing** | JUnit (Backend), Jest (Frontend), Postman (API) |
+| Frontend | React.js (v18+) |
+| Backend | Spring Boot (Java, v3+) |
+| Database | MySQL (v8+) |
+| Authentication | JWT (JSON Web Tokens) |
+| Communication | RESTful APIs over HTTPS |
+| Version Control | Git / GitHub |
 
 ---
 
-## 📐 Software Design & Roles
+## 🏗️ System Architecture
 
-### User Roles & Access Levels
-Access is enforced through **Role-Based Access Control (RBAC)** implemented via JWT claims.
-- **Customer**: Browses products, builds gift boxes, places orders, and tracks order status.
-- **Vendor**: Lists and manages products; views and fulfils incoming sub-orders. Restricted to their own catalogue.
-- **Admin**: Top-level access to approve vendor registrations, monitor system health, and oversee platform operations.
-- **Assembler** *(Future Phase)*: Verifies incoming vendor items at the centralized assembly point, checks quality, and confirms packaging.
+The platform follows a clean three-tier architecture:
 
-### Core Modules
-1. **User Management**: Stateless JWT auth, BCrypt hashing, and strict RBAC enforced at API and UI layers.
-2. **Gift Box Customization Engine**: An interactive canvas allowing customers to add cross-vendor items, view real-time totals, and save drafts. Backed by an EAV database schema for flexible attributes.
-3. **Vendor & Item Management**: Vendor portal to manage stock and listings.
-4. **Order Management & Splitting**: Master order record creation instantly splitting into sub-orders for vendors.
-5. **Milestone-Based Tracking**: Customers see a clear timeline: *Order Placed → Vendor Processing → Dispatched to Hub → Quality Inspection → Out for Delivery*.
+```
+[React.js Frontend]  ←→  [Spring Boot REST API]  ←→  [MySQL Database]
+        ↕                          ↕
+  [Customer / Vendor]     [JWT Auth | RBAC | Order Engine]
+```
+
+A single customer order flows through:
+`Order Placed → Sub-orders Created → Vendor Dispatch → Hub Receipt → Quality Check → Assembly → Delivery`
 
 ---
 
 ## 📁 Project Structure
-```text
+```
 e23-co2060-GiftBox-Customization-Marketplace/
 ├── code/
 │   ├── backend/
 │   │   └── nexus/
-│   │       ├── src/main/java/com/example/nexus/
-│   │       │   ├── config/       # Security filters, CORS
-│   │       │   ├── controller/   # REST API Endpoints
-│   │       │   ├── dto/          # Data Transfer Objects
-│   │       │   ├── model/        # Entities (User, Order, Product, Cart)
-│   │       │   ├── repository/   # JPA Repositories
-│   │       │   └── service/      # Business Logic
-│   │       └── resources/
-│   │           └── application.properties # Env vars & DB config
+│   │       ├── src/
+│   │       │   ├── main/
+│   │       │   │   ├── java/com/example/nexus/
+│   │       │   │   │   ├── config/
+│   │       │   │   │   │   └── SecurityConfig.java
+│   │       │   │   │   ├── controller/
+│   │       │   │   │   │   ├── AuthController.java
+│   │       │   │   │   │   ├── CartController.java
+│   │       │   │   │   │   ├── OrderController.java
+│   │       │   │   │   │   ├── PartnerController.java
+│   │       │   │   │   │   ├── ProductController.java
+│   │       │   │   │   │   ├── SellerDashboardController.java
+│   │       │   │   │   │   └── UserController.java
+│   │       │   │   │   ├── dto/
+│   │       │   │   │   ├── model/
+│   │       │   │   │   │   ├── CartItem.java
+│   │       │   │   │   │   ├── Order.java
+│   │       │   │   │   │   ├── Partner.java
+│   │       │   │   │   │   ├── Product.java
+│   │       │   │   │   │   ├── Role.java
+│   │       │   │   │   │   ├── SessionCartManager.java
+│   │       │   │   │   │   └── User.java
+│   │       │   │   │   ├── repository/
+│   │       │   │   │   │   ├── OrderRepository.java
+│   │       │   │   │   │   ├── PartnerRepository.java
+│   │       │   │   │   │   ├── ProductRepository.java
+│   │       │   │   │   │   └── UserRepository.java
+│   │       │   │   │   ├── service/
+│   │       │   │   │   └── NexusApplication.java
+│   │       │   │   └── resources/
+│   │       │   │       ├── application.properties
+│   │       │   │       ├── application-arch.properties
+│   │       │   │       └── application-windows.properties
+│   │       │   └── test/
+│   │       └── pom.xml
 │   ├── database/
+│   │   ├── data.sql
+│   │   ├── items.sql
 │   │   ├── schema.sql
-│   │   └── data.sql
+│   │   └── triggers.sql
 │   └── frontend/
 │       ├── public/
+│       │   ├── index.html
+│       │   └── logo.jpeg
 │       └── src/
-│           ├── components/       # Reusable UI components
-│           ├── layouts/          # Role-based layouts (Admin, Customer, Vendor)
-│           └── pages/            # Page-level components
-└── docs/                         # GitHub Pages Website Documentation
+│           ├── assets/
+│           │   └── login/
+│           ├── components/
+│           │   ├── admin/
+│           │   ├── homepage/
+│           │   │   ├── CartBadge.jsx
+│           │   │   ├── Footer.jsx
+│           │   │   └── Header.jsx
+│           │   ├── seller/
+│           │   └── user/
+│           ├── context/
+│           ├── layouts/
+│           │   ├── AdminLayout.jsx
+│           │   ├── CustomerLayout.jsx
+│           │   └── SellerLayout.jsx
+│           └── pages/
+│               ├── admin/
+│               │   ├── Customers.jsx
+│               │   ├── Dashboard.jsx
+│               │   ├── Partners.jsx
+│               │   ├── PendingPartners.jsx
+│               │   ├── Settings.jsx
+│               │   └── StaffManagement.jsx
+│               ├── auth/
+│               │   ├── Login.jsx
+│               │   └── VendorRegistration.jsx
+│               ├── homepage/
+│               │   ├── AboutUsPage.jsx
+│               │   ├── CartPage.jsx
+│               │   ├── HomePage.jsx
+│               │   ├── HowItWorksPage.jsx
+│               │   ├── Products.jsx
+│               │   ├── ProductsPage.jsx
+│               │   └── VendorLanding.jsx
+│               ├── seller/
+│               │   ├── AddItems.jsx
+│               │   ├── MyItems.jsx
+│               │   ├── SellerDashboard.jsx
+│               │   └── Settings.jsx
+│               └── user/
+│                   ├── CustomerHome.jsx
+│                   ├── GiftCustomizer.jsx
+│                   ├── OrderDetail.jsx
+│                   ├── Orders.jsx
+│                   ├── Profile.jsx
+│                   └── Verify.jsx
+└── docs/
+    └── data/
+
+---
+
+## 🗓️ Project Timeline
+
+| Phase | Weeks | Focus |
+|-------|-------|-------|
+| Phase 1 | 1–5 | Foundation: Auth, RBAC, Vendor Registration |
+| Phase 2 | 6–11 | Core Marketplace: Browsing, Filtering, Cart, Checkout |
+| Phase 3 | 12–17 | Assembly & Logistics Workflow |
+| Phase 4 | 18–22 | Admin Tools, Notifications, UI Polish |
+| Phase 5 | 23–28 | Testing, Optimization & Final Submission |
+
+**Final Deadline:** July 26, 2026
 ```
-
----
-
-## 📈 Implementation & Challenges
-
-### Milestones Achieved
-- ✅ Secure user authentication and RBAC (JWT, BCrypt).
-- ✅ Multi-vendor product catalogue with images, highlights, and reviews.
-- 🟡 Gift box builder with category-specific attributes (Partially Implemented).
-- 🟡 Order splitting engine (Partially Implemented).
-
-### Technical Challenges Resolved
-1. **Hibernate `LazyInitializationException`**: Prevented 500 errors by restructuring entity fetch strategies, executing schema migrations, and introducing DTO-based projections to avoid lazy-loading outside active sessions.
-2. **CORS Configuration**: Explicit allowed-origin configuration was required to permit cross-domain API requests between the Vercel-hosted frontend and Azure-hosted backend.
-3. **Security Remediation**: Initial hardcoded SMTP credentials were mitigated by rotating keys and migrating to environment-variable-driven configuration.
-4. **Deployment Blocking**: An expired OAuth token blocked Vercel redeployment. Resolved by reconnecting a personal fork and reconfiguring the sync workflow.
-
----
-
-## 🧪 Testing Strategy
-
-The system is verified across four strategies:
-- **Unit Tests**: Backend service methods tested with JUnit; frontend components tested with Jest.
-- **Integration Tests**: API endpoints verified against SRS requirements using Postman collections.
-- **System Tests**: End-to-end user journeys simulated on the deployed staging environment.
-- **Security Tests**: JWT validation, RBAC enforcement, and input sanitisation verified through targeted API tests.
-
 ---
 
 ## 🚀 Getting Started
@@ -180,98 +224,100 @@ The system is verified across four strategies:
 - Node.js (v18+)
 - Java JDK (v17+)
 - MySQL (v8+)
+- Docker (optional, for containerized deployment)
 
-### Setup Instructions
+### Setup
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/cepdnaclk/e23-co2060-GiftBox-Customization-Marketplace.git
-cd e23-co2060-GiftBox-Customization-Marketplace
+# Clone the repository
+git clone https://github.com/cepdnaclk/e23-co2060-GiftBox-CustomizationMarketplace.git
+cd e23-co2060-GiftBox-CustomizationMarketplace
 
-# 2. Frontend setup
+# Frontend setup
 cd frontend
 npm install
 npm start
 
-# 3. Backend setup (in a new terminal)
+# Backend setup (in a new terminal)
 cd backend
-# Ensure MySQL is running and application.properties is configured with your Aiven credentials
 ./mvnw spring-boot:run
 ```
+
+Configure your MySQL connection in `backend/src/main/resources/application.properties` before starting.
 
 ---
 
 ## 🔌 API Endpoints
 
-### Authentication & Customer
+### Authentication
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/auth/login` | Login and receive JWT |
 | POST | `/api/auth/register` | Register new user |
-| GET | `/api/customer/profile` | Get customer profile |
-| POST | `/api/cart/add` | Add customized box to cart |
-| GET | `/api/orders/customer` | Get all customer orders |
+| POST | `/api/auth/login` | Login and receive JWT |
+| POST | `/api/auth/verify` | Verify email address |
 
-### Vendor (Seller)
+### Customer
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/customer/profile` | Get customer profile |
+| PUT | `/api/customer/profile` | Update profile |
+| GET | `/api/orders/customer` | Get all customer orders |
+| GET | `/api/orders/{id}` | Get single order detail |
+| POST | `/api/cart/add` | Add customized box to cart |
+
+### Products & Items
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/items` | Get all gift items |
+| GET | `/api/boxes/sizes` | Get available box sizes |
+
+### Seller
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/seller/items` | Get seller's listed items |
 | POST | `/api/seller/items` | Add new item |
 | PUT | `/api/seller/items/{id}` | Update item |
-| GET | `/api/seller/orders` | Get vendor-specific sub-orders |
+| GET | `/api/seller/orders` | Get seller's orders |
 
 ---
 
 ## 🌿 Git Workflow
 
-We follow a strict branching model to maintain stability:
-- `main`: Production releases only.
-- `dev`: Integration branch.
-- `feature/xxx`: Individual feature branches.
-- `fix/xxx`: Bug fix branches.
-
-```bash
-git checkout dev
-git pull origin dev
-git checkout -b feature/your-feature-name
-# Work and commit
-git add .
-git commit -m "feat: implemented amazing feature"
-git push origin feature/your-feature-name
-# Create PR targetting dev
+```
+main          ← production releases only
+dev           ← integration branch (everyone merges here)
+feature/xxx   ← individual feature branches
+fix/xxx       ← bug fix branches
 ```
 
----
+```bash
+# 1. Always pull latest dev before starting
+git checkout dev
+git pull origin dev
 
-## 👨‍💻 Individual Contributions
+# 2. Create your feature branch
+git checkout -b feature/your-feature-name
 
-| Name (Index No) | Assigned Area & Completed Work |
-|-----------------|--------------------------------|
-| **Karunarathna A. V. P. J. P.**<br>(E/23/167) | **Vendor Module Frontend & Customer Portal UI/UX:**<br>Designed and implemented the complete Vendor module frontend (`SellerDashboard`, `AddItems`, `MyItems`, `Settings`). Connected vendor components to the backend REST API for product CRUD. Contributed to Customer portal frontend (`CartPage`, `GiftCustomizer`), assisting in integrating cart and order placement functionality. |
-| **Vishwaka A. G. S.**<br>(E/23/416) | **Authentication, Vendor App UI/UX & DB Management:**<br>Implemented the complete customer login and auth system. Engineered the JWT authentication pipeline (token generation, signing, stateless validation via custom filter). Developed Vendor application UI/UX and managed the MySQL DB design for authentication and vendor-related modules. |
-| **Vidanya A. P. S.**<br>(E/23/412) | **Landing Page & Customer Page UI/UX:**<br>Designed and developed all pages of the public-facing Landing Page (`HomePage`, `AboutUsPage`, `ProductsPage`). Connected components to enable dynamic product catalogue rendering via `/api/items`. Implemented shared UI components (`Header`, `Footer`, `CartBadge`). Maintained overall layout consistency. |
-| **Sanjuna K. D.**<br>(E/23/351) | **Admin Module UI/UX, Full Backend & Database Implementation:**<br>Implemented the complete Admin role UI/UX (`Dashboard`, `Customers`, `Partners`, `StaffManagement`). Designed, implemented, and managed the MySQL relational database including Flyway schema migrations and entity-mapping fixes (e.g. `StaleObjectStateException`). Built all Spring Boot backend implementation including controllers, repositories, and service logic. |
+# 3. Work and commit regularly
+git add .
+git commit -m "feat: describe what you did"
 
----
+# 4. Push and open Pull Request → target: dev
+git push origin feature/your-feature-name
+```
 
-## 🗓️ Project Timeline & Future Work
-
-### Past Phases (Completed)
-- **Phase 1 (Weeks 1-5):** System Design, Database Modeling, User Auth, and Vendor Registration.
-- **Phase 2 (Weeks 6-10):** Core Marketplace Browsing, Vendor Dashboard, Filtering, and basic Cart integration.
-
-### Future Work (Weeks 11-14)
-The final phase focuses on implementing advanced multi-vendor gifting mechanics and preparing for production launch:
-1. **Upgrade Gift Box Mechanics**: Enhancing the core gift box builder logic to ensure customers experience a seamless and intuitive process when customizing multi-vendor items.
-2. **Implement Assembler System**: Developing the backend assembler interface for operations staff to efficiently manage order splitting and coordinate the physical aggregation of boxes.
-3. **Delivery & Tracking System**: Building out the unified tracking logistics to ensure customers receive consolidated, real-time updates for multi-item orders.
-4. **Integration Testing & Deployment**: Comprehensive end-to-end integration testing across all developed modules (frontend, backend, DB) before the final production deployment in Week 14.
+| Commit Prefix | Use for |
+|---------------|---------|
+| `feat:` | New feature |
+| `fix:` | Bug fix |
+| `docs:` | Documentation change |
+| `merge:` | Resolving merge conflict |
 
 ---
 
+---
 ## 🔗 Links
-- [Project Repository](https://github.com/cepdnaclk/e23-co2060-GiftBox-Customization-Marketplace)
-- [Project Page (Docs)](https://cepdnaclk.github.io/e23-co2060-GiftBox-Customization-Marketplace/)
+
 - [Department of Computer Engineering](http://www.ce.pdn.ac.lk/)
 - [University of Peradeniya](https://eng.pdn.ac.lk/)
 - [CE Projects Portal](https://projects.ce.pdn.ac.lk)
