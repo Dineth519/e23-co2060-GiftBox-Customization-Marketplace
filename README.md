@@ -12,15 +12,19 @@
 ## 📌 Table of Contents
 - [The Problem](#-the-problem)
 - [Our Solution](#-our-solution)
+- [Impact](#-impact)
 - [Key Features](#-key-features)
 - [Tech Stack](#-technology-stack)
 - [System Architecture](#-system-architecture)
+- [Software Design](#-software-design)
 - [Project Structure](#-project-structure)
+- [Testing](#-testing)
 - [Getting Started](#-getting-started)
 - [API Endpoints](#-api-endpoints)
 - [Git Workflow](#-git-workflow)
 - [Project Timeline](#-project-timeline)
-- [Team](#-team)
+- [Team](#-team-nexus)
+- [Conclusion](#-conclusion)
 - [Links](#-links)
   
 ## 👥 Team Nexus
@@ -62,6 +66,16 @@ Giftora introduces a **centralized assembly workflow**:
 
 ---
 
+## 🚀 Impact
+
+**For Customers** — One checkout, one delivery, zero coordination headache. Personalized gifts without logistical complexity.
+
+**For Vendors** — Broader customer reach, reduced individual shipping overhead, and clear order workflow integration.
+
+**For the Gift Industry** — A scalable model for multi-vendor collaboration with built-in quality assurance.
+
+---
+
 ## ✨ Key Features
 
 - **Multi-Vendor Gift Box Builder** — select items from different vendors into one box
@@ -99,6 +113,18 @@ The platform follows a clean three-tier architecture:
 
 A single customer order flows through:
 `Order Placed → Sub-orders Created → Vendor Dispatch → Hub Receipt → Quality Check → Assembly → Delivery`
+
+---
+
+## 📐 Software Design
+
+### Core Modules
+
+- **User Management** — Secure registration and login for Customers, Vendors, and Administrators. JWT-based stateless authentication, BCrypt password hashing, and role-based access control (RBAC) enforced at both API and UI layers.
+- **Gift Box Customization Engine** — An interactive canvas where customers browse a searchable, filterable multi-vendor catalogue, add items from different sellers into one gift box, view a real-time cost total, attach a personalized message, and save drafts for later.
+- **Vendor & Item Management** — A dedicated vendor portal for creating, editing, and managing product listings with images, pricing, and stock levels. Stock is automatically decremented on order confirmation.
+- **Order Management & Splitting** — On checkout, a master order record is created and automatically split into one sub-order per vendor. Vendors are notified immediately; administrators manage the assembly hub workflow.
+- **Milestone-Based Order Tracking** — Customers see a clear timeline across five stages: *Order Placed → Vendor Processing → Items Dispatched to Hub → Quality Inspection → Out for Delivery*, each with a recorded timestamp.
 
 ---
 
@@ -201,21 +227,21 @@ e23-co2060-GiftBox-Customization-Marketplace/
 │                   └── Verify.jsx
 └── docs/
     └── data/
+```
 
 ---
 
-## 🗓️ Project Timeline
+## 🧪 Testing
 
-| Phase | Weeks | Focus |
-|-------|-------|-------|
-| Phase 1 | 1–5 | Foundation: Auth, RBAC, Vendor Registration |
-| Phase 2 | 6–11 | Core Marketplace: Browsing, Filtering, Cart, Checkout |
-| Phase 3 | 12–17 | Assembly & Logistics Workflow |
-| Phase 4 | 18–22 | Admin Tools, Notifications, UI Polish |
-| Phase 5 | 23–28 | Testing, Optimization & Final Submission |
+The system is verified across four strategies:
 
-**Final Deadline:** July 26, 2026
-```
+- **Unit Tests** — Backend service/utility methods with JUnit; frontend components with Jest
+- **Integration Tests** — API endpoint behaviour verified against the SRS using Postman collections
+- **System Tests** — End-to-end user journey scenarios on a deployed staging environment
+- **Security Tests** — JWT validation, RBAC enforcement, and input sanitisation via targeted API tests
+
+Automated regression tests run on every pull request to the main branch. Final User Acceptance Testing (UAT) simulates the full gift customization lifecycle with real user scenarios.
+
 ---
 
 ## 🚀 Getting Started
@@ -230,8 +256,8 @@ e23-co2060-GiftBox-Customization-Marketplace/
 
 ```bash
 # Clone the repository
-git clone https://github.com/cepdnaclk/e23-co2060-GiftBox-CustomizationMarketplace.git
-cd e23-co2060-GiftBox-CustomizationMarketplace
+git clone https://github.com/cepdnaclk/e23-co2060-GiftBox-Customization-Marketplace.git
+cd e23-co2060-GiftBox-Customization-Marketplace
 
 # Frontend setup
 cd frontend
@@ -315,9 +341,29 @@ git push origin feature/your-feature-name
 
 ---
 
+## 🗓️ Project Timeline
+
+| Phase | Weeks | Focus |
+|-------|-------|-------|
+| Phase 1 | 1–5 | Foundation: Auth, RBAC, Vendor Registration |
+| Phase 2 | 6–11 | Core Marketplace: Browsing, Filtering, Cart, Checkout |
+| Phase 3 | 12–17 | Assembly & Logistics Workflow |
+| Phase 4 | 18–22 | Admin Tools, Notifications, UI Polish |
+| Phase 5 | 23–28 | Testing, Optimization & Final Submission |
+
+**Final Deadline:** July 26, 2026
+
+---
+
+## 🎉 Conclusion
+
+Giftora addresses a genuine gap in the online gifting market by combining multi-vendor item selection, centralized assembly, and milestone-based tracking into one seamless platform. The project demonstrates practical application of full-stack web development, secure system design, RESTful API architecture, and Agile project management — and provides a foundation for future enhancements including AI-powered gift recommendations, mobile applications, and multi-currency support.
+
 ---
 ## 🔗 Links
 
+- [Project Repository](https://github.com/cepdnaclk/e23-co2060-GiftBox-Customization-Marketplace)
+- [Project Page](https://cepdnaclk.github.io/e23-co2060-GiftBox-Customization-Marketplace/)
 - [Department of Computer Engineering](http://www.ce.pdn.ac.lk/)
 - [University of Peradeniya](https://eng.pdn.ac.lk/)
 - [CE Projects Portal](https://projects.ce.pdn.ac.lk)

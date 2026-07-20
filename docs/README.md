@@ -23,10 +23,10 @@ A HTML template integrated with the given GitHub repository templates, based on 
 ---
 
 ## Team
--  E/23/167 - Name, [email](mailto:e23167@eng.pdn.ac.lk)
--  E/23/351 - Sanjuna K.D - [email](mailto:e23351@eng.pdn.ac.lk)
--  E/23/412 - Name, [email](mailto:e23412@eng.pdn.ac.lk)
--  E/23/416 - Vishwaka A.G.S, [email](mailto:e23416@eng.pdn.ac.lk)
+-  E/23/167 - Karunarathna A. V. P. J. P., [e23167@eng.pdn.ac.lk](mailto:e23167@eng.pdn.ac.lk)
+-  E/23/351 - Sanjuna K. D., [e23351@eng.pdn.ac.lk](mailto:e23351@eng.pdn.ac.lk)
+-  E/23/412 - Vidanya A. P. S., [e23412@eng.pdn.ac.lk](mailto:e23412@eng.pdn.ac.lk)
+-  E/23/416 - Vishwaka A. G. S., [e23416@eng.pdn.ac.lk](mailto:e23416@eng.pdn.ac.lk)
 
 <!-- Image (photo/drawing of the final hardware) should be here -->
 
@@ -36,8 +36,8 @@ A HTML template integrated with the given GitHub repository templates, based on 
 
 #### Table of Contents
 1. [Introduction](#introduction)
-2. [Solution Architecture](#solution-architecture )
-3. [Software Designs](#hardware-and-software-designs)
+2. [Solution Architecture](#solution-architecture)
+3. [Software Design](#software-design)
 4. [Testing](#testing)
 5. [Conclusion](#conclusion)
 6. [Links](#links)
@@ -75,9 +75,9 @@ The platform introduces a **centralized assembly workflow**: a dedicated team co
 
 Giftora is a full-stack web application structured around three tiers:
 
-- **Frontend** — A React.js (v18+) single-page application serving role-specific dashboards for Customers, Vendors, Assembly Staff, and Administrators over HTTPS
-- **Backend** — A Spring Boot (Java, v3+) RESTful API layer handling business logic, JWT-based authentication, RBAC enforcement, order splitting, and assembly workflow coordination
-- **Database** — A MySQL (v8+) relational database storing users, products, orders, sub-orders, assembly records, and tracking milestones
+- **Frontend** — A React.js (v18+) single-page application serving role-specific dashboards for Customers, Vendors, Assembly Staff, and Administrators over HTTPS.
+- **Backend** — A Spring Boot (Java, v3+) RESTful API layer handling business logic, JWT-based authentication, RBAC enforcement, order splitting, and assembly workflow coordination.
+- **Database** — A MySQL (v8+) relational database storing users, products, orders, sub-orders, assembly records, and tracking milestones.
 
 A single customer order is split internally into **sub-orders per vendor**, each tracked independently and merged for the customer-facing milestone view. Real-time status updates are delivered via API polling or WebSocket connections.
 
@@ -89,7 +89,7 @@ A single customer order is split internally into **sub-orders per vendor**, each
 
 **User Management** — Secure registration and login for Customers, Vendors, and Administrators. JWT-based stateless authentication, BCrypt password hashing, and role-based access control (RBAC) enforced at both API and UI layers.
 
-**Gift Box Customisation Engine** — An interactive canvas where customers browse a searchable, filterable multi-vendor catalogue, add items from different sellers into one gift box, view a real-time cost total, attach a personalised message, and save drafts for later.
+**Gift Box Customization Engine** — An interactive canvas where customers browse a searchable, filterable multi-vendor catalogue, add items from different sellers into one gift box, view a real-time cost total, attach a personalized message, and save drafts for later.
 
 **Vendor & Item Management** — A dedicated vendor portal for creating, editing, and managing product listings with images, pricing, and stock levels. Stock is automatically decremented on order confirmation.
 
@@ -113,10 +113,10 @@ A single customer order is split internally into **sub-orders per vendor**, each
 
 The system is verified across four strategies:
 
-- **Unit Tests** — Backend service/utility methods with JUnit; frontend components with Jest
-- **Integration Tests** — API endpoint behaviour verified against the SRS using Postman collections
-- **System Tests** — End-to-end user journey scenarios on a deployed staging environment
-- **Security Tests** — JWT validation, RBAC enforcement, and input sanitisation via targeted API tests
+- **Unit Tests** — Backend service/utility methods with JUnit; frontend components with Jest.
+- **Integration Tests** — API endpoint behaviour verified against the SRS using Postman collections.
+- **System Tests** — End-to-end user journey scenarios on a deployed staging environment.
+- **Security Tests** — JWT validation, RBAC enforcement, and input sanitisation via targeted API tests.
 
 Automated regression tests run on every pull request to the main branch. Final User Acceptance Testing (UAT) simulates the full gift customization lifecycle with real user scenarios.
 
