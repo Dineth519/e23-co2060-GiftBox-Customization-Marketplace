@@ -10,9 +10,8 @@ import Footer from '../../components/landingpage/Footer';
 import { useCart } from '../../context/CartContext';
 import './CustomerHome.css';
 
-// ─── Config (From ProductsPage) ───────────────────────────────────────────
-const CATEGORY_MAP = { 1:'Wine', 2:'Watches', 3:'Perfume', 4:'Teddy Bears', 5:'Bangles', 6:'Chocolates' };
-const CAT_ICONS    = { All:'🛍️', Wine:'🍷', Watches:'⌚', Perfume:'🌸', 'Teddy Bears':'🧸', Bangles:'💍', Chocolates:'🍫' };
+// ─── Config ───────────────────────────────────────────
+const CAT_ICONS    = { All:'🛍️', Wine:'🍷', Watches:'⌚', Perfume:'🌸', 'Teddy Bears':'🧸', Bangles:'💍', Chocolates:'🍫', Other:'🎁' };
 const SORT_OPTIONS = [
   { value:'default',    label:'Featured' },
   { value:'price-asc',  label:'Price: Low → High' },
@@ -38,6 +37,7 @@ const CustomerHome = () => {
 
   // ─── States ─────────────────────────────────────────────────────────────
   const [allProducts, setAllProducts] = useState([]);
+  const [dbCategories, setDbCategories] = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -45,26 +45,40 @@ const CustomerHome = () => {
   const [sortBy, setSortBy]           = useState('default');
   const [quickView, setQuickView]     = useState(null);
 
-  // Fetch Products
+  // Fetch Products and Categories
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/products`)
-      .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
-      .then(data => { setAllProducts(data); setLoading(false); })
-      .catch(err => { setError(err.message); setLoading(false); });
+    Promise.all([
+      fetch(`${process.env.REACT_APP_API_URL}/api/products`).then(res => res.ok ? res.json() : []),
+      fetch(`${process.env.REACT_APP_API_URL}/api/categories`).then(res => res.ok ? res.json() : [])
+    ])
+      .then(([productsData, categoriesData]) => {
+        setAllProducts(productsData);
+        setDbCategories(categoriesData);
+        setLoading(false);
+      })
+      .catch(err => { 
+        setError(err.message); 
+        setLoading(false); 
+      });
   }, []);
+
+  const getCategoryName = (id) => {
+    const cat = dbCategories.find(c => c.id === id);
+    return cat ? cat.name : 'Other';
+  };
 
   // ─── Logic (Filtering & Sorting) ────────────────────────────────────────
   const categories = useMemo(() => {
-    const names = allProducts.map(p => CATEGORY_MAP[p.categoryId] || 'Other');
+    const names = allProducts.map(p => getCategoryName(p.categoryId));
     return ['All', ...new Set(names)];
-  }, [allProducts]);
+  }, [allProducts, dbCategories]);
 
   const displayProducts = useMemo(() => {
     let f = [...allProducts];
-    if (activeCategory !== 'All') f = f.filter(p => CATEGORY_MAP[p.categoryId] === activeCategory);
+    if (activeCategory !== 'All') f = f.filter(p => getCategoryName(p.categoryId) === activeCategory);
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      f = f.filter(p => p.name.toLowerCase().includes(q) || (CATEGORY_MAP[p.categoryId]||'').toLowerCase().includes(q));
+      f = f.filter(p => p.name.toLowerCase().includes(q) || getCategoryName(p.categoryId).toLowerCase().includes(q));
     }
     switch (sortBy) {
       case 'price-asc':  f.sort((a,b) => a.price - b.price); break;
@@ -116,7 +130,7 @@ const CustomerHome = () => {
 
           <div className="home-filters">
             <select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)}>
-              {categories.map(cat => <option key={cat} value={cat}>{CAT_ICONS[cat]} {cat}</option>)}
+              {categories.map(cat => <option key={cat} value={cat}>{CAT_ICONS[cat] ? `${CAT_ICONS[cat]} ` : ''}{cat}</option>)}
             </select>
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
               {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
@@ -130,8 +144,7 @@ const CustomerHome = () => {
           {error && <div className="home-state error">⚠️ {error}</div>}
           
           {!loading && !error && displayProducts.map((p, i) => {
-            const catName  = CATEGORY_MAP[p.categoryId] || 'Gift';
-            const catIcon  = CAT_ICONS[catName] || '🎁';
+            const catName  = getCategoryName(p.categoryId);
             const justAdded = addedId === p.id;
             
             return (
@@ -216,7 +229,7 @@ const CustomerHome = () => {
             </div>
             <div className="qv-info-side">
               <div className="qv-cat-tag">
-                {CAT_ICONS[CATEGORY_MAP[quickView.categoryId]] || '🎁'} {CATEGORY_MAP[quickView.categoryId] || 'Gift'}
+                {CAT_ICONS[getCategoryName(quickView.categoryId)] ? `${CAT_ICONS[getCategoryName(quickView.categoryId)]} ` : ''}{getCategoryName(quickView.categoryId)}
               </div>
               <h3 className="qv-name">{quickView.name}</h3>
               <div className="qv-stars-row">★★★★★ <span>5.0 · Premium Quality</span></div>

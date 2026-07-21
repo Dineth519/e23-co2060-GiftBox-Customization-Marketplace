@@ -36,7 +36,7 @@ const TopBar = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate('/');
+    navigate('/', { replace: true });
   };
 
   return (

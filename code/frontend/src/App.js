@@ -19,6 +19,7 @@ import CustomerProfile from './pages/customer/Profile.jsx'
 import AboutUs from './pages/customer/AboutUsPage.jsx';
 import BoxBuilder from './pages/customer/BoxBuilderPage.jsx'
 import Checkout from './pages/customer/Checkout.jsx';
+import CustomerSettings from './pages/customer/Settings.jsx';
 
 // Authentication pages
 import Login from './pages/auth/Login.jsx';
@@ -30,6 +31,7 @@ import AdminLayout from './layouts/AdminLayout.jsx';
 import Vendors from './pages/admin/Vendors.jsx';
 import PendingVendors from './pages/admin/PendingVendors.jsx';
 import Customers from './pages/admin/Customers.jsx';
+import AdminCategories from './pages/admin/AdminCategories.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
 import Settings from './pages/admin/Settings.jsx';
 import StaffManagement from './pages/admin/StaffManagement.jsx';
@@ -93,6 +95,7 @@ function App() {
           {/* Public and user routes */}
           <Route path="/" element={<LayoutWrapper><LandingPage /></LayoutWrapper>} />
           <Route path="/products" element={<ProductsPage />} />
+
           <Route path="/about-us" element={<LayoutWrapper><AboutUsPage /></LayoutWrapper>} />
           <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
@@ -115,6 +118,7 @@ function App() {
             <Route path="checkout" element={<Checkout />} />
             <Route path="about-us" element={<AboutUs />} />
             <Route path="build-box" element={<BoxBuilder />} />
+            <Route path="settings" element={<CustomerSettings />} />
 
           </Route>
 
@@ -136,11 +140,12 @@ function App() {
             <AdminLayout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
+                <Route path="staff-management" element={<StaffManagement />} />
                 <Route path="vendors" element={<Vendors />} />
                 <Route path="vendors/pending" element={<PendingVendors />} />
                 <Route path="customers" element={<Customers />} />
+                <Route path="categories" element={<AdminCategories />} />
                 <Route path="settings" element={<Settings />} />
-                <Route path="staff-management" element={<StaffManagement />} />
               </Routes>
             </AdminLayout>
           } />
