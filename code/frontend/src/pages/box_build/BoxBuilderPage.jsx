@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../../components/landingpage/Header';
+import Footer from '../../components/landingpage/Footer';
 import { useCart } from '../../context/CartContext'; 
 import './BoxBuilderPage.css';
 
@@ -196,19 +198,22 @@ const BoxBuilderPage = () => {
   if (submitSuccess) {
     return (
       <div className="bb-page">
+        <Header />
         <div className="bb-success-screen">
           <div className="bb-success-icon">🎁</div>
           <h2 className="bb-success-title">Your Box is Being Prepared!</h2>
           <p className="bb-success-desc">Thank you for choosing Giftora. Our premium vendors are carefully assembling your personalized gift box.</p>
           <button className="bb-btn-primary" onClick={() => navigate('/')}>Return to Home</button>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
     <div className="bb-page">
-      
+      <Header />
+
       {/* HEADER HERO ELEMENT */}
       <section className="bb-hero-clean">
         <div className="bb-hero-inner" ref={heroRef}>
@@ -520,6 +525,8 @@ const BoxBuilderPage = () => {
         </aside>
 
       </div>
+
+      <Footer />
     </div>
   );
 };

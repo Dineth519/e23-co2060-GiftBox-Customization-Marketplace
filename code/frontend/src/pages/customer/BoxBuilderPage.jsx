@@ -54,7 +54,7 @@ const BoxBuilderPage = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [validationError, setValidationError] = useState('');
 
-  // 🛠️ FIX: Fetch the actual item catalog automatically so users don't have to leave the page
+  //  FIX: Fetch the actual item catalog automatically so users don't have to leave the page
   useEffect(() => {
     const fetchCatalog = async () => {
       setIsLoadingCatalog(true);

@@ -31,11 +31,124 @@
 }
 
 /* ══════════════════════════════════
-   HERO SECTION (Matches About Us)
+   NAVIGATION HEADER (Matches Site Header)
+   ══════════════════════════════════ */
+.bb-navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 48px;
+}
+
+.bb-navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.bb-navbar__logo-img {
+  height: 36px;
+  width: auto;
+}
+
+.bb-navbar__logo-text {
+  font-family: var(--font-d);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.5px;
+}
+
+.bb-navbar__menu {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.bb-navbar__link {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.bb-navbar__link:hover,
+.bb-navbar__link--active {
+  color: var(--white);
+}
+
+.bb-navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.bb-navbar__cart-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s ease;
+}
+
+.bb-navbar__cart-btn:hover {
+  color: var(--white);
+}
+
+.bb-navbar__btn-outline {
+  padding: 8px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.bb-navbar__btn-outline:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.bb-navbar__btn-gold {
+  padding: 8px 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+  transition: all 0.2s ease;
+}
+
+.bb-navbar__btn-gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+}
+
+/* ══════════════════════════════════
+   HERO SECTION (Matches About Us / Products)
    ══════════════════════════════════ */
 .bb-hero {
   background: linear-gradient(135deg, var(--navy) 0%, var(--deep) 55%, #0d1b35 100%);
-  padding: 100px 0 0;
+  padding: 140px 0 0; /* Expanded top padding to clear navigation bar */
   position: relative;
   overflow: hidden;
 }
@@ -71,7 +184,7 @@
 .bb-hero__inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 48px 50px;
+  padding: 0 48px 40px;
   position: relative;
   z-index: 2;
   opacity: 0;
@@ -103,25 +216,36 @@
 }
 
 .bb-hero__sub {
-  font-size: 16px; color: rgba(255,255,255,.6);
-  max-width: 500px; line-height: 1.6;
+  font-size: 15px; color: rgba(255,255,255,.6);
+  max-width: 540px; line-height: 1.6;
 }
 
 .bb-hero__pills {
   max-width: 1280px; margin: 0 auto;
   padding: 20px 48px;
   position: relative; z-index: 2;
-  display: flex; gap: 8px; flex-wrap: wrap;
+  display: flex; gap: 10px; flex-wrap: wrap;
   border-top: 1px solid rgba(255,255,255,.06);
 }
 
 .bb-hero-pill {
-  padding: 6px 16px;
+  padding: 8px 18px;
   border: 1px solid rgba(255,255,255,.12);
   background: rgba(255,255,255,.05);
   border-radius: 999px;
-  font-size: 12px; font-weight: 500;
-  color: rgba(255,255,255,.6);
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,.7);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(4px);
+}
+
+.bb-hero-pill--active {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  color: var(--navy);
+  border-color: var(--gold);
+  font-weight: 600;
 }
 
 /* ══════════════════════════════════
@@ -152,7 +276,7 @@
    SECTIONS & HEADERS
    ══════════════════════════════════ */
 .bb-section {
-  scroll-margin-top: 100px; /* For smooth scrolling */
+  scroll-margin-top: 100px;
 }
 
 .bb-section-header {
@@ -472,12 +596,15 @@
    RESPONSIVE
    ══════════════════════════════════ */
 @media (max-width: 1024px) {
+  .bb-navbar { padding: 20px 24px; }
   .bb-layout-wrapper { flex-direction: column; padding: 40px 24px; }
   .bb-sidebar { width: 100%; }
   .bb-sticky-panel { position: relative; top: 0; }
 }
 
 @media (max-width: 768px) {
+  .bb-hero { padding-top: 100px; }
+  .bb-navbar__menu { display: none; } /* Hide menu links on mobile */
   .bb-hero__inner, .bb-hero__pills { padding: 0 24px 40px; }
   .bb-hero__title { font-size: 40px; }
   .bb-section--dark { padding: 24px; }
