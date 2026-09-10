@@ -1088,3 +1088,71 @@
   width: 0;
   height: 0;
 }
+.bb-selected-products-list {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.bb-selected-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #777777;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.bb-selected-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 26px;
+  align-items: center;
+}
+
+.bb-empty-chip-text {
+  font-size: 11px;
+  color: #a0aec0;
+  font-style: italic;
+}
+
+.bb-selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fdfbf7;
+  border: 1px solid #c9a961;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.bb-chip-name {
+  color: #1a1a2e;
+  font-weight: 500;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bb-chip-qty {
+  font-weight: 700;
+  color: #c9a961;
+}
+
+.bb-chip-remove {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0 2px;
+  margin-left: 2px;
+}
+
+.bb-chip-remove:hover {
+  color: #e53e3e;
+}

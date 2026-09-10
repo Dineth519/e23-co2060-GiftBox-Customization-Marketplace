@@ -5,6 +5,9 @@ import Footer from '../../components/landingpage/Footer';
 import { useCart } from '../../context/CartContext';
 import './BoxBuilderPage.css';
 
+// Safe helper to extract product ID regardless of backend field naming (_id, id, productId)
+const getProdId = (p) => p?.productId ?? p?.id ?? p?._id;
+
 // Master Static Data Definitions
 const OCCASIONS = [
   { id: 'Birthday', icon: '🎂', label: 'Birthday', desc: 'Celebrate another trip around the sun' },
@@ -163,7 +166,7 @@ const BoxBuilderPage = () => {
   const availableItems = useMemo(() => {
     return catalogProducts.filter(p => {
       const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
-      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
   }, [catalogProducts, activeCategory, searchQuery]);
@@ -174,7 +177,7 @@ const BoxBuilderPage = () => {
 
   const itemsSubtotal = useMemo(() => {
     return Object.entries(selectedItems).reduce((sum, [id, qty]) => {
-      const product = catalogProducts.find(p => p.productId === parseInt(id, 10));
+      const product = catalogProducts.find(p => String(getProdId(p)) === String(id));
       return sum + (product ? product.price * qty : 0);
     }, 0);
   }, [selectedItems, catalogProducts]);
@@ -184,13 +187,16 @@ const BoxBuilderPage = () => {
 
   // Item Handlers
   const handleAddItem = (product) => {
+    const prodId = getProdId(product);
+    if (!prodId) return;
+
     if (totalItemsCount >= boxSize.limit) {
       triggerToast(`Limit reached (${boxSize.limit} items max). Upgrade box size for more.`);
       return;
     }
     setSelectedItems(prev => ({
       ...prev,
-      [product.productId]: (prev[product.productId] || 0) + 1
+      [prodId]: (prev[prodId] || 0) + 1
     }));
   };
 
@@ -242,7 +248,7 @@ const BoxBuilderPage = () => {
       deliveryDate,
       totalPrice: grandTotal,
       items: Object.entries(selectedItems).map(([id, qty]) => ({
-        productId: parseInt(id, 10),
+        productId: id,
         quantity: qty
       }))
     };
@@ -493,6 +499,36 @@ const BoxBuilderPage = () => {
                     style={{ width: `${(totalItemsCount / boxSize.limit) * 100}%` }}
                   />
                 </div>
+
+                {/* Selected Products Mini-List */}
+                <div className="bb-selected-products-list">
+                  <span className="bb-selected-label">Packed Items:</span>
+                  <div className="bb-selected-chips">
+                    {Object.entries(selectedItems).length === 0 ? (
+                      <span className="bb-empty-chip-text">No items packed yet</span>
+                    ) : (
+                      Object.entries(selectedItems).map(([id, qty]) => {
+                        if (qty <= 0) return null;
+                        const prod = catalogProducts.find(p => String(getProdId(p)) === String(id));
+
+                        return (
+                          <div key={id} className="bb-selected-chip">
+                            <span className="bb-chip-name">{prod ? prod.name : `Item #${id}`}</span>
+                            <span className="bb-chip-qty">x{qty}</span>
+                            <button
+                              type="button"
+                              className="bb-chip-remove"
+                              onClick={() => handleRemoveItem(id)}
+                              title="Remove item"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Catalog Grid */}
@@ -505,23 +541,24 @@ const BoxBuilderPage = () => {
               ) : (
                 <div className="bb-catalog-grid">
                   {availableItems.map(prod => {
-                    const qty = selectedItems[prod.productId] || 0;
+                    const prodId = getProdId(prod);
+                    const qty = selectedItems[prodId] || 0;
                     const isFull = totalItemsCount >= boxSize.limit && qty === 0;
 
                     return (
-                      <div key={prod.productId} className={`bb-item-card ${qty > 0 ? 'selected' : ''}`}>
+                      <div key={prodId} className={`bb-item-card ${qty > 0 ? 'selected' : ''}`}>
                         <div className="bb-item-img-wrap">
                           <img src={prod.imageUrl} alt={prod.name} loading="lazy" />
                           {qty > 0 && <span className="bb-item-qty-badge">{qty}</span>}
                         </div>
                         <div className="bb-item-body">
                           <h5>{prod.name}</h5>
-                          <span className="bb-item-price">LKR {prod.price.toLocaleString()}</span>
+                          <span className="bb-item-price">LKR {prod.price ? prod.price.toLocaleString() : '0'}</span>
                           
                           <div className="bb-item-actions">
                             {qty > 0 ? (
                               <div className="bb-qty-stepper">
-                                <button onClick={() => handleRemoveItem(prod.productId)}>−</button>
+                                <button onClick={() => handleRemoveItem(prodId)}>−</button>
                                 <span>{qty}</span>
                                 <button onClick={() => handleAddItem(prod)} disabled={totalItemsCount >= boxSize.limit}>+</button>
                               </div>
@@ -731,7 +768,7 @@ const BoxBuilderPage = () => {
                 <p className="bb-empty-packed">No items packed yet.</p>
               ) : (
                 Object.entries(selectedItems).map(([id, qty]) => {
-                  const prod = catalogProducts.find(p => p.productId === parseInt(id, 10));
+                  const prod = catalogProducts.find(p => String(getProdId(p)) === String(id));
                   if (!prod) return null;
                   return (
                     <div key={id} className="bb-packed-item-row">
