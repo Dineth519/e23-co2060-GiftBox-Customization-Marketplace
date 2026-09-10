@@ -24,14 +24,38 @@ const WRAPPING_STYLES = [
   { id: 'Classic Gold', name: 'Royal Gold Foil', color: '#C9A961', defaultRibbon: '#FFFFFF' },
   { id: 'Rose Blush', name: 'Velvet Rose Pink', color: '#E8A0BF', defaultRibbon: '#4A2E35' },
   { id: 'Midnight Navy', name: 'Imperial Midnight', color: '#1A1A2E', defaultRibbon: '#C9A961' },
-  { id: 'Emerald Luxe', name: 'Botanical Emerald', color: '#1B4332', defaultRibbon: '#D4AF37' }
+  { id: 'Emerald Luxe', name: 'Botanical Emerald', color: '#1B4332', defaultRibbon: '#D4AF37' },
+  { id: 'Champagne Silk', name: 'Silk Champagne', color: '#F7E7CE', defaultRibbon: '#6B0F1A' },
+  { id: 'Burgundy Reserve', name: 'Vintage Burgundy', color: '#6B0F1A', defaultRibbon: '#F7E7CE' },
+  { id: 'Matte Onyx', name: 'Obsidian Noir', color: '#111111', defaultRibbon: '#C9A961' },
+  { id: 'Pearl Ivory', name: 'Gilded Ivory', color: '#F5F5F0', defaultRibbon: '#C9A961' },
+  { id: 'Sapphire Elegance', name: 'Deep Sapphire', color: '#0F2027', defaultRibbon: '#E0E0E0' },
+  { id: 'Tuscan Terracotta', name: 'Warm Terracotta', color: '#C86D51', defaultRibbon: '#4A2E35' },
+  { id: 'Sage Linen', name: 'Artisanal Sage', color: '#8A9A86', defaultRibbon: '#FFFFFF' },
+  { id: 'Platinum Slate', name: 'Platinum Slate', color: '#708090', defaultRibbon: '#1A1A2E' },
+  { id: 'Plum Opulence', name: 'Imperial Plum', color: '#3B1F2B', defaultRibbon: '#FCF6BA' },
+  { id: 'Copper Metallic', name: 'Burnished Copper', color: '#B87333', defaultRibbon: '#1A1A2E' },
+  { id: 'Muted Lavender', name: 'Dusty Lavender', color: '#96897B', defaultRibbon: '#3B1F2B' },
+  { id: 'Celestial Azure', name: 'Midnight Azure', color: '#2C3E50', defaultRibbon: '#F7E7CE' },
+  { id: 'Warm Cashmere', name: 'Soft Cashmere', color: '#D3B8AE', defaultRibbon: '#1B4332' },
+  { id: 'Smoked Quartz', name: 'Espresso Quartz', color: '#4A3B32', defaultRibbon: '#C9A961' },
+  { id: 'Frosted Silver', name: 'Sterling Silver', color: '#E0E0E0', defaultRibbon: '#111111' },
+  { id: 'Olive Regency', name: 'Regency Olive', color: '#4A5335', defaultRibbon: '#F5F5F0' },
+  { id: 'Coral Solstice', name: 'Sunken Coral', color: '#D07A60', defaultRibbon: '#F7E7CE' },
+  { id: 'Cognac Leather', name: 'Artisan Cognac', color: '#8C5228', defaultRibbon: '#111111' }
 ];
 
 const RIBBON_OPTIONS = [
   { id: 'Gold Ribbon', color: '#D4AF37', label: 'Metallic Gold' },
   { id: 'Silk White', color: '#F8F9FA', label: 'Ivory Silk' },
   { id: 'Satin Red', color: '#900C3F', label: 'Crimson Satin' },
-  { id: 'Midnight Onyx', color: '#111111', label: 'Onyx Black' }
+  { id: 'Midnight Onyx', color: '#111111', label: 'Onyx Black' },
+  { id: 'Rose Gold', color: '#B76E79', label: 'Rose Gold' },
+  { id: 'Emerald Satin', color: '#1B4332', label: 'Botanical Emerald' },
+  { id: 'Royal Navy', color: '#1B263B', label: 'Imperial Navy' },
+  { id: 'Champagne Silk', color: '#F7E7CE', label: 'Champagne Silk' },
+  { id: 'Sterling Silver', color: '#E0E0E0', label: 'Sterling Silver' },
+  { id: 'Blush Pink', color: '#E8A0BF', label: 'Velvet Blush' }
 ];
 
 const CARD_TEMPLATES = [
@@ -292,23 +316,20 @@ const BoxBuilderPage = () => {
       {/* HERO SECTION */}
       <section className="bb-hero">
         <div className="bb-hero-inner" ref={heroRef}>
-          <span className="bb-hero-badge">Giftora Bespoke Studio</span>
+          <span className="bb-hero-badge">Giftora Studio</span>
           <h1 className="bb-hero-title">
-            Bespoke Gift Box <span className="bb-hero-accent">Craft Studio</span>
+            Gift Box <span className="bb-hero-accent">Craft Studio</span>
           </h1>
-          <p className="bb-hero-sub">
-            Curate luxurious personalized packages, hand-wrapped with silk ribbons and tailored keepsakes.
-          </p>
         </div>
       </section>
 
       {/* STEPPER PROGRESS NAVIGATION */}
       <div className="bb-stepper-bar">
         {[
-          { step: 1, label: '1. Framework & Size' },
-          { step: 2, label: '2. Wrap & Styling' },
-          { step: 3, label: '3. Select Inventory' },
-          { step: 4, label: '4. Card & Dispatch' }
+          { step: 1, label: ' Framework & Size' },
+          { step: 2, label: ' Wrap & Styling' },
+          { step: 3, label: ' Select Inventory' },
+          { step: 4, label: ' Card & Dispatch' }
         ].map((item) => (
           <button
             key={item.step}

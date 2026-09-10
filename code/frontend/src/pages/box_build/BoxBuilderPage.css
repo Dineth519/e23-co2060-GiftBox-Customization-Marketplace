@@ -993,3 +993,98 @@
     flex-direction: column;
   }
 }
+/* Compact Scrollable Wrapping Grid */
+.bb-wrap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  max-height: 180px; /* Reduced container height */
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 4px;
+
+  /* Hide scrollbars */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.bb-wrap-grid::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Compact Wrapping Card Item */
+.bb-wrap-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bb-wrap-card:hover {
+  border-color: #c9a961;
+  background: #fdfbf7;
+}
+
+.bb-wrap-card.active {
+  border-color: #c9a961;
+  background: #faf6ed;
+  box-shadow: 0 0 0 1px #c9a961;
+}
+
+/* Compact Color Swatch */
+.bb-wrap-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Compact Typography */
+.bb-wrap-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.bb-wrap-details h5 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bb-wrap-details small {
+  display: none; /* Hidden to keep layout tight */
+}
+/* Scrollable Ribbon Grid with Hidden Scrollbars */
+.bb-ribbon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 4px;
+
+  /* Hide scrollbar for Firefox and IE/Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar for Chrome, Safari, and Opera */
+.bb-ribbon-grid::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
