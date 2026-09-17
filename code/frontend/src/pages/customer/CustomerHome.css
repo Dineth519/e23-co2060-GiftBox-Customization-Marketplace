@@ -318,7 +318,7 @@ body {
 }
 
 /* Major page sections with padding and responsive spacing */
-section {
+:where(.customer-home) section {
   padding: 120px 60px;
 }
 
@@ -1066,7 +1066,7 @@ section {
 }
 
 @media (max-width: 768px) {
-  section {
+  :where(.customer-home) section {
     padding: 80px 30px;
   }
   

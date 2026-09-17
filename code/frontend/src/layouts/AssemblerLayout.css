@@ -2,13 +2,16 @@
 
 .assembler-layout-container {
     display: flex;
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
     background-color: #f8f6f1;
 }
 
 .assembler-main-content {
     flex: 1;
     min-width: 0;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Prevents the entire page from scrolling */
@@ -16,14 +19,17 @@
 
 .assembler-main-area {
     flex: 1;
+    min-height: 0;
     padding: 32px;
-    overflow-y: auto; /* Allows only the main content area to scroll */
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
 }
 
 @media (max-width: 900px) {
     .assembler-main-area { padding: 22px; }
 }
 @media (max-width: 600px) {
-    .assembler-layout-container { flex-direction: column; }
-    .assembler-main-area { padding: 20px 14px; }
+    .assembler-layout-container { flex-direction: column; height: auto; min-height: 100dvh; overflow: visible; }
+    .assembler-main-content { overflow: visible; }
+    .assembler-main-area { padding: 20px 14px; overflow: visible; }
 }

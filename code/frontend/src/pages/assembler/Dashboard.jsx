@@ -1,187 +1,94 @@
-import React, { useState, useEffect } from 'react';
-import { FaBoxOpen, FaClipboardCheck, FaCheckDouble, FaShippingFast } from 'react-icons/fa';
+import React, { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Package, Box, Settings, CircleCheck, Clock, TriangleAlert, Search, ArrowUpRight, ArrowRight, X, Inbox, BookOpen } from 'lucide-react';
+import { STATUS, SAMPLE_ORDERS, filterOrders } from './overviewData';
 import './Dashboard.css';
 
-// ── Config ────────────────────────────────────────────────────
-const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
+const metrics = [
+  { status: 'awaiting', icon: Package, hint: 'Waiting for vendor deliveries' },
+  { status: 'ready', icon: Box, hint: 'All items received' },
+  { status: 'assembling', icon: Settings, hint: 'Preparation in progress' },
+  { status: 'review', icon: CircleCheck, hint: 'Awaiting final approval' },
+];
+const statusIcons = { awaiting: Clock, ready: Box, assembling: Settings, review: CircleCheck, hold: TriangleAlert };
 
-// ── Helper Sub-components ──────────────────────────────────────
-const StatCard = ({ icon, title, value }) => (
-  <div className="asm-stat-card">
-    <div className="asm-stat-icon">{icon}</div>
-    <div className="asm-stat-body">
-      <p className="asm-stat-title">{title}</p>
-      <h3 className="asm-stat-value">{value}</h3>
-    </div>
-  </div>
-);
+function StatusBadge({ status }) {
+  const Icon = statusIcons[status];
+  return <span className={'ao-status ao-tone-' + STATUS[status].tone}><Icon size={14} aria-hidden="true" />{STATUS[status].label}</span>;
+}
 
-// ── Main Component ────────────────────────────────────────────
-const AssemblerDashboard = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Mock initial fetch. In reality, you'd fetch from `/api/orders` where status is CONFIRMED, RECEIVED, ASSEMBLING, etc.
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const fetchOrders = async () => {
-    setLoading(true);
-    try {
-      // NOTE: Replace this with actual backend API when ready
-      const res = await fetch(`${API_BASE}/orders`);
-      if (res.ok) {
-        let data = await res.json();
-        // Filter out orders that are standard (no box customization) or already delivered
-        data = data.filter(o => o.boxSize && o.status !== 'DELIVERED');
-        setOrders(data);
-      } else {
-        // Fallback Mock Data if API fails or doesn't support fetching all orders yet
-        setOrders([
-          { orderId: 101, customerName: 'Hasini K.', boxSize: 'LARGE', occasion: 'Birthday', status: 'CONFIRMED' },
-          { orderId: 102, customerName: 'Test User', boxSize: 'MEDIUM', occasion: 'Anniversary', status: 'RECEIVED' },
-          { orderId: 103, customerName: 'Alice M.', boxSize: 'SMALL', occasion: 'Graduation', status: 'ASSEMBLING' }
-        ]);
-      }
-    } catch (error) {
-      console.error("Failed to fetch orders, using mock data", error);
-      // Fallback Mock Data
-      setOrders([
-        { orderId: 101, customerName: 'Hasini K.', boxSize: 'LARGE', occasion: 'Birthday', status: 'CONFIRMED' },
-        { orderId: 102, customerName: 'Test User', boxSize: 'MEDIUM', occasion: 'Anniversary', status: 'RECEIVED' },
-        { orderId: 103, customerName: 'Alice M.', boxSize: 'SMALL', occasion: 'Graduation', status: 'ASSEMBLING' }
-      ]);
-    } finally {
-      setLoading(false);
-    }
+export default function AssemblerDashboard() {
+  const [status, setStatus] = useState('all');
+  const [query, setQuery] = useState('');
+  const [selected, setSelected] = useState(null);
+  const dialog = useRef(null);
+  const orders = filterOrders(SAMPLE_ORDERS, status, query);
+  const onHold = SAMPLE_ORDERS.filter(order => order.status === 'hold').length;
+  const openPreview = order => {
+    setSelected(order);
+    dialog.current.showModal();
   };
-
-  const updateOrderStatus = async (orderId, newStatus) => {
-    try {
-      // Update locally immediately for better UX
-      setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status: newStatus } : o));
-
-      // Make API call to backend
-      const res = await fetch(`${API_BASE}/orders/${orderId}/status?status=${newStatus}`, {
-        method: 'PUT',
-      });
-      
-      if (!res.ok) {
-        console.error("Failed to update status on server");
-        // In a real app, you might want to revert the local change here if it fails
-      }
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
-  };
-
-  const pendingCount = orders.filter(o => o.status === 'CONFIRMED').length;
-  const assemblingCount = orders.filter(o => o.status === 'RECEIVED' || o.status === 'ASSEMBLING').length;
-  const readyCount = orders.filter(o => o.status === 'QA_PASSED' || o.status === 'READY').length;
+  const reset = () => { setStatus('all'); setQuery(''); };
 
   return (
-    <div className="asm-page">
-      {/* ── Welcome Banner ── */}
-      <div className="asm-banner">
+    <section className="asm-overview" aria-labelledby="ao-title">
+      <header className="ao-header">
         <div>
-          <h1>Assembly Workflow Module</h1>
-          <p>Track, manage, and assemble custom gift boxes.</p>
+          <div className="ao-title-row"><h1 id="ao-title">Assembly overview</h1><span className="ao-sample">Sample data</span></div>
+          <p>Receive items. Prepare gifts. Keep every detail right.</p>
         </div>
-        <div className="asm-banner-date">
-          <p className="date-label">Today</p>
-          <p className="date-value">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
-        </div>
+        <div className="ao-date"><span>Today</span><time dateTime={new Date().toLocaleDateString('en-CA')}>{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</time></div>
+      </header>
+
+      <div className="ao-metrics" aria-label="Assembly summary">
+        {metrics.map(({ status: key, icon: Icon, hint }) => (
+          <button key={key} type="button" className={'ao-metric' + (status === key ? ' ao-metric-selected' : '')} aria-pressed={status === key} onClick={() => { setStatus(key); setQuery(''); }}>
+            <span className={'ao-metric-icon ao-tone-' + STATUS[key].tone}><Icon size={24} aria-hidden="true" /></span>
+            <span><span className="ao-metric-label">{STATUS[key].label}</span><strong>{String(SAMPLE_ORDERS.filter(order => order.status === key).length).padStart(2, '0')}</strong><span className="ao-metric-hint">{hint}</span></span>
+            <ArrowUpRight className="ao-metric-arrow" size={16} aria-hidden="true" />
+          </button>
+        ))}
       </div>
 
-      {/* ── Stats Grid ── */}
-      <div className="asm-stats-grid">
-        <StatCard icon={<FaBoxOpen />} title="Pending Receipts" value={pendingCount} />
-        <StatCard icon={<FaClipboardCheck />} title="In Assembly" value={assemblingCount} />
-        <StatCard icon={<FaCheckDouble />} title="QA Passed" value={readyCount} />
-        <StatCard icon={<FaShippingFast />} title="Total Handled" value={orders.length} />
-      </div>
-
-      {/* ── Orders Table ── */}
-      <div className="asm-card">
-        <div className="asm-section-title">
-          <h2>Gift Box Queue</h2>
-          <button className="asm-btn" onClick={fetchOrders}>Refresh Queue</button>
+      <section className="ao-queue" aria-labelledby="ao-queue-title">
+        <div className="ao-queue-heading">
+          <div><h2 id="ao-queue-title">My work queue</h2><p>A preview of your upcoming assembly work.</p></div>
+          <label className="ao-search"><Search size={18} aria-hidden="true" /><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search order ID..." aria-label="Search by order ID" /></label>
         </div>
-
-        {loading ? (
-          <p style={{ textAlign: 'center', color: '#7A869A', padding: '20px' }}>Loading orders...</p>
-        ) : (
-          <table className="asm-table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Box Size</th>
-                <th>Occasion</th>
-                <th>Current Status</th>
-                <th style={{ textAlign: 'right' }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.length === 0 ? (
-                <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '30px' }}>No orders in queue.</td>
-                </tr>
-              ) : (
-                orders.map((order) => (
-                  <tr key={order.orderId}>
-                    <td className="asm-order-id">#{order.orderId}</td>
-                    <td>{order.customerName || `Customer #${order.customerId}`}</td>
-                    <td><strong style={{ color: '#1A2340' }}>{order.boxSize || 'Standard'}</strong></td>
-                    <td>{order.occasion || 'N/A'}</td>
-                    <td>
-                      <select 
-                        className="asm-status-select"
-                        value={order.status}
-                        onChange={(e) => updateOrderStatus(order.orderId, e.target.value)}
-                      >
-                        <option value="PENDING">PENDING</option>
-                        <option value="CONFIRMED">CONFIRMED (Awaiting Receipt)</option>
-                        <option value="RECEIVED">RECEIVED (Items Arrived)</option>
-                        <option value="ASSEMBLING">ASSEMBLING (In Progress)</option>
-                        <option value="QA_PASSED">QA PASSED</option>
-                        <option value="READY">READY FOR DELIVERY</option>
-                      </select>
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      {order.status === 'CONFIRMED' && (
-                        <button className="asm-btn" onClick={() => updateOrderStatus(order.orderId, 'RECEIVED')}>
-                          Mark Received
-                        </button>
-                      )}
-                      {order.status === 'RECEIVED' && (
-                        <button className="asm-btn" onClick={() => updateOrderStatus(order.orderId, 'ASSEMBLING')}>
-                          Start Assembly
-                        </button>
-                      )}
-                      {order.status === 'ASSEMBLING' && (
-                        <button className="asm-btn" onClick={() => updateOrderStatus(order.orderId, 'QA_PASSED')}>
-                          Pass QA
-                        </button>
-                      )}
-                      {order.status === 'QA_PASSED' && (
-                        <button className="asm-btn" onClick={() => updateOrderStatus(order.orderId, 'READY')}>
-                          Mark Ready
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
+        <div className="ao-filters" role="group" aria-label="Filter orders by status">
+          {['all', ...Object.keys(STATUS)].map(key => <button type="button" key={key} aria-pressed={status === key} className={status === key ? 'ao-filter-active' : ''} onClick={() => setStatus(key)}>{key === 'all' ? 'All orders' : STATUS[key].label}</button>)}
+        </div>
+        <div className="ao-table-scroll" tabIndex={0} role="region" aria-label="Work queue table">
+          <table className="ao-table">
+            <thead><tr><th scope="col">Order</th><th scope="col">Occasion</th><th scope="col">Items received</th><th scope="col">Due</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+            <tbody>{orders.map(order => <tr key={order.id}>
+              <td><strong>#{order.id}</strong><small>{order.box} box</small></td>
+              <td>{order.occasion}</td>
+              <td><span className="ao-receipt">{order.received} of {order.total}{order.received === order.total && <CircleCheck size={14} aria-label="All items received" />}</span><progress value={order.received} max={order.total} aria-label={'Items received for ' + order.id} /></td>
+              <td><span className={order.due === 'Today' ? 'ao-due-today' : ''}>{order.due}</span></td>
+              <td><StatusBadge status={order.status} /></td>
+              <td><button type="button" className={'ao-order-button' + (order.status === 'hold' ? ' ao-order-issue' : '')} aria-label={(order.status === 'hold' ? 'View issue for ' : 'Preview order ') + order.id} onClick={() => openPreview(order)}>{order.status === 'hold' ? 'View issue' : 'Open order'}<ArrowUpRight size={14} aria-hidden="true" /></button></td>
+            </tr>)}</tbody>
           </table>
-        )}
-      </div>
-    </div>
-  );
-};
+        </div>
+        {orders.length === 0 && <div className="ao-empty"><Inbox size={32} aria-hidden="true" /><h3>No matching orders</h3><p>Try another order ID or clear the filters.</p><button type="button" onClick={reset}>Clear filters</button></div>}
+        <div className="ao-queue-footer"><span role="status">{orders.length} of {SAMPLE_ORDERS.length} sample orders</span>{(status !== 'all' || query) && <button type="button" onClick={reset}>Clear filters</button>}</div>
+        <button type="button" className="ao-alert" onClick={() => { setStatus('hold'); setQuery(''); }}><TriangleAlert size={19} aria-hidden="true" /><span><strong>{onHold} order needs attention</strong> — damaged item reported</span><ArrowRight size={18} aria-hidden="true" /></button>
+      </section>
 
-export default AssemblerDashboard;
+      <footer className="ao-bottom"><p>Frontend preview only. Orders and counts are illustrative; no live orders are changed.</p><Link to="/assembler/packing-guide"><BookOpen size={17} aria-hidden="true" />Packing guide<ArrowRight size={15} aria-hidden="true" /></Link></footer>
+
+      <dialog ref={dialog} className="ao-dialog" aria-labelledby="ao-dialog-title" onClick={event => { if (event.target === event.currentTarget) dialog.current.close(); }}>
+        {selected && <div className="ao-dialog-content">
+          <div className="ao-dialog-top"><span className="ao-sample">Sample order preview</span><button type="button" autoFocus aria-label="Close order preview" className="ao-close" onClick={() => dialog.current.close()}><X size={22} /></button></div>
+          <h2 id="ao-dialog-title">Order #{selected.id}</h2><StatusBadge status={selected.status} />
+          <dl className="ao-details"><div><dt>Occasion</dt><dd>{selected.occasion}</dd></div><div><dt>Recipient</dt><dd>{selected.recipient}</dd></div><div><dt>Box size</dt><dd>{selected.box}</dd></div><div><dt>Due</dt><dd>{selected.due}</dd></div><div><dt>Wrapping</dt><dd>{selected.wrap}</dd></div><div><dt>Ribbon</dt><dd>{selected.ribbon}</dd></div><div><dt>Items received</dt><dd>{selected.received} of {selected.total}</dd></div></dl>
+          <div className="ao-message"><h3>Gift message</h3><p>{selected.message}</p></div>
+          {selected.issue && <div className="ao-issue-note"><h3>Reported issue</h3><p>{selected.issue}</p></div>}
+          <p className="ao-dialog-note">Read-only preview. Receipt confirmation and packing checks will be added in the order workspace.</p>
+          <button type="button" className="ao-dialog-done" onClick={() => dialog.current.close()}>Back to overview</button>
+        </div>}
+      </dialog>
+    </section>
+  );
+}
