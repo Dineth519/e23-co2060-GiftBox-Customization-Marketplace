@@ -18,3 +18,12 @@ export function filterOrders(orders, status, query) {
   const search = query.trim().toLowerCase().replace(/^#/, '');
   return orders.filter(order => (status === 'all' || order.status === status) && order.id.toLowerCase().includes(search));
 }
+
+export function selectQueueOrders(orders, { status = 'all', query = '', box = 'all', due = 'all', sort = 'due' } = {}) {
+  const dueRank = { Today: 0, Tomorrow: 1, 'In 2 days': 2 };
+  return filterOrders(orders, status, query)
+    .filter(order => (box === 'all' || order.box === box) && (due === 'all' || order.due === due))
+    .sort((a, b) => sort === 'id'
+      ? a.id.localeCompare(b.id)
+      : (dueRank[a.due] ?? 99) - (dueRank[b.due] ?? 99) || a.id.localeCompare(b.id));
+}
