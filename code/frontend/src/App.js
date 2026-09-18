@@ -57,6 +57,7 @@ import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
 import AssemblerLayout from './layouts/AssemblerLayout.jsx';
 import AssemblerDashboard from './pages/assembler/Dashboard.jsx';
 import AssemblerOrderQueue from './pages/assembler/OrderQueue.jsx';
+import AssemblerOrderWorkspace from './pages/assembler/OrderWorkspace.jsx';
 import AssemblerPlaceholder from './pages/assembler/Placeholder.jsx';
 
 // Scroll to top helper on route navigation
@@ -161,6 +162,7 @@ function App() {
                   <Routes>
                       <Route path="/" element={<AssemblerDashboard />} />
                       <Route path="queue" element={<AssemblerOrderQueue />} />
+                      <Route path="orders/:orderId" element={<AssemblerOrderWorkspace />} />
                       <Route path="issues" element={<AssemblerPlaceholder section="issues" />} />
                       <Route path="completed" element={<AssemblerPlaceholder section="completed" />} />
                       <Route path="packing-guide" element={<AssemblerPlaceholder section="packing-guide" />} />
