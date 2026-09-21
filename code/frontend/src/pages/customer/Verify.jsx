@@ -1,37 +1,82 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaEnvelope, FaLock } from 'react-icons/fa';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FaSpinner } from 'react-icons/fa';
+import AuthLayout from '../auth/AuthLayout';
 import './Verify.css';
 
 const Verify = () => {
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success', 'error', 'info'
   const [loading, setLoading] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
+  
   const navigate = useNavigate();
+  const location = useLocation();
+  const inputRefs = useRef([]);
 
-  // Handle email verification submission
+  // Get email from location state or session storage
+  const email = location.state?.email || sessionStorage.getItem('verifyEmail');
+
+  useEffect(() => {
+    if (!email) {
+      navigate('/login'); // If no email context, send back to login
+    }
+  }, [email, navigate]);
+
+  const handleChange = (e, index) => {
+    const value = e.target.value;
+    if (isNaN(value)) return;
+    
+    const newOtp = [...otp];
+    // Take only the last character if multiple are entered (e.g., autocomplete)
+    newOtp[index] = value.substring(value.length - 1);
+    setOtp(newOtp);
+
+    // Focus next input
+    if (value && index < 5 && inputRefs.current[index + 1]) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0 && inputRefs.current[index - 1]) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6).split('');
+    if (!pasteData.length) return;
+    
+    const newOtp = [...otp];
+    pasteData.forEach((char, i) => {
+      if (i < 6) newOtp[i] = char;
+    });
+    setOtp(newOtp);
+    
+    const nextIndex = Math.min(pasteData.length, 5);
+    if (inputRefs.current[nextIndex]) {
+      inputRefs.current[nextIndex].focus();
+    }
+  };
+
   const handleVerify = async (e) => {
     e.preventDefault();
+    const code = otp.join('');
     
-    if (!email || !code) {
-      setMessage('Please fill in all fields');
-      setMessageType('error');
-      return;
-    }
-
-    if (code.length !== 6 || isNaN(code)) {
-      setMessage('Verification code must be 6 digits');
+    if (code.length !== 6) {
+      setMessage('Please enter all 6 digits');
       setMessageType('error');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/verify-email`, {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+      const response = await fetch(`${apiUrl}/api/auth/verify-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
@@ -42,6 +87,7 @@ const Verify = () => {
       if (data.success) {
         setMessage('Email verified successfully! Redirecting to login...');
         setMessageType('success');
+        sessionStorage.removeItem('verifyEmail');
         setTimeout(() => navigate('/login'), 2000);
       } else {
         setMessage(data.message || 'Verification failed. Please try again.');
@@ -56,22 +102,16 @@ const Verify = () => {
     }
   };
 
-  // Handle resend verification code
   const handleResendCode = async () => {
-    if (!email) {
-      setMessage('Please enter your email first');
-      setMessageType('error');
-      return;
-    }
-
     setResendDisabled(true);
     setResendCountdown(60);
+    setMessage('');
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/resend-code`, {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+      const response = await fetch(`${apiUrl}/api/auth/resend-code?email=${encodeURIComponent(email)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
@@ -83,17 +123,17 @@ const Verify = () => {
         setMessage(data.message || 'Failed to resend code');
         setMessageType('error');
         setResendDisabled(false);
+        setResendCountdown(0);
       }
     } catch (error) {
       setMessage('Error sending code. Please try again.');
       setMessageType('error');
       setResendDisabled(false);
-      console.error('Resend error:', error);
+      setResendCountdown(0);
     }
   };
 
-  // Countdown timer for resend button
-  React.useEffect(() => {
+  useEffect(() => {
     if (resendCountdown > 0) {
       const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
       return () => clearTimeout(timer);
@@ -102,110 +142,77 @@ const Verify = () => {
     }
   }, [resendCountdown, resendDisabled]);
 
-  // Handle back to login
-  const handleBackToLogin = () => {
-    navigate('/login');
-  };
+  if (!email) return null; // Wait for redirect if no email
 
   return (
-    <div className="verify-page">
-      {/* Logo */}
-      <div className="verify-logo">
-        <img src="/logo.png" alt="Giftora Logo" />
-      </div>
-
-      {/* Verification Card */}
-      <div className="verify-container">
+    <AuthLayout>
+      <div className="login-card-front" style={{marginTop: '20px'}}>
+        <span className="auth-kicker">Security</span>
         <h2>Verify Your Email</h2>
-        <p>Enter the 6-digit code we sent to your email address</p>
+        <p className="login-sub">
+          We've sent a 6-digit code to <strong>{email}</strong>.<br />
+          Enter it below to confirm your account.
+        </p>
 
-        {/* Message Display */}
-        {message && (
-          <div className={`verify-message ${messageType}`}>
-            {message}
-          </div>
-        )}
+        <form onSubmit={handleVerify} className="otp-form">
+          {message && (
+            <p className={`login-error login-general-error ${messageType === 'success' ? 'success' : ''}`} style={{backgroundColor: messageType==='success'?'rgba(46, 204, 113, 0.1)':'', borderColor: messageType==='success'?'rgba(46, 204, 113, 0.2)':'', color: messageType==='success'?'#2ecc71':''}}>
+              {message}
+            </p>
+          )}
 
-        {/* Verification Form */}
-        <form onSubmit={handleVerify} className="verify-form">
-          {/* Email Input */}
-          <div className="verify-input-row verify-email-input">
-            <div className="verify-icon">
-              <FaEnvelope />
-            </div>
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          {/* Verification Code Input */}
-          <div className="verify-input-row verify-code-input">
-            <div className="verify-icon">
-              <FaLock />
-            </div>
-            <input
-              type="text"
-              placeholder="6-digit code"
-              value={code}
-              onChange={(e) => {
-                // Only allow digits and limit to 6 characters
-                const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                setCode(value);
-              }}
-              maxLength="6"
-              required
-              disabled={loading}
-              inputMode="numeric"
-            />
+          <div className="otp-container">
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                type="text"
+                inputMode="numeric"
+                maxLength="1"
+                value={digit}
+                ref={(el) => (inputRefs.current[index] = el)}
+                onChange={(e) => handleChange(e, index)}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+                onPaste={handlePaste}
+                disabled={loading}
+                className="otp-input"
+              />
+            ))}
           </div>
 
-          <div className="verify-code-hint">
-            {code.length}/6 digits
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="verify-submit-btn"
-            disabled={loading || code.length !== 6}
+          <button 
+            type="submit" 
+            className="login-submit-btn" 
+            disabled={loading || otp.join('').length !== 6}
+            style={{marginTop: '32px'}}
           >
-            {loading ? 'Verifying...' : 'Verify Email'}
+            {loading ? <><FaSpinner className="spinner-icon" /> Verifying...</> : 'Verify Email'}
           </button>
         </form>
 
-        {/* Resend Code Section */}
-        <div className="verify-resend-section">
-          <p className="verify-resend-text">Didn't receive a code?</p>
-          <button
-            type="button"
-            className="verify-resend-btn"
-            onClick={handleResendCode}
+        <p className="login-toggle-text" style={{marginTop: '32px'}}>
+          Didn't receive a code?{' '}
+          <button 
+            type="button" 
+            className="login-toggle-link" 
+            onClick={handleResendCode} 
             disabled={resendDisabled || loading}
           >
-            {resendDisabled ? (
-              <span className="verify-countdown">
-                Resend in {resendCountdown}s
-              </span>
-            ) : (
-              'Resend Code'
-            )}
+            {resendDisabled ? `Resend in ${resendCountdown}s` : 'Resend Code'}
           </button>
-        </div>
-
-        {/* Back to Login Link */}
-        <div className="verify-back-link">
-          <p>
-            Remember your password?{' '}
-            <a onClick={handleBackToLogin}>Back to Login</a>
-          </p>
-        </div>
+        </p>
+        
+        <p className="login-toggle-text">
+          Remember your password?{' '}
+          <button 
+            type="button" 
+            className="login-toggle-link" 
+            onClick={() => navigate('/login')}
+          >
+            Back to Login
+          </button>
+        </p>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 

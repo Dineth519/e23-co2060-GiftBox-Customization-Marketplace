@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/landingpage/Header';
 import Footer from '../../components/landingpage/Footer';
-import { useCart } from '../../context/CartContext';
 import './BoxBuilderPage.css';
 
 // Safe helper to extract product ID regardless of backend field naming (_id, id, productId)
@@ -85,22 +84,30 @@ const BoxBuilderPage = () => {
   const navigate = useNavigate();
   const heroRef = useRef(null);
   
-  const { cartItems } = useCart(); 
-  const availableItems = cartItems || [];
+  const [activeStep, setActiveStep] = useState(1);
+  const [catalogProducts, setCatalogProducts] = useState([]);
+  const [isLoadingCatalog, setIsLoadingCatalog] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Form State
   const [draft] = useState(() => {
     try { return JSON.parse(sessionStorage.getItem('giftora_box_draft')) || {}; }
     catch { return {}; }
   });
-  const [occasion, setOccasion] = useState(draft.occasion || null);
+  const [occasion, setOccasion] = useState(draft.occasion || OCCASIONS[0].id);
   const [selectedItems, setSelectedItems] = useState(draft.selectedItems || {}); // { productId: quantity }
-  const [boxSize, setBoxSize] = useState(BOX_SIZES.find(size => size.id === draft.boxSize?.id) || null);
+  const [boxSize, setBoxSize] = useState(BOX_SIZES.find(size => size.id === draft.boxSize?.id) || BOX_SIZES[1]);
   
   // Personalization State
   const [recipientName, setRecipientName] = useState(draft.recipientName || '');
   const [giftMessage, setGiftMessage] = useState(draft.giftMessage || '');
-  const [wrappingStyle, setWrappingStyle] = useState(draft.wrappingStyle || null);
+  const [wrappingStyle, setWrappingStyle] = useState(WRAPPING_STYLES.find(style => style.id === (draft.wrappingStyle?.id || draft.wrappingStyle)) || WRAPPING_STYLES[0]);
+  const [ribbonColor, setRibbonColor] = useState(draft.ribbonColor || wrappingStyle.defaultRibbon);
+  const [senderName, setSenderName] = useState(draft.senderName || '');
+  const [cardTemplate, setCardTemplate] = useState(CARD_TEMPLATES.find(template => template.id === draft.cardTemplate?.id) || CARD_TEMPLATES[1]);
+  const [hasWaxSeal, setHasWaxSeal] = useState(draft.hasWaxSeal ?? true);
+  const [deliveryDate, setDeliveryDate] = useState(draft.deliveryDate || '');
   const [deliveryAddress, setDeliveryAddress] = useState(draft.deliveryAddress || '');
 
   // App UI Feedback States
@@ -210,13 +217,17 @@ const BoxBuilderPage = () => {
   };
 
   // Submit Order Process
+  const canPlaceOrder = () => !isLoadingCatalog && totalItemsCount > 0 &&
+    totalItemsCount <= boxSize.limit && recipientName.trim() && deliveryAddress.trim();
+
   const handlePlaceOrder = async () => {
     if (!canPlaceOrder() || submitting) return;
     const token = localStorage.getItem('accessToken');
     const customerId = Number(localStorage.getItem('userId'));
     if (!token || !customerId || localStorage.getItem('role') !== 'CUSTOMER') {
       sessionStorage.setItem('giftora_box_draft', JSON.stringify({
-        occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress
+        occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress,
+        ribbonColor, senderName, cardTemplate, hasWaxSeal, deliveryDate
       }));
       sessionStorage.setItem('giftora_return_to', '/build-box');
       navigate('/login');
@@ -226,7 +237,7 @@ const BoxBuilderPage = () => {
     setSubmitting(true);
     const orderPayload = {
       customerId, deliveryAddress, occasion, boxSize: boxSize.id,
-      giftMessage, recipientName, wrappingStyle,
+      giftMessage, recipientName, wrappingStyle: wrappingStyle.id,
       items: Object.entries(selectedItems).map(([id, qty]) => ({ productId: parseInt(id), quantity: qty }))
     };
 
@@ -241,18 +252,7 @@ const BoxBuilderPage = () => {
       setSubmitSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      // Fallback: simulate cart addition/order success if backend API is not responding
-      if (addToCart) {
-        addToCart({
-          id: `custom-box-${Date.now()}`,
-          name: `${boxSize.title} - ${occasion} Edition`,
-          price: grandTotal,
-          quantity: 1,
-          customDetails: payload
-        });
-      }
-      setSubmitSuccess(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      triggerToast('Could not place your order. Your selections are still here. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -691,6 +691,9 @@ const BoxBuilderPage = () => {
               {submitting ? 'Processing...' : (localStorage.getItem('role') === 'CUSTOMER' && localStorage.getItem('accessToken') ? 'Place Order' : 'Sign in to place order')}
             </button>
             
+          <div className="bb-box-canvas" style={{ backgroundColor: wrappingStyle.color }}>
+            <div className="bb-canvas-ribbon-v" style={{ backgroundColor: ribbonColor }} />
+            <div className="bb-canvas-ribbon-h" style={{ backgroundColor: ribbonColor }} />
             {/* Wax Seal Badge */}
             {hasWaxSeal && (
               <div className="bb-canvas-wax-seal">

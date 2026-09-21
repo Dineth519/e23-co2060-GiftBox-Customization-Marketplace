@@ -1257,7 +1257,6 @@ const LandingPage = () => (
         <GiftBoxShowcase />
         <TrendingGrid />
         {/* <WhyGiftora /> */}
-        <p style={{ textAlign: 'center', padding: '24px' }}>Student demonstration: gift-box examples, prices, and testimonials are illustrative, not verified customer purchases.</p>
         <Testimonials />
         <BuilderCTA />
       </div>
