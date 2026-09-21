@@ -19,10 +19,8 @@ const Footer = () => {
       { label: 'Benefits', path: '/vendor-landing' }
     ]},
     { heading: 'Support', links: [
-      { label: 'Help Center', path: '/about-us' },
-      { label: 'Order Tracking', path: '/customer/orders' },
-      { label: 'Returns', path: '/about-us' },
-      { label: 'Contact Us', path: '/about-us' }
+      { label: 'About the Project', path: '/about-us' },
+      { label: 'Sign In to Track Orders', path: '/login' },
     ]},
   ];
 
@@ -37,13 +35,9 @@ const Footer = () => {
             <span className="footer-logo__text">Giftora</span>
           </div>
           <p className="footer-tagline">
-            Sri Lanka's premium gift marketplace — curating joy since 2023.
+            Giftora is a student marketplace demonstration by Team Nexus. Vendors, products, and fulfillment may be simulated.
           </p>
-          <div className="footer-socials">
-            {['Instagram', 'Facebook', 'TikTok'].map(s => (
-              <button key={s} className="social-btn" title={s}>{s[0]}</button>
-            ))}
-          </div>
+
         </div>
 
         {/* Link columns */}
@@ -67,7 +61,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <span>© 2025 Giftora. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Giftora. All rights reserved.</span>
         <span>Made with 💛 in Sri Lanka</span>
       </div>
     </footer>

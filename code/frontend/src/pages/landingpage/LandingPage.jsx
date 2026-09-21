@@ -20,7 +20,7 @@ import landingPage2Img from '../../assets/landingpage/landing_page_2.png';
 
 const FEATURES = [
   { icon: '🎨', title: 'Fully Custom',   desc: 'Build your own box from scratch' },
-  { icon: '🚀', title: 'Fast Delivery',  desc: 'Same day delivery available'     },
+  { icon: '🚀', title: 'Fast Delivery',  desc: 'Explore our gifting workflow'     },
   { icon: '💝', title: 'Luxury Packing', desc: 'Premium gift wrapping included'  },
 ];
 
@@ -32,9 +32,9 @@ const TESTIMONIALS = [
 ];
 
 const STATS = [
-  { value: '2,800+', label: 'Happy Customers' },
-  { value: '150+',   label: 'Local Vendors'   },
-  { value: '10K+',   label: 'Gifts Delivered' },
+  { value: 'Mix', label: 'Products from multiple vendors' },
+  { value: 'Create', label: 'A personalized gift box' },
+  { value: 'Explore', label: 'Student project demo' },
 ];
 
 // ─── NEW DATA ─────────────────────────────────────────────────────────────────
@@ -93,7 +93,7 @@ const SHOWCASE_BOXES = [
     ],
     image: '/boxes/romantic_bliss_box.png',
     accent: '#C9A961',
-    tag: 'Best Seller',
+    tag: 'Featured',
   },
   {
     id: 2,
@@ -307,55 +307,28 @@ function CountdownTimer({ expiry }) {
 const HeroSection = () => {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
-  const [muted, setMuted] = useState(true);
-  const [videoError, setVideoError] = useState(false);
-  const videoRef = useRef(null);
 
   useEffect(() => { setTimeout(() => setMounted(true), 80); }, []);
 
-  const toggleMute = () => {
-    setMuted(m => {
-      if (videoRef.current) videoRef.current.muted = !m;
-      return !m;
-    });
-  };
 
   return (
     <section className="hero">
-      {/* Video background — falls back to orbs if error */}
-      {!videoError && (
-        <video
-          ref={videoRef}
-          className="hero-video"
-          autoPlay
-          loop
-          muted
-          playsInline
-          onError={() => setVideoError(true)}
-          src="https://assets.mixkit.co/videos/preview/mixkit-hands-wrapping-a-gift-2553-large.mp4"
-        />
-      )}
       <div className="hero-video-overlay" />
 
       {/* Ambient orbs — always visible, more visible if no video */}
-      <div className={`hero-orb hero-orb--gold ${videoError ? 'hero-orb--prominent' : ''}`} />
-      <div className={`hero-orb hero-orb--blue ${videoError ? 'hero-orb--prominent' : ''}`} />
+      <div className="hero-orb hero-orb--gold hero-orb--prominent" />
+      <div className="hero-orb hero-orb--blue hero-orb--prominent" />
       <div className="hero-orb hero-orb--mid" />
       <div className="hero-grain" />
 
-      {/* Mute toggle */}
-      {!videoError && (
-        <button className="hero-mute-btn" onClick={toggleMute} title={muted ? 'Unmute' : 'Mute'}>
-          {muted ? '🔇' : '🔊'}
-        </button>
-      )}
+
 
       <div className={`hero__inner ${mounted ? 'hero--mounted' : ''}`}>
         {/* ── Left content ── */}
         <div className="hero__content">
           <div className="hero__eyebrow">
             <span className="eyebrow-dot" />
-            <span>Sri Lanka's #1 Gift Marketplace</span>
+            <span>Build a Gift Box with Giftora</span>
           </div>
 
           <h1 className="hero__title">
@@ -913,7 +886,7 @@ const TrendingGrid = () => {
               
               // New Arrivals: sort by id desc, take 8
               const sortedNew = [...activeOnly].sort((a, b) => b.id - a.id);
-              // Best Sellers: sort by rating desc, take 8
+              // Featured Products: sort by rating desc, take 8
               const sortedHot = [...activeOnly].sort((a, b) => (b.rating || 0) - (a.rating || 0));
 
               setNewProducts(sortedNew.slice(0, 8));
@@ -935,7 +908,7 @@ const TrendingGrid = () => {
   const renderGrid = (items, ribbonText) => (
     <div className="trending-grid">
       {items.map((p, i) => {
-        const rating = p.rating ? Number(p.rating).toFixed(1) : '5.0';
+        const rating = p.rating ? Number(p.rating).toFixed(1) : null;
         const stars = Math.round(Number(rating));
         return (
           <div
@@ -963,18 +936,14 @@ const TrendingGrid = () => {
               <div className="t-card__name">{p.name}</div>
               
               {/* Star rating */}
-              <div className="t-card__stars">
-                {Array.from({ length: 5 }, (_, idx) => (
-                  <span key={idx} style={{ color: idx < stars ? 'var(--gold)' : 'rgba(0,0,0,0.15)' }}>★</span>
-                ))}
-                <span>{rating}</span>
-              </div>
+              <div className="t-card__stars">{p.vendorName || 'Seller details unavailable'} · {Number(p.stockQuantity) > 0 ? 'In stock' : 'Out of stock'}</div>
 
               {/* Price & Add to Cart Row */}
               <div className="t-card__footer-row">
                 <div className="t-card__price">LKR {Number(p.price).toLocaleString()}</div>
                 <button
                   className="t-card__cart-btn"
+                  disabled={!(Number(p.stockQuantity) > 0)}
                   onClick={(e) => {
                     e.stopPropagation();
                     addToCart(p);
@@ -1030,11 +999,11 @@ const TrendingGrid = () => {
         {/* Divider */}
         <div style={{ height: '60px' }} />
 
-        {/* ── SECTION 2: Best Sellers ── */}
+        {/* ── SECTION 2: Featured Products ── */}
         <div className="trending__section">
           <div className="trending__section-header">
             <div className="section-label center">Most Loved</div>
-            <h2 className="trending__section-title">Best Sellers</h2>
+            <h2 className="trending__section-title">Featured Products</h2>
             <p className="trending__section-sub">The best selling products on our store right now. Check out what is hot!</p>
           </div>
 
@@ -1053,7 +1022,7 @@ const TrendingGrid = () => {
               No best sellers available at the moment.
             </div>
           ) : (
-            renderGrid(hotProducts, 'Best Seller')
+            renderGrid(hotProducts, 'Featured')
           )}
         </div>
 
@@ -1081,16 +1050,17 @@ const TrendingGrid = () => {
                 {CAT_ICONS[CATEGORY_MAP[quickView.categoryId]] || '🎁'} {CATEGORY_MAP[quickView.categoryId] || 'Gift'}
               </div>
               <h3 className="qv-name">{quickView.name}</h3>
-              <div className="qv-stars-row">★★★★★ <span>5.0 · Premium Quality</span></div>
+              <div className="qv-stars-row">{quickView.vendorName || 'Seller details unavailable'} · {Number(quickView.stockQuantity) > 0 ? 'In stock' : 'Out of stock'}</div>
               <div className="qv-price">LKR {Number(quickView.price).toLocaleString()}</div>
               <div className="qv-sep" />
-              <p className="qv-desc">{quickView.description || "A premium curated gift from Giftora's exclusive collection. Hand-packed with love, beautifully presented, and ready to create a lasting memory."}</p>
+              <p className="qv-desc">{quickView.description || "The seller has not added a detailed description yet."}</p>
               <div className="qv-features">
-                {['🎀 Gift Wrapped','✍️ Personal Note','🚚 Island-wide Delivery'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
+                {['Choose wrapping and a personal note in the box builder. Delivery details are confirmed at checkout.'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
               </div>
               <div className="qv-actions">
                 <button
                   className="qv-cta qv-cta--primary"
+                  disabled={!(Number(quickView.stockQuantity) > 0)}
                   onClick={() => { addToCart(quickView); setQuickView(null); }}
                 >
                   🛒 Add to Cart
@@ -1151,7 +1121,7 @@ const Testimonials = () => {
       <div className="testimonials__bg" />
       <div className="section-inner">
         <div className="section-label center">Love Notes</div>
-        <h2 className="section-title center" style={{ fontSize: '50px'}}>What Our Customers Say</h2>
+        <h2 className="section-title center" style={{ fontSize: '50px'}}>Example Customer Experiences</h2>
 
         <div className="testimonials__grid">
           {TESTIMONIALS.map((t, i) => (
@@ -1196,7 +1166,7 @@ const BuilderCTA = () => {
             </div>
           ))}
         </div>
-        <button className="btn-hero-primary large" onClick={() => navigate('/build')}>
+        <button className="btn-hero-primary large" onClick={() => navigate('/build-box')}>
           <span className="btn-icon">✨</span>
           <span>Start Building Now</span>
           <span className="btn-arrow">→</span>
@@ -1287,6 +1257,7 @@ const LandingPage = () => (
         <GiftBoxShowcase />
         <TrendingGrid />
         {/* <WhyGiftora /> */}
+        <p style={{ textAlign: 'center', padding: '24px' }}>Student demonstration: gift-box examples, prices, and testimonials are illustrative, not verified customer purchases.</p>
         <Testimonials />
         <BuilderCTA />
       </div>

@@ -37,15 +37,19 @@ const BoxBuilderPage = () => {
   const availableItems = cartItems || [];
 
   // Form State
-  const [occasion, setOccasion] = useState(null);
-  const [selectedItems, setSelectedItems] = useState({}); // { productId: quantity }
-  const [boxSize, setBoxSize] = useState(null);
+  const [draft] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('giftora_box_draft')) || {}; }
+    catch { return {}; }
+  });
+  const [occasion, setOccasion] = useState(draft.occasion || null);
+  const [selectedItems, setSelectedItems] = useState(draft.selectedItems || {}); // { productId: quantity }
+  const [boxSize, setBoxSize] = useState(BOX_SIZES.find(size => size.id === draft.boxSize?.id) || null);
   
   // Personalization State
-  const [recipientName, setRecipientName] = useState('');
-  const [giftMessage, setGiftMessage] = useState('');
-  const [wrappingStyle, setWrappingStyle] = useState(null);
-  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [recipientName, setRecipientName] = useState(draft.recipientName || '');
+  const [giftMessage, setGiftMessage] = useState(draft.giftMessage || '');
+  const [wrappingStyle, setWrappingStyle] = useState(draft.wrappingStyle || null);
+  const [deliveryAddress, setDeliveryAddress] = useState(draft.deliveryAddress || '');
 
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -111,11 +115,21 @@ const BoxBuilderPage = () => {
   };
 
   const handlePlaceOrder = async () => {
-    if (!canPlaceOrder()) return;
+    if (!canPlaceOrder() || submitting) return;
+    const token = localStorage.getItem('accessToken');
+    const customerId = Number(localStorage.getItem('userId'));
+    if (!token || !customerId || localStorage.getItem('role') !== 'CUSTOMER') {
+      sessionStorage.setItem('giftora_box_draft', JSON.stringify({
+        occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress
+      }));
+      sessionStorage.setItem('giftora_return_to', '/build-box');
+      navigate('/login');
+      return;
+    }
     
     setSubmitting(true);
     const orderPayload = {
-      customerId: 5, deliveryAddress, occasion, boxSize: boxSize.id,
+      customerId, deliveryAddress, occasion, boxSize: boxSize.id,
       giftMessage, recipientName, wrappingStyle,
       items: Object.entries(selectedItems).map(([id, qty]) => ({ productId: parseInt(id), quantity: qty }))
     };
@@ -123,10 +137,11 @@ const BoxBuilderPage = () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/custom-box`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(orderPayload)
       });
       if (!res.ok) throw new Error('Failed to place order');
+      sessionStorage.removeItem('giftora_box_draft');
       setSubmitSuccess(true);
       window.scrollTo(0, 0);
     } catch (err) {
@@ -401,7 +416,7 @@ const BoxBuilderPage = () => {
               onClick={handlePlaceOrder}
               disabled={submitting || !canPlaceOrder()}
             >
-              {submitting ? 'Processing...' : 'Place Order 🎁'}
+              {submitting ? 'Processing...' : (localStorage.getItem('role') === 'CUSTOMER' && localStorage.getItem('accessToken') ? 'Place Order' : 'Sign in to place order')}
             </button>
             
             {!canPlaceOrder() && (

@@ -250,6 +250,7 @@ const ProductsPage = () => {
                     <div className="ppc-overlay">
                       <button
                         className="ppc-action ppc-action--primary"
+                        disabled={!(Number(p.stockQuantity) > 0)}
                         onClick={() => addToCart(p)}
                       >
                         {justAdded ? '✓ Added!' : '🛒 Add to Cart'}
@@ -262,15 +263,13 @@ const ProductsPage = () => {
                   <div className="ppc-body">
                     <span className="pp-card-category">{getCategoryName(p.categoryId)}</span>
                     <div className="ppc-name">{p.name}</div>
-                    <div className="ppc-vendor">by Giftora Exclusive</div>
-                    <div className="ppc-stars-row">
-                      <span className="ppc-stars">★★★★★</span>
-                      <span className="ppc-rating">5.0</span>
-                    </div>
+                    <div className="ppc-vendor">{p.vendorName ? `Sold by ${p.vendorName}` : 'Seller details unavailable'}</div>
+                    <div className="ppc-stars-row">{Number(p.stockQuantity) > 0 ? `In stock · ${p.stockQuantity} available` : 'Out of stock'}</div>
                     <div className="ppc-footer">
                       <span className="ppc-price">LKR {Number(p.price).toLocaleString()}</span>
                       <button
                         className={`ppc-add ${justAdded ? 'ppc-add--added' : ''}`}
+                        disabled={!(Number(p.stockQuantity) > 0)}
                         onClick={() => addToCart(p)}
                         title="Add to cart"
                       >
@@ -302,19 +301,22 @@ const ProductsPage = () => {
                 {CAT_ICONS[getCategoryName(quickView.categoryId)] ? `${CAT_ICONS[getCategoryName(quickView.categoryId)]} ` : ''}{getCategoryName(quickView.categoryId)}
               </div>
               <h3 className="qv-name">{quickView.name}</h3>
-              <div className="qv-stars-row">★★★★★ <span>5.0 · Premium Quality</span></div>
+              <div className="qv-stars-row">{quickView.vendorName ? `Sold by ${quickView.vendorName}` : 'Seller details unavailable'}</div>
               <div className="qv-price">LKR {Number(quickView.price).toLocaleString()}</div>
               <div className="qv-sep" />
-              <p className="qv-desc">A premium curated gift from Giftora's exclusive collection. Hand-packed with love, beautifully presented, and ready to create a lasting memory.</p>
+              <p className="qv-desc" style={{ whiteSpace: 'pre-line' }}>{quickView.description?.trim() || 'The seller has not added a detailed description yet.'}</p>
+              {quickView.subCategory && <p className="qv-desc">Product type: {quickView.subCategory}</p>}
+              <p className="qv-desc">{Number(quickView.stockQuantity) > 0 ? `In stock · ${quickView.stockQuantity} available` : 'Out of stock'}</p>
               <div className="qv-features">
-                {['🎀 Gift Wrapped','✍️ Personal Note','🚚 Island-wide Delivery'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
+                {['Build a gift box to choose wrapping and a personal note. Delivery details are confirmed at checkout.'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
               </div>
               <div className="qv-actions">
                 <button
                   className="qv-cta qv-cta--primary"
+                  disabled={!(Number(quickView.stockQuantity) > 0)}
                   onClick={() => { addToCart(quickView); setQuickView(null); }}
                 >
-                  🛒 Add to Cart
+                  {Number(quickView.stockQuantity) > 0 ? 'Add to Cart' : 'Out of stock'}
                 </button>
                 <button className="qv-cta qv-cta--outline" onClick={() => { setQuickView(null); navigate('/products'); }}>View All →</button>
               </div>

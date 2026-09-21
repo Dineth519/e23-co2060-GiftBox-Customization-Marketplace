@@ -6,6 +6,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VendorRepository extends JpaRepository<Vendor, Integer> {
+    interface ShopSummary {
+        Integer getVendorId();
+        String getShopName();
+    }
+
+    @org.springframework.data.jpa.repository.Query(value = "SELECT vendor_id AS vendorId, shop_name AS shopName FROM vendors", nativeQuery = true)
+    java.util.List<ShopSummary> findShopSummaries();
     // JpaRepository gives you standard methods like findAll(), findById(), save(), delete() for free.
     // You don't need to write any code here for basic operations.
     java.util.Optional<Vendor> findByShopName(String shopName);
