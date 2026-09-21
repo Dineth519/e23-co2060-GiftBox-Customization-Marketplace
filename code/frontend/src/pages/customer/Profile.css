@@ -1,13 +1,7 @@
 /* Profile.css — Giftora Customer Panel — Light Theme (view-only summary) */
 @import './customer-theme.css';
 
-/* ── Page Shell ── */
-.pf-page {
-  min-height: 100vh;
-  background: var(--ct-bg);
-  font-family: var(--ct-font);
-  padding-bottom: 60px;
-}
+
 
 /* ── Loading ── */
 .pf-loading {
@@ -39,6 +33,8 @@
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+
 
 /* ── Profile Summary Card ── */
 .pf-summary-card {

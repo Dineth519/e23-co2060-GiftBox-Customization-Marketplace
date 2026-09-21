@@ -100,21 +100,35 @@ const AddItems = () => {
     e.preventDefault();
     setDragOver(false);
     const files = Array.from(e.dataTransfer?.files || e.target.files || []);
-    const newImgs = files.slice(0, 5 - images.length).map(f => ({
+    if (files.length !== 1 || !files[0].type.startsWith('image/') || files[0].size > 5 * 1024 * 1024) {
+      alert('Choose one image smaller than 5 MB.');
+      return;
+    }
+    const newImgs = files.map(f => ({
       id: Date.now() + Math.random(),
       name: f.name,
       url: URL.createObjectURL(f),
       file: f
     }));
-    setImages(prev => [...prev, ...newImgs].slice(0, 5));
+    images.forEach(image => URL.revokeObjectURL(image.url));
+    setImages(newImgs);
   };
 
   const removeImage = (id) => setImages(prev => prev.filter(i => i.id !== id));
 
   // ── Submit ──
   const handleSubmit = async () => {
-    if (!form.name || !form.category || !form.price || !form.stock) {
-      alert('Please fill in all required fields including sub-category.');
+    if (submitted) return;
+    if (!form.name.trim() || !form.category || !form.description.trim() || !form.subCategory.trim() || !images.length) {
+      alert('Add a name, description, category, product type, and product photo.');
+      return;
+    }
+    if (!form.price || !Number.isFinite(Number(form.price)) || Number(form.price) <= 0 || form.stock === '' || !Number.isInteger(Number(form.stock)) || Number(form.stock) < 0) {
+      alert('Enter a positive price and a whole-number stock quantity of zero or more.');
+      return;
+    }
+    if (form.discountPrice !== '' && (!Number.isFinite(Number(form.discountPrice)) || Number(form.discountPrice) <= 0 || Number(form.discountPrice) >= Number(form.price))) {
+      alert('Discount price must be positive and lower than the regular price.');
       return;
     }
 
@@ -182,7 +196,7 @@ const AddItems = () => {
         </div>
         <div className="ai-header-actions">
           <button className="btn-cancel" onClick={() => navigate('/vendor/my-items')}>Cancel</button>
-          <button className={`btn-save${submitted ? ' saved' : ''}`} onClick={handleSubmit}>
+          <button className={`btn-save${submitted ? ' saved' : ''}`} disabled={submitted} onClick={handleSubmit}>
             <FaPlus size={12} /> {submitted ? 'Saving…' : 'Save Item'}
           </button>
         </div>
@@ -201,7 +215,7 @@ const AddItems = () => {
             </div>
             <div className="ai-field">
               <Label required>Description</Label>
-              <Textarea name="description" value={form.description} onChange={handleChange} placeholder="Describe your product — what's included, occasion, packaging…" />
+              <Textarea name="description" value={form.description} onChange={handleChange} placeholder="Describe the material or ingredients, size or weight, colour, care instructions, and what is included. Only include verified details." />
             </div>
 
             {/* Category Dropdown */}
@@ -278,7 +292,7 @@ const AddItems = () => {
           </SectionCard>
 
           {/* Image Upload */}
-          <SectionCard icon={<FaImage />} title="Product Images">
+          <SectionCard icon={<FaImage />} title="Product Photo">
             <div
               className={`ai-dropzone${dragOver ? ' drag-over' : ''}`}
               onDragOver={e => { e.preventDefault(); setDragOver(true); }}
@@ -287,13 +301,12 @@ const AddItems = () => {
               onClick={() => document.getElementById('imgInput').click()}
             >
               <div><FaUpload className="dz-icon" /></div>
-              <p className="dz-title">Drop images here</p>
-              <p className="dz-sub">or click to browse · max 5 images</p>
+              <p className="dz-title">Drop one product photo here</p>
+              <p className="dz-sub">or click to browse · one image, up to 5 MB</p>
               <input
                 id="imgInput"
                 type="file"
                 accept="image/*"
-                multiple
                 style={{ display: 'none' }}
                 onChange={handleImageDrop}
               />
@@ -310,7 +323,7 @@ const AddItems = () => {
                 ))}
               </div>
             )}
-            <p className="ai-img-hint">First image will be the main product photo</p>
+            <p className="ai-img-hint">Choose a clear photo of the actual item. Selecting another photo replaces the current one.</p>
           </SectionCard>
 
         </div>

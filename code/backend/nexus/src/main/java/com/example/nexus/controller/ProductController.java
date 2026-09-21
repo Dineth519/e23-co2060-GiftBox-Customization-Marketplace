@@ -24,31 +24,40 @@ public class ProductController {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private com.example.nexus.repository.VendorRepository vendorRepository;
+
+    private List<Product> publicProducts() {
+        java.util.Map<Integer, String> shops = new java.util.HashMap<>();
+        vendorRepository.findShopSummaries().forEach(vendor -> shops.put(vendor.getVendorId(), vendor.getShopName()));
+        return productRepository.findAll().stream()
+            .filter(product -> Integer.valueOf(1).equals(product.getIsActive()))
+            .peek(product -> product.setVendorName(shops.get(product.getVendorId())))
+            .collect(Collectors.toList());
+    }
+
     // GET /api/products — Fetch all products for the customer-facing Products Page
     @GetMapping("/products")
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return publicProducts();
     }
 
     // GET /api/products/new-arrivals — Latest 8 active products (landing page)
     @GetMapping("/products/new-arrivals")
     public List<Product> getNewArrivals() {
-        return productRepository.findAll(
-            PageRequest.of(0, 8, Sort.by(Sort.Direction.DESC, "id"))
-        ).getContent()
-          .stream()
-          .filter(p -> p.getIsActive() == null || p.getIsActive() == 1)
+        return publicProducts().stream()
+          .sorted(java.util.Comparator.comparing(Product::getId).reversed())
+          .limit(8)
           .collect(Collectors.toList());
     }
 
     // GET /api/products/hot-sellers — Top 8 by rating (landing page)
     @GetMapping("/products/hot-sellers")
     public List<Product> getHotSellers() {
-        return productRepository.findAll(
-            PageRequest.of(0, 8, Sort.by(Sort.Direction.DESC, "rating"))
-        ).getContent()
-          .stream()
-          .filter(p -> p.getIsActive() == null || p.getIsActive() == 1)
+        return publicProducts().stream()
+          .sorted(java.util.Comparator.comparing(Product::getRating,
+              java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder())))
+          .limit(8)
           .collect(Collectors.toList());
     }
 
@@ -67,6 +76,7 @@ public class ProductController {
                         .map(com.example.nexus.model.Category::getName)
                         .orElse("Unknown"));
                 dto.setSubCategory(product.getSubCategory());
+                dto.setDescription(product.getDescription());
                 dto.setPrice(product.getPrice());
                 dto.setStock(product.getStockQuantity() != null ? product.getStockQuantity() : 0);
                 dto.setSold(0);
@@ -113,6 +123,7 @@ public class ProductController {
             if (updatedProduct.getSku()           != null) product.setSku(updatedProduct.getSku());
             if (updatedProduct.getImageUrl()      != null) product.setImageUrl(updatedProduct.getImageUrl());
             if (updatedProduct.getCategoryId()    != null) product.setCategoryId(updatedProduct.getCategoryId());
+            if (updatedProduct.getSubCategory()   != null) product.setSubCategory(updatedProduct.getSubCategory());
             productRepository.save(product);
             return ResponseEntity.ok().body("Product updated successfully");
         }).orElse(ResponseEntity.notFound().build());

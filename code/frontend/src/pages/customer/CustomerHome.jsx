@@ -10,9 +10,8 @@ import Footer from '../../components/landingpage/Footer';
 import { useCart } from '../../context/CartContext';
 import './CustomerHome.css';
 
-// ─── Config (From ProductsPage) ───────────────────────────────────────────
-const CATEGORY_MAP = { 1:'Wine', 2:'Watches', 3:'Perfume', 4:'Teddy Bears', 5:'Bangles', 6:'Chocolates' };
-const CAT_ICONS    = { All:'🛍️', Wine:'🍷', Watches:'⌚', Perfume:'🌸', 'Teddy Bears':'🧸', Bangles:'💍', Chocolates:'🍫' };
+// ─── Config ───────────────────────────────────────────
+const CAT_ICONS    = { All:'🛍️', Wine:'🍷', Watches:'⌚', Perfume:'🌸', 'Teddy Bears':'🧸', Bangles:'💍', Chocolates:'🍫', Other:'🎁' };
 const SORT_OPTIONS = [
   { value:'default',    label:'Featured' },
   { value:'price-asc',  label:'Price: Low → High' },
@@ -38,6 +37,7 @@ const CustomerHome = () => {
 
   // ─── States ─────────────────────────────────────────────────────────────
   const [allProducts, setAllProducts] = useState([]);
+  const [dbCategories, setDbCategories] = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -45,26 +45,40 @@ const CustomerHome = () => {
   const [sortBy, setSortBy]           = useState('default');
   const [quickView, setQuickView]     = useState(null);
 
-  // Fetch Products
+  // Fetch Products and Categories
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/products`)
-      .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
-      .then(data => { setAllProducts(data); setLoading(false); })
-      .catch(err => { setError(err.message); setLoading(false); });
+    Promise.all([
+      fetch(`${process.env.REACT_APP_API_URL}/api/products`).then(res => res.ok ? res.json() : []),
+      fetch(`${process.env.REACT_APP_API_URL}/api/categories`).then(res => res.ok ? res.json() : [])
+    ])
+      .then(([productsData, categoriesData]) => {
+        setAllProducts(productsData);
+        setDbCategories(categoriesData);
+        setLoading(false);
+      })
+      .catch(err => { 
+        setError(err.message); 
+        setLoading(false); 
+      });
   }, []);
+
+  const getCategoryName = (id) => {
+    const cat = dbCategories.find(c => c.id === id);
+    return cat ? cat.name : 'Other';
+  };
 
   // ─── Logic (Filtering & Sorting) ────────────────────────────────────────
   const categories = useMemo(() => {
-    const names = allProducts.map(p => CATEGORY_MAP[p.categoryId] || 'Other');
+    const names = allProducts.map(p => getCategoryName(p.categoryId));
     return ['All', ...new Set(names)];
-  }, [allProducts]);
+  }, [allProducts, dbCategories]);
 
   const displayProducts = useMemo(() => {
     let f = [...allProducts];
-    if (activeCategory !== 'All') f = f.filter(p => CATEGORY_MAP[p.categoryId] === activeCategory);
+    if (activeCategory !== 'All') f = f.filter(p => getCategoryName(p.categoryId) === activeCategory);
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      f = f.filter(p => p.name.toLowerCase().includes(q) || (CATEGORY_MAP[p.categoryId]||'').toLowerCase().includes(q));
+      f = f.filter(p => p.name.toLowerCase().includes(q) || getCategoryName(p.categoryId).toLowerCase().includes(q));
     }
     switch (sortBy) {
       case 'price-asc':  f.sort((a,b) => a.price - b.price); break;
@@ -116,7 +130,7 @@ const CustomerHome = () => {
 
           <div className="home-filters">
             <select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)}>
-              {categories.map(cat => <option key={cat} value={cat}>{CAT_ICONS[cat]} {cat}</option>)}
+              {categories.map(cat => <option key={cat} value={cat}>{CAT_ICONS[cat] ? `${CAT_ICONS[cat]} ` : ''}{cat}</option>)}
             </select>
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
               {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
@@ -130,8 +144,7 @@ const CustomerHome = () => {
           {error && <div className="home-state error">⚠️ {error}</div>}
           
           {!loading && !error && displayProducts.map((p, i) => {
-            const catName  = CATEGORY_MAP[p.categoryId] || 'Gift';
-            const catIcon  = CAT_ICONS[catName] || '🎁';
+            const catName  = getCategoryName(p.categoryId);
             const justAdded = addedId === p.id;
             
             return (
@@ -142,7 +155,8 @@ const CustomerHome = () => {
                   <div className="ppc-overlay">
                     <button
                       className="ppc-action ppc-action--primary"
-                      onClick={() => addToCart(p)}
+                      disabled={!(Number(p.stockQuantity) > 0)}
+                        onClick={() => addToCart(p)}
                     >
                       {justAdded ? '✓ Added!' : '🛒 Add to Cart'}
                     </button>
@@ -153,16 +167,14 @@ const CustomerHome = () => {
                 {/* Body */}
                 <div className="ppc-body">
                   <div className="ppc-name">{p.name}</div>
-                  <div className="ppc-vendor">by Giftora Exclusive</div>
-                  <div className="ppc-stars-row">
-                    <span className="ppc-stars">★★★★★</span>
-                    <span className="ppc-rating">5.0</span>
-                  </div>
+                  <div className="ppc-vendor">{p.vendorName ? `Sold by ${p.vendorName}` : 'Seller details unavailable'}</div>
+                  <div className="ppc-stars-row">{Number(p.stockQuantity) > 0 ? `In stock · ${p.stockQuantity} available` : 'Out of stock'}</div>
                   <div className="ppc-footer">
                     <span className="ppc-price">LKR {Number(p.price).toLocaleString()}</span>
                     <button
                       className={`ppc-add ${justAdded ? 'ppc-add--added' : ''}`}
-                      onClick={() => addToCart(p)}
+                      disabled={!(Number(p.stockQuantity) > 0)}
+                        onClick={() => addToCart(p)}
                       title="Add to cart"
                     >
                       {justAdded
@@ -216,22 +228,25 @@ const CustomerHome = () => {
             </div>
             <div className="qv-info-side">
               <div className="qv-cat-tag">
-                {CAT_ICONS[CATEGORY_MAP[quickView.categoryId]] || '🎁'} {CATEGORY_MAP[quickView.categoryId] || 'Gift'}
+                {CAT_ICONS[getCategoryName(quickView.categoryId)] ? `${CAT_ICONS[getCategoryName(quickView.categoryId)]} ` : ''}{getCategoryName(quickView.categoryId)}
               </div>
               <h3 className="qv-name">{quickView.name}</h3>
-              <div className="qv-stars-row">★★★★★ <span>5.0 · Premium Quality</span></div>
+              <div className="qv-stars-row">{quickView.vendorName ? `Sold by ${quickView.vendorName}` : 'Seller details unavailable'}</div>
               <div className="qv-price">LKR {Number(quickView.price).toLocaleString()}</div>
               <div className="qv-sep" />
-              <p className="qv-desc">A premium curated gift from Giftora's exclusive collection. Hand-packed with love, beautifully presented, and ready to create a lasting memory.</p>
+              <p className="qv-desc" style={{ whiteSpace: 'pre-line' }}>{quickView.description?.trim() || 'The seller has not added a detailed description yet.'}</p>
+              {quickView.subCategory && <p className="qv-desc">Product type: {quickView.subCategory}</p>}
+              <p className="qv-desc">{Number(quickView.stockQuantity) > 0 ? `In stock · ${quickView.stockQuantity} available` : 'Out of stock'}</p>
               <div className="qv-features">
-                {['🎀 Gift Wrapped','✍️ Personal Note','🚚 Island-wide Delivery'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
+                {['Build a gift box to choose wrapping and a personal note. Delivery details are confirmed at checkout.'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
               </div>
               <div className="qv-actions">
                 <button
                   className="qv-cta qv-cta--primary"
+                  disabled={!(Number(quickView.stockQuantity) > 0)}
                   onClick={() => { addToCart(quickView); setQuickView(null); }}
                 >
-                  🛒 Add to Cart
+                  {Number(quickView.stockQuantity) > 0 ? 'Add to Cart' : 'Out of stock'}
                 </button>
                 <button className="qv-cta qv-cta--outline" onClick={() => { setQuickView(null); document.getElementById('marketplace').scrollIntoView({behavior:'smooth'}); }}>View All →</button>
               </div>

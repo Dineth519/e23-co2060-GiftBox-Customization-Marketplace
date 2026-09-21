@@ -1,13 +1,7 @@
 /* Settings.css — Giftora Customer Panel — Light Theme */
 @import './customer-theme.css';
 
-/* ── Page Shell ── */
-.st-page {
-  min-height: 100vh;
-  background: var(--ct-bg);
-  font-family: var(--ct-font);
-  padding-bottom: 60px;
-}
+
 
 /* ── Loading ── */
 .st-loading {
@@ -40,17 +34,11 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Header ── */
-.st-header {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 40px 48px 0;
-}
-
+/* ── Back Button inside Hero ── */
 .st-back-btn {
   background: none;
   border: none;
-  color: var(--ct-text-muted);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -61,15 +49,7 @@
 }
 
 .st-back-btn:hover {
-  color: var(--ct-gold);
-}
-
-.st-header-title {
-  font-family: var(--ct-font-serif);
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--ct-text);
-  margin: 0;
+  color: #FFFFFF;
 }
 
 /* ── Tabs ── */

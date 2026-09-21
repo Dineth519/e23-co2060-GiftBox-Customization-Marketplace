@@ -31,6 +31,7 @@ import AdminLayout from './layouts/AdminLayout.jsx';
 import Vendors from './pages/admin/Vendors.jsx';
 import PendingVendors from './pages/admin/PendingVendors.jsx';
 import Customers from './pages/admin/Customers.jsx';
+import AdminCategories from './pages/admin/AdminCategories.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
 import Settings from './pages/admin/Settings.jsx';
 import StaffManagement from './pages/admin/StaffManagement.jsx';
@@ -51,6 +52,10 @@ import CartPage from './pages/landingpage/CartPage.jsx';
 
 // Box Builder
 import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
+
+// Assembler
+import AssemblerLayout from './layouts/AssemblerLayout.jsx';
+import AssemblerDashboard from './pages/assembler/Dashboard.jsx';
 
 // Scroll to top helper on route navigation
 const ScrollToTop = () => {
@@ -94,6 +99,7 @@ function App() {
           {/* Public and user routes */}
           <Route path="/" element={<LayoutWrapper><LandingPage /></LayoutWrapper>} />
           <Route path="/products" element={<ProductsPage />} />
+
           <Route path="/about-us" element={<LayoutWrapper><AboutUsPage /></LayoutWrapper>} />
           <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
@@ -138,15 +144,25 @@ function App() {
             <AdminLayout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
+                <Route path="staff-management" element={<StaffManagement />} />
                 <Route path="vendors" element={<Vendors />} />
                 <Route path="vendors/pending" element={<PendingVendors />} />
                 <Route path="customers" element={<Customers />} />
+                <Route path="categories" element={<AdminCategories />} />
                 <Route path="settings" element={<Settings />} />
-                <Route path="staff-management" element={<StaffManagement />} />
               </Routes>
             </AdminLayout>
           } />
-
+          {/* Assembler routes using AssemblerLayout for sidebar and route guard */}
+          <Route path="/assembler/*" element={
+              <AssemblerLayout>
+                  <Routes>
+                      <Route path="/" element={<AssemblerDashboard />} />
+                      {/* Add more assembler pages here later, e.g. Order Detail, QA Checklist */}
+                  </Routes>
+              </AssemblerLayout>
+          } />
+          
           {/* Catch-all route that redirects to home page */}
           <Route path="*" element={<Navigate to="/" />} />
 

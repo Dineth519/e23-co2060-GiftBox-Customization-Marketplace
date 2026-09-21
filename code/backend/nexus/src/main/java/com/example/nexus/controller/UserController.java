@@ -39,6 +39,7 @@ public class UserController {
             if (updatedUser.getDistrict() != null) user.setDistrict(updatedUser.getDistrict());
             if (updatedUser.getProvince() != null) user.setProvince(updatedUser.getProvince());
             if (updatedUser.getPostalCode() != null) user.setPostalCode(updatedUser.getPostalCode());
+            if (updatedUser.getProfileImageUrl() != null) user.setProfileImageUrl(updatedUser.getProfileImageUrl());
             User saved = userRepository.save(user);
             return ResponseEntity.ok(saved);
         }).orElse(ResponseEntity.notFound().build());

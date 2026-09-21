@@ -136,6 +136,14 @@
 }
 
 /* Responsive */
+.public-menu-toggle { display: none; }
+@media (max-width: 1060px) {
+  .giftora-header .public-menu-toggle { display: block; color: white; background: #1A1A2E; border: 1px solid #C9A961; border-radius: 8px; padding: 10px 14px; }
+  .giftora-header .header-nav.public-nav-open { display: flex; position: absolute; top: 72px; left: 16px; right: 16px; padding: 16px; flex-direction: column; align-items: stretch; background: #1A1A2E; border-radius: 12px; box-shadow: 0 8px 24px #0005; max-height: calc(100dvh - 90px); overflow-y: auto; }
+}
+@media (max-width: 480px) {
+  .giftora-header .header-btn-gold { display: none; }
+}
 @media (max-width: 1220px) {
   .header-inner {
     gap: 16px;

@@ -6,9 +6,18 @@
   min-height: 100vh;
   background: var(--ct-bg);
   font-family: var(--ct-font);
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 /* ── Content body ── */
+.orders-page .ct-hero {
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 0 !important;
+}
+
 .orders-body {
   max-width: 900px;
   margin: 0 auto;

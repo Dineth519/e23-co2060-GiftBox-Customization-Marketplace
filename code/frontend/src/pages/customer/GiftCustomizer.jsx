@@ -165,18 +165,17 @@ export default function GiftCustomizer() {
     <div className="gc-page">
  
       {/* ── Hero Banner ── */}
-      <div className="ct-hero">
-        <div className="ct-hero__orb ct-hero__orb--1" />
-        <div className="ct-hero__orb ct-hero__orb--2" />
-        <div className="ct-hero__inner">
-          <div className="ct-hero__label">Gift Customizer</div>
-          <h1 className="ct-hero__title">Curate the <em style={{color:'#C9A961',fontStyle:'italic'}}>Perfect Gift</em></h1>
-          <p className="ct-hero__sub">Choose items from our local vendors — we hand-pack and deliver island-wide.</p>
+      <div className="gc-hero">
+        <div className="gc-hero__orb gc-hero__orb--1" />
+        <div className="gc-hero__orb gc-hero__orb--2" />
+        <div className="gc-hero__inner">
+          <h1 className="gc-hero__title">Curate the <em style={{color:'#C9A961',fontStyle:'italic'}}>Perfect Gift</em></h1>
+          <p className="gc-hero__sub">Choose items from our local vendors — we hand-pack and deliver island-wide.</p>
         </div>
       </div>
 
       {/* ── Main Layout: Steps (left) + Summary (right) ── */}
-      <div className="ct-body">
+      <div className="gc-body">
       <div className="gc-layout">
  
         {/* ════ LEFT PANEL — 4 steps ════ */}

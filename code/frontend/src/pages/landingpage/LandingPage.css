@@ -804,7 +804,7 @@ html, body {
   transition: all 0.25s var(--ease-back);
 }
 
-.btn-add-cart:hover { transform: scale(1.15) rotate(90deg); }
+.btn-add-cart:hover { transform: scale(1.15); }
 
 
 
@@ -1694,7 +1694,6 @@ html, body {
 .qv-close:hover {
   background: var(--gold);
   color: white;
-  transform: rotate(90deg);
 }
 
 .qv-image {

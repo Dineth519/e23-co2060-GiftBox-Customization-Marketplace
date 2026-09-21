@@ -157,9 +157,11 @@ const Login = () => {
           } else if (userRole === 'VENDOR' || userRole === 'SELLER' || userRole === 'PARTNER') {
             navigate('/vendor');
           } else if (userRole === 'CUSTOMER') {
-            navigate('/customer/home');
+            const returnTo = sessionStorage.getItem('giftora_return_to');
+            sessionStorage.removeItem('giftora_return_to');
+            navigate(returnTo === '/build-box' ? returnTo : '/customer/home');
           } else if (userRole === 'ASSEMBLER') {
-            navigate('/assembler-dashboard');
+            navigate('/assembler');
           } else {
             navigate('/');
           }

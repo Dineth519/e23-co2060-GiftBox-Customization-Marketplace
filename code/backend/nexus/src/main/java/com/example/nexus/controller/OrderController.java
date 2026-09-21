@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import com.example.nexus.repository.UserRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,6 +30,9 @@ public class OrderController {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     // 1. Vendor-specific orders retrieval (sorted by created_at desc)
     @GetMapping("/vendors/{vendorId}/orders")
     public List<Order> getOrdersByVendor(@PathVariable Integer vendorId) {
@@ -41,22 +45,83 @@ public class OrderController {
         return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
     }
 
-    // 2. Vendor order status update (only from PENDING to CONFIRMED or CANCELLED)
+    // 1c. Customer-specific orders summary
+    @GetMapping("/orders/customer/{customerId}/summary")
+    public ResponseEntity<?> getCustomerOrderSummary(@PathVariable Integer customerId) {
+        List<Order> orders = orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
+        
+        int totalOrders = orders.size();
+        int delivered = 0;
+        int inProgress = 0;
+        BigDecimal totalSpent = BigDecimal.ZERO;
+
+        for (Order order : orders) {
+            String status = order.getStatus();
+            if ("DELIVERED".equalsIgnoreCase(status)) {
+                delivered++;
+            } else if ("PENDING".equalsIgnoreCase(status) || "CONFIRMED".equalsIgnoreCase(status) || "SHIPPED".equalsIgnoreCase(status)) {
+                inProgress++;
+            }
+            if (!"CANCELLED".equalsIgnoreCase(status)) {
+                totalSpent = totalSpent.add(order.getTotalAmount());
+            }
+        }
+
+        Map<String, Object> summary = new java.util.HashMap<>();
+        summary.put("totalOrders", totalOrders);
+        summary.put("delivered", delivered);
+        summary.put("inProgress", inProgress);
+        summary.put("totalSpent", totalSpent);
+
+        return ResponseEntity.ok(summary);
+    }
+
+    // 2. Order status update (Vendor or Customer)
     @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Integer orderId, @RequestBody Map<String, String> request) {
         return orderRepository.findById(orderId).map(order -> {
             String newStatus = request.get("status");
+            String currentStatus = order.getStatus();
 
-            // Only allow status change if current status is PENDING
-            if ("PENDING".equals(order.getStatus())) {
-                if ("CONFIRMED".equals(newStatus) || "CANCELLED".equals(newStatus)) {
-                    order.setStatus(newStatus);
-                    orderRepository.save(order);
-                    return ResponseEntity.ok().body("Order " + newStatus);
-                }
+            // Allow vendor to change PENDING to CONFIRMED or CANCELLED
+            if ("PENDING".equals(currentStatus) && ("CONFIRMED".equals(newStatus) || "CANCELLED".equals(newStatus))) {
+                order.setStatus(newStatus);
+                orderRepository.save(order);
+                return ResponseEntity.ok().body("Order " + newStatus);
             }
+            
+            // Allow customer to mark as RECEIVED if it's currently DELIVERED
+            if ("RECEIVED".equals(newStatus) && "DELIVERED".equals(currentStatus)) {
+                order.setStatus(newStatus);
+                orderRepository.save(order);
+                return ResponseEntity.ok().body("Order marked as RECEIVED");
+            }
+
             return ResponseEntity.badRequest().body("Action not allowed for current status");
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // 2b. Get items for an order
+    @GetMapping("/orders/{orderId}/items")
+    public ResponseEntity<?> getOrderItems(@PathVariable Integer orderId) {
+        List<OrderItem> items = orderItemRepository.findByOrderId(orderId);
+        List<Map<String, Object>> response = new java.util.ArrayList<>();
+        
+        for (OrderItem item : items) {
+            Product product = productRepository.findById(item.getProductId()).orElse(null);
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("productId", item.getProductId());
+            map.put("quantity", item.getQuantity());
+            map.put("unitPrice", item.getUnitPrice());
+            if (product != null) {
+                map.put("name", product.getName());
+                map.put("imageUrl", product.getImageUrl());
+            } else {
+                map.put("name", "Unknown Product");
+            }
+            response.add(map);
+        }
+        return ResponseEntity.ok(response);
     }
 
     // 3. Place custom box order
@@ -67,6 +132,9 @@ public class OrderController {
             // Validate request
             if (request.getCustomerId() == null) {
                 return ResponseEntity.badRequest().body("Validation Error: customerId is required.");
+            }
+            if (!userRepository.existsById(request.getCustomerId())) {
+                return ResponseEntity.badRequest().body("Validation Error: customer with ID " + request.getCustomerId() + " does not exist.");
             }
             if (request.getDeliveryAddress() == null || request.getDeliveryAddress().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("Validation Error: deliveryAddress is required.");
@@ -115,7 +183,7 @@ public class OrderController {
             order.setOrderType("CUSTOM_BOX");
             order.setTotalAmount(totalAmount);
 
-            Order savedOrder = orderRepository.save(order);
+            Order savedOrder = orderRepository.saveAndFlush(order);
 
             // Save OrderItems and update product stock
             for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
@@ -133,7 +201,7 @@ public class OrderController {
                 orderItem.setQuantity(itemReq.getQuantity());
                 orderItem.setUnitPrice(product.getPrice());
                 
-                orderItemRepository.save(orderItem);
+                orderItemRepository.saveAndFlush(orderItem);
             }
             
             // Build a safe response map to prevent Jackson serialization issues
@@ -161,6 +229,9 @@ public class OrderController {
             // Validate request
             if (request.getCustomerId() == null) {
                 return ResponseEntity.badRequest().body("Validation Error: customerId is required.");
+            }
+            if (!userRepository.existsById(request.getCustomerId())) {
+                return ResponseEntity.badRequest().body("Validation Error: customer with ID " + request.getCustomerId() + " does not exist.");
             }
             if (request.getDeliveryAddress() == null || request.getDeliveryAddress().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("Validation Error: deliveryAddress is required.");
@@ -205,7 +276,7 @@ public class OrderController {
                 order.setOrderType("STANDARD");
                 order.setTotalAmount(totalAmount);
 
-                Order savedOrder = orderRepository.save(order);
+                Order savedOrder = orderRepository.saveAndFlush(order);
 
                 for (CreateOrderRequest.OrderItemRequest itemReq : vendorItems) {
                     Product product = productRepository.findById(itemReq.getProductId()).get();
@@ -222,7 +293,7 @@ public class OrderController {
                     orderItem.setQuantity(itemReq.getQuantity());
                     orderItem.setUnitPrice(product.getPrice());
                     
-                    orderItemRepository.save(orderItem);
+                    orderItemRepository.saveAndFlush(orderItem);
                 }
                 
                 // Build a safe response map to prevent Jackson serialization issues
