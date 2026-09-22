@@ -2,13 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Footer.css';
 
-const Footer = () => {
+const Footer = ({ customer = false }) => {
   const navigate = useNavigate();
 
   const FOOTER_COLS = [
     { heading: 'Shop',    links: [
       { label: 'Gift Bundles', path: '/products' },
-      { label: 'Build a Box', path: '/build-box' },
+      { label: 'Build a Box', path: customer ? '/customer/build-box' : '/build-box' },
       { label: 'Featured', path: '/products' },
       { label: 'New Arrivals', path: '/products' }
     ]},
@@ -19,10 +19,8 @@ const Footer = () => {
       { label: 'Benefits', path: '/vendor-landing' }
     ]},
     { heading: 'Support', links: [
-      { label: 'Help Center', path: '/about-us' },
-      { label: 'Order Tracking', path: '/customer/orders' },
-      { label: 'Returns', path: '/about-us' },
-      { label: 'Contact Us', path: '/about-us' }
+      { label: 'About the Project', path: customer ? '/customer/about-us' : '/about-us' },
+      { label: customer ? 'Track My Orders' : 'Sign In to Track Orders', path: customer ? '/customer/orders' : '/login' },
     ]},
   ];
 
@@ -32,18 +30,14 @@ const Footer = () => {
 
         {/* Brand column */}
         <div className="footer-brand">
-          <div className="footer-logo" onClick={() => navigate('/')}>
+          <div className="footer-logo" onClick={() => navigate(customer ? '/customer/home' : '/')}>
             <span className="footer-logo__icon">🎁</span>
             <span className="footer-logo__text">Giftora</span>
           </div>
           <p className="footer-tagline">
-            Sri Lanka's premium gift marketplace — curating joy since 2023.
+            Giftora is a student marketplace demonstration by Team Nexus. Vendors, products, and fulfillment may be simulated.
           </p>
-          <div className="footer-socials">
-            {['Instagram', 'Facebook', 'TikTok'].map(s => (
-              <button key={s} className="social-btn" title={s}>{s[0]}</button>
-            ))}
-          </div>
+
         </div>
 
         {/* Link columns */}
@@ -67,7 +61,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <span>© 2025 Giftora. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Giftora. All rights reserved.</span>
         <span>Made with 💛 in Sri Lanka</span>
       </div>
     </footer>

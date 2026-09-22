@@ -401,7 +401,7 @@ export default function OrderDetail() {
                 {order.status === 'Delivered' && (
                   <button
                     className="od-btn-primary"
-                    onClick={() => navigate('/customize')}
+                    onClick={() => navigate('/customer/build-box')}
                   >
                     🎁 Build Another Box
                   </button>

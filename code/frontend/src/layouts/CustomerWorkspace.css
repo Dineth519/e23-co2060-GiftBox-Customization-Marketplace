@@ -1,0 +1,80 @@
+/* Scoped to account pages: the customer homepage keeps its own presentation. */
+.customer-workspace.customer-workspace {
+  --ct-bg: #f5f4ef;
+  --ct-text: #202c3d;
+  --ct-text-muted: #6b7480;
+  --ct-border: #e4e5df;
+  --ct-shadow: 0 4px 24px #172a3b06;
+  background: var(--ct-bg);
+  color: var(--ct-text);
+  font-family: 'DM Sans', sans-serif;
+}
+.customer-workspace.customer-workspace main { background: var(--ct-bg); }
+.workspace-heading { background: var(--ct-deep, #16213E); border-bottom: 1px solid rgba(201, 169, 97, 0.3); }
+.workspace-heading__inner { max-width: 1240px; margin: auto; padding: 28px 32px 42px; }
+.workspace-heading__row { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 16px; }
+.workspace-eyebrow { color: var(--ct-gold, #C9A961); font-size: 10px; font-weight: 700; letter-spacing: 2px; margin-bottom: 10px; }
+.workspace-heading h1 { font: 600 clamp(32px, 3.5vw, 48px)/1.12 'Cormorant Garamond', Georgia, serif; color: var(--ct-surface, #FFFFFF); margin: 0 0 14px; }
+.workspace-description { color: rgba(255, 255, 255, 0.75); font-size: 14px; line-height: 1.8; max-width: 650px; }
+.workspace-emblem { width: 78px; height: 78px; flex-shrink: 0; display: grid; place-items: center; border: 1px solid rgba(201, 169, 97, 0.4); border-radius: 50%; color: var(--ct-gold, #C9A961); font-size: 48px; background: rgba(201, 169, 97, 0.1); }
+.customer-workspace--headed :is(.bb-hero, .ct-hero, .about-hero) { display: none; }
+.customer-workspace.customer-workspace :is(.orders-page, .about-page, .bb-page) { background: var(--ct-bg); }
+.customer-workspace.customer-workspace :is(.orders-body, .ct-body) { max-width: 1240px; margin: auto; padding: 32px 32px 72px; }
+.customer-workspace.customer-workspace :is(.order-card, .st-card, .ct-card, .about-step__card, .about-faq-item) { background: #fff; border: 1px solid #e4e5df; border-radius: 16px; box-shadow: 0 4px 24px #172a3b06; }
+.customer-workspace.customer-workspace :is(.orders-tabs, .st-tabs) { background: #fff; border: 1px solid #e4e5df; border-radius: 12px; padding: 6px; gap: 6px; flex-wrap: wrap; }
+.customer-workspace.customer-workspace :is(.orders-tab, .st-tab) { border: 0; border-radius: 8px; padding: 12px 18px; color: #647080; }
+.customer-workspace.customer-workspace :is(.orders-tab.active, .st-tab.active) { background: #202c3d; color: #fff; }
+.customer-workspace.customer-workspace .st-tabs { max-width: none; margin: 0 0 24px; }
+.customer-workspace.customer-workspace .st-tab-divider { display: none; }
+.customer-workspace.customer-workspace .st-tab-content { max-width: none; padding: 0; margin: 0; }
+.customer-workspace.customer-workspace .st-tab-logout { margin-left: auto; }
+.customer-workspace.customer-workspace .ct-btn-gold { background: #202c3d; color: #fff; box-shadow: none; border-radius: 9px; }
+.customer-workspace.customer-workspace :is(input, textarea, select):focus-visible { outline: 2px solid #b99955; outline-offset: 3px; }
+.customer-workspace.customer-workspace :is(button, a):focus-visible { outline: 2px solid #b99955; outline-offset: 4px; }
+.customer-workspace.customer-workspace .about-steps-section { padding: 48px 32px; max-width: 1240px; margin: auto; }
+.customer-workspace.customer-workspace .about-section-header { text-align: left; margin-bottom: 36px; }
+.customer-workspace.customer-workspace .about-section-sub { margin-left: 0; }
+.customer-workspace.customer-workspace .about-steps-track { max-width: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.customer-workspace.customer-workspace .about-steps-line { display: none; }
+.customer-workspace.customer-workspace .about-step { width: auto; margin: 0; padding: 0; display: block; opacity: 1; transform: none; }
+.customer-workspace.customer-workspace .about-step__node { position: static; margin-bottom: 12px; transform: none; }
+.customer-workspace.customer-workspace .about-step__card { width: 100%; height: auto; }
+.customer-workspace.customer-workspace .about-step::after { display: none; }
+.customer-workspace.customer-workspace .about-faq-section { background: #f5f4ef; }
+.customer-workspace.customer-workspace .topbar-container { background: #1a2438; border-bottom: 1px solid #ffffff12; box-shadow: none; }
+.customer-workspace.customer-workspace .customer-nav { display: flex; gap: 6px; margin-left: auto; margin-right: 24px; }
+.customer-workspace.customer-workspace .customer-nav .nav-link-btn { padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #dfe4ed; font-size: 13px; white-space: nowrap; }
+.customer-workspace.customer-workspace .customer-nav .nav-link-btn:hover,
+.customer-workspace.customer-workspace .customer-nav .nav-link-btn.active { background: #ffffff10; color: #e5c577; }
+.customer-workspace.customer-workspace .profile-section { border-color: #ffffff1a; background: #ffffff06; }
+.customer-workspace.customer-workspace .customer-box-builder { font-family: 'DM Sans', sans-serif; --surface-light: #f5f4ef; --text-primary: #202c3d; --navy-dark: #202c3d; }
+.customer-workspace.customer-workspace .bb-stepper-bar { max-width: 1176px; margin: 28px auto; border-radius: 12px; background: #fff; box-shadow: none; border: 1px solid #e4e5df; }
+.customer-workspace.customer-workspace .bb-step-btn { border-radius: 8px; }
+.customer-workspace.customer-workspace .bb-step-btn.active { background: #202c3d; color: #fff; }
+.customer-workspace.customer-workspace .bb-workspace-container { max-width: 1240px; padding: 0 32px 72px; grid-template-columns: minmax(0, 1fr) 350px; gap: 24px; }
+.customer-workspace.customer-workspace .bb-builder-panel { padding: 28px; border: 1px solid #e4e5df; border-radius: 16px; box-shadow: none; }
+.customer-workspace.customer-workspace .bb-preview-panel { top: 88px; }
+.customer-workspace.customer-workspace .bb-step-header h3 { font-family: 'DM Sans', sans-serif; font-size: 20px; }
+.customer-workspace.customer-workspace .bb-occ-card.active,
+.customer-workspace.customer-workspace .bb-size-card.active { border-color: #b99955; background: #faf7ee; }
+@media (max-width: 1000px) {
+  .customer-workspace.customer-workspace .bb-workspace-container { grid-template-columns: minmax(0, 1fr); }
+  .customer-workspace.customer-workspace .bb-preview-panel { position: static; }
+  .customer-workspace.customer-workspace .topbar-container { height: 112px; flex-wrap: wrap; padding: 10px 20px; }
+  .customer-workspace.customer-workspace .customer-nav { order: 3; width: 100%; margin: 0; overflow-x: auto; }
+  .customer-workspace.customer-workspace .topbar-actions { margin-left: auto; }
+  .customer-workspace.customer-workspace main { padding-top: 112px !important; }
+  .customer-workspace.customer-workspace .bb-stepper-bar { margin: 24px 20px; flex-wrap: wrap; }
+  .customer-workspace.customer-workspace .bb-step-btn { flex: 1 1 40%; }
+}
+@media (max-width: 600px) {
+  .workspace-heading__inner { padding: 24px 20px 32px; }
+  .workspace-emblem { display: none; }
+  .customer-workspace.customer-workspace :is(.orders-body, .ct-body, .about-steps-section) { padding: 24px 20px 48px; }
+  .customer-workspace.customer-workspace .about-steps-track { grid-template-columns: 1fr; }
+  .customer-workspace.customer-workspace .bb-workspace-container { padding: 0 16px 48px; }
+  .customer-workspace.customer-workspace .bb-builder-panel { padding: 20px 16px; }
+  .customer-workspace.customer-workspace .bb-occasion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .customer-workspace.customer-workspace .st-tab { padding: 10px; font-size: 12px; }
+  .customer-workspace.customer-workspace .st-tab-logout { margin-left: 0; }
+}

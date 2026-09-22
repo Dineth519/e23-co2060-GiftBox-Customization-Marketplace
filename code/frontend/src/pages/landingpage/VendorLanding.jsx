@@ -10,16 +10,16 @@ import Footer from '../../components/landingpage/Footer';
 // ─── Data for Vendors ────────────────────────────────────────────────────────
 
 const VENDOR_FEATURES = [
-  { icon: '🚀', title: 'Island-wide Reach', desc: 'Instantly get your products in front of thousands of active buyers across Sri Lanka.' },
+  { icon: '🚀', title: 'Island-wide Reach', desc: 'Demonstrate how customers can discover products from different vendors in one marketplace.' },
   { icon: '📦', title: 'We Handle Packing', desc: 'You supply the items, we hand-assemble them into luxury gift boxes with other brands.' },
-  { icon: '💸', title: 'Zero Listing Fees', desc: 'No upfront costs. You only pay a small commission when your item successfully sells.' },
+  { icon: '💸', title: 'Demo Vendor Portal', desc: 'Explore product listing and order management using a sample vendor account.' },
 ];
 
 const VENDOR_STEPS = [
   { icon: '📝', title: 'Apply',       desc: 'Fill out our quick vendor registration form with your business details.' },
   { icon: '🤝', title: 'Approval',    desc: 'Our team reviews your application to ensure premium quality standards.' },
   { icon: '📸', title: 'List Items',  desc: 'Upload your products through our easy-to-use Seller Dashboard.' },
-  { icon: '💰', title: 'Get Paid',    desc: 'We sell, we pack, we deliver. You get paid directly to your bank account.' },
+  { icon: '💰', title: 'Manage Orders',    desc: 'Follow the simulated order and assembly workflow. This student demo does not provide bank payouts.' },
 ];
 
 const VENDOR_TESTIMONIALS = [
@@ -203,7 +203,7 @@ const VendorTestimonials = () => {
       <div className="testimonials__bg" />
       <div className="section-inner">
         <div className="section-label center" style={{ fontSize: '15px' }}>Success Stories</div>
-        <h2 className="section-title center" style={{ fontSize: '45px' }} >Hear From Our Partners</h2>
+        <h2 className="section-title center" style={{ fontSize: '45px' }} >Illustrative Vendor Experiences</h2>
 
         <div className="testimonials__grid">
           {VENDOR_TESTIMONIALS.map((t, i) => (
@@ -258,6 +258,7 @@ const VendorLanding = () => (
         {/* <VendorStats /> */}
         <VendorBenefits />
         <VendorHowItWorks />
+        <p style={{ textAlign: 'center', padding: '24px' }}>The following testimonials are fictional examples for this student project.</p>
         <VendorTestimonials />
         <VendorCTA />
       </div>

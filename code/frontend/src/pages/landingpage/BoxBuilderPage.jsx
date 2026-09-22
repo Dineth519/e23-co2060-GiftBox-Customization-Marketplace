@@ -1,8 +1,8 @@
+// Public gift builder, presented within the landing-page layout.
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/landingpage/Header';
 import Footer from '../../components/landingpage/Footer';
-import { useCart } from '../../context/CartContext';
 import './BoxBuilderPage.css';
 
 // Safe helper to extract product ID regardless of backend field naming (_id, id, productId)
@@ -84,32 +84,32 @@ const FALLBACK_PRODUCTS = [
 const BoxBuilderPage = () => {
   const navigate = useNavigate();
   const heroRef = useRef(null);
-  const { addToCart } = useCart();
-
-  // Wizard Control
+  
   const [activeStep, setActiveStep] = useState(1);
-
-  // Catalog State
   const [catalogProducts, setCatalogProducts] = useState([]);
   const [isLoadingCatalog, setIsLoadingCatalog] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Gift Configuration States
-  const [occasion, setOccasion] = useState(OCCASIONS[0].id);
-  const [boxSize, setBoxSize] = useState(BOX_SIZES[1]);
-  const [wrappingStyle, setWrappingStyle] = useState(WRAPPING_STYLES[0]);
-  const [ribbonColor, setRibbonColor] = useState(WRAPPING_STYLES[0].defaultRibbon);
-  const [selectedItems, setSelectedItems] = useState({});
-
-  // Personalization States
-  const [recipientName, setRecipientName] = useState('');
-  const [senderName, setSenderName] = useState('');
-  const [giftMessage, setGiftMessage] = useState('');
-  const [cardTemplate, setCardTemplate] = useState(CARD_TEMPLATES[1]);
-  const [hasWaxSeal, setHasWaxSeal] = useState(true);
-  const [deliveryAddress, setDeliveryAddress] = useState('');
-  const [deliveryDate, setDeliveryDate] = useState('');
+  // Form State
+  const [draft] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('giftora_box_draft')) || {}; }
+    catch { return {}; }
+  });
+  const [occasion, setOccasion] = useState(draft.occasion || OCCASIONS[0].id);
+  const [selectedItems, setSelectedItems] = useState(draft.selectedItems || {}); // { productId: quantity }
+  const [boxSize, setBoxSize] = useState(BOX_SIZES.find(size => size.id === draft.boxSize?.id) || BOX_SIZES[1]);
+  
+  // Personalization State
+  const [recipientName, setRecipientName] = useState(draft.recipientName || '');
+  const [giftMessage, setGiftMessage] = useState(draft.giftMessage || '');
+  const [wrappingStyle, setWrappingStyle] = useState(WRAPPING_STYLES.find(style => style.id === (draft.wrappingStyle?.id || draft.wrappingStyle)) || WRAPPING_STYLES[0]);
+  const [ribbonColor, setRibbonColor] = useState(draft.ribbonColor || wrappingStyle.defaultRibbon);
+  const [senderName, setSenderName] = useState(draft.senderName || '');
+  const [cardTemplate, setCardTemplate] = useState(CARD_TEMPLATES.find(template => template.id === draft.cardTemplate?.id) || CARD_TEMPLATES[1]);
+  const [hasWaxSeal, setHasWaxSeal] = useState(draft.hasWaxSeal ?? true);
+  const [deliveryDate, setDeliveryDate] = useState(draft.deliveryDate || '');
+  const [deliveryAddress, setDeliveryAddress] = useState(draft.deliveryAddress || '');
 
   // App UI Feedback States
   const [submitting, setSubmitting] = useState(false);
@@ -122,26 +122,12 @@ const BoxBuilderPage = () => {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  // Fetch product catalog on mount with fallback
+  // Use cart items as the only available inventory for the box builder
   useEffect(() => {
-    const fetchCatalog = async () => {
-      setIsLoadingCatalog(true);
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/products`);
-        if (res.ok) {
-          const data = await res.json();
-          setCatalogProducts(data.length > 0 ? data : FALLBACK_PRODUCTS);
-        } else {
-          setCatalogProducts(FALLBACK_PRODUCTS);
-        }
-      } catch (err) {
-        setCatalogProducts(FALLBACK_PRODUCTS);
-      } finally {
-        setIsLoadingCatalog(false);
-      }
-    };
-    fetchCatalog();
-  }, []);
+    setIsLoadingCatalog(true);
+    setCatalogProducts(cartItems || []);
+    setIsLoadingCatalog(false);
+  }, [cartItems]);
 
   // Sync Item Trim Constraints when Box Size Decreases
   useEffect(() => {
@@ -218,73 +204,35 @@ const BoxBuilderPage = () => {
   };
 
   // Submit Order Process
-  const handlePlaceOrder = async () => {
-    if (totalItemsCount === 0) {
-      triggerToast('Your gift box is empty! Add items in Step 3.');
-      setActiveStep(3);
-      return;
-    }
-    if (!recipientName.trim()) {
-      triggerToast('Please specify a recipient name.');
-      return;
-    }
-    if (!deliveryAddress.trim()) {
-      triggerToast('Please provide a complete delivery address.');
-      return;
-    }
+  const canPlaceOrder = () => !isLoadingCatalog && totalItemsCount > 0 &&
+    totalItemsCount <= boxSize.limit && recipientName.trim() && deliveryAddress.trim();
 
-    setSubmitting(true);
-    const payload = {
-      occasion,
-      boxSize: boxSize.id,
-      wrappingStyle: wrappingStyle.id,
-      ribbonColor,
-      hasWaxSeal,
-      recipientName,
-      senderName,
-      giftMessage,
-      cardTemplate: cardTemplate.id,
-      deliveryAddress,
-      deliveryDate,
-      totalPrice: grandTotal,
-      items: Object.entries(selectedItems).map(([id, qty]) => ({
-        productId: id,
-        quantity: qty
-      }))
-    };
-
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/orders/custom-box`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Backend returned invalid response');
-      
-      setSubmitSuccess(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (err) {
-      // Fallback: simulate cart addition/order success if backend API is not responding
-      if (addToCart) {
-        addToCart({
-          id: `custom-box-${Date.now()}`,
-          name: `${boxSize.title} - ${occasion} Edition`,
-          price: grandTotal,
-          quantity: 1,
-          customDetails: payload
-        });
-      }
-      setSubmitSuccess(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } finally {
-      setSubmitting(false);
-    }
+  const handleSignInToBuy = () => {
+    if (!canPlaceOrder() || submitting) return;
+    sessionStorage.setItem('giftora_box_draft', JSON.stringify({
+      occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress,
+      ribbonColor, senderName, cardTemplate, hasWaxSeal, deliveryDate
+    }));
+    sessionStorage.setItem('giftora_return_to', '/build-box'); // Wait, if they sign in to buy, they should probably go back to the builder to place the order, or go to cart? Let's send them to /build-box to let them click Complete Order.
+    navigate('/login');
   };
+
+  const handleSaveDraft = () => {
+    sessionStorage.setItem('giftora_box_draft', JSON.stringify({
+      occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress,
+      ribbonColor, senderName, cardTemplate, hasWaxSeal, deliveryDate
+    }));
+    sessionStorage.setItem('giftora_return_to', '/customer/home'); // Or /build-box
+    triggerToast('Draft saved! Redirecting to sign in to save it permanently.');
+    setTimeout(() => {
+      navigate('/login');
+    }, 1500);
+  };
+
 
   if (submitSuccess) {
     return (
-      <div className="bb-page">
+      <div className="bb-page public-box-builder">
         <Header />
         <div className="bb-success-screen">
           <div className="bb-success-card">
@@ -309,7 +257,7 @@ const BoxBuilderPage = () => {
   }
 
   return (
-    <div className="bb-page">
+    <div className="bb-page public-box-builder">
       <Header />
 
       {/* Toast Alert */}
@@ -322,10 +270,13 @@ const BoxBuilderPage = () => {
       {/* HERO SECTION */}
       <section className="bb-hero">
         <div className="bb-hero-inner" ref={heroRef}>
-          <span className="bb-hero-badge">Giftora Studio</span>
+          <span className="bb-hero-badge">A gift, made personal</span>
           <h1 className="bb-hero-title">
-            Gift Box <span className="bb-hero-accent">Craft Studio</span>
+            A little thought.<br />
+            An unforgettable <span className="bb-hero-accent">gift.</span>
           </h1>
+          <p className="bb-hero-sub">Create something that feels like them. Choose your box, discover thoughtful gifts, and finish with a personal message.</p>
+          <div className="public-builder-details"><span>Curated by you</span><span>Beautifully wrapped</span><span>Made for every occasion</span></div>
         </div>
       </section>
 
@@ -339,6 +290,8 @@ const BoxBuilderPage = () => {
         ].map((item) => (
           <button
             key={item.step}
+            aria-label={`Step ${item.step}: ${item.label.trim()}`}
+            aria-current={activeStep === item.step ? 'step' : undefined}
             className={`bb-step-btn ${activeStep === item.step ? 'active' : ''} ${activeStep > item.step ? 'completed' : ''}`}
             onClick={() => setActiveStep(item.step)}
           >
@@ -505,7 +458,7 @@ const BoxBuilderPage = () => {
                   <span className="bb-selected-label">Packed Items:</span>
                   <div className="bb-selected-chips">
                     {Object.entries(selectedItems).length === 0 ? (
-                      <span className="bb-empty-chip-text">No items packed yet</span>
+                      <span className="bb-empty-chip-text">Your box is empty. Please select items from the catalog below.</span>
                     ) : (
                       Object.entries(selectedItems).map(([id, qty]) => {
                         if (qty <= 0) return null;
@@ -533,7 +486,12 @@ const BoxBuilderPage = () => {
 
               {/* Catalog Grid */}
               {isLoadingCatalog ? (
-                <div className="bb-loading-spinner">Loading curated catalog...</div>
+                <div className="bb-loading-spinner">Loading items...</div>
+              ) : catalogProducts.length === 0 ? (
+                <div className="bb-empty-catalog">
+                  <p>Your shopping cart is empty. Please add items to your cart first before building a box.</p>
+                  <button className="bb-btn-secondary" style={{marginTop: '16px'}} onClick={() => navigate('/')}>Go to Shop</button>
+                </div>
               ) : availableItems.length === 0 ? (
                 <div className="bb-empty-catalog">
                   <p>No products match your current search criteria.</p>
@@ -679,6 +637,7 @@ const BoxBuilderPage = () => {
                   <label>Preferred Delivery Date</label>
                   <input
                     type="date"
+                    min={new Date().toISOString().split('T')[0]}
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
                   />
@@ -688,11 +647,18 @@ const BoxBuilderPage = () => {
               <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
                 <button className="bb-btn-secondary" onClick={() => setActiveStep(3)}>← Back</button>
                 <button
-                  className="bb-btn-submit"
-                  disabled={submitting}
-                  onClick={handlePlaceOrder}
+                  className="bb-btn-secondary"
+                  onClick={handleSaveDraft}
+                  style={{ marginRight: '16px' }}
                 >
-                  {submitting ? 'Processing Submission...' : `Complete Order • LKR ${grandTotal.toLocaleString()}`}
+                  Save Draft
+                </button>
+                <button
+                  className="bb-btn-submit"
+                  disabled={submitting || !canPlaceOrder()}
+                  onClick={handleSignInToBuy}
+                >
+                  {submitting ? 'Processing Submission...' : `Sign in to buy • LKR ${grandTotal.toLocaleString()}`}
                 </button>
               </div>
             </div>
@@ -707,12 +673,27 @@ const BoxBuilderPage = () => {
             <span className="bb-live-tag">Interactive</span>
           </div>
 
-          {/* 3D Visual Box Canvas Mockup */}
+            <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
+              <button 
+                className="bb-btn-secondary" 
+                onClick={handleSaveDraft}
+                style={{flex: 1, padding: '12px'}}
+              >
+                Save Draft
+              </button>
+              <button 
+                className="bb-btn-submit" 
+                onClick={handleSignInToBuy}
+                disabled={submitting || !canPlaceOrder()}
+                style={{flex: 1, padding: '12px'}}
+              >
+                {submitting ? 'Processing...' : 'Sign in to buy'}
+              </button>
+            </div>
+            
           <div className="bb-box-canvas" style={{ backgroundColor: wrappingStyle.color }}>
-            {/* Ribbons */}
             <div className="bb-canvas-ribbon-v" style={{ backgroundColor: ribbonColor }} />
             <div className="bb-canvas-ribbon-h" style={{ backgroundColor: ribbonColor }} />
-            
             {/* Wax Seal Badge */}
             {hasWaxSeal && (
               <div className="bb-canvas-wax-seal">
@@ -765,7 +746,7 @@ const BoxBuilderPage = () => {
             <div className="bb-packed-items-list">
               <span className="bb-packed-title">Packed Items ({totalItemsCount})</span>
               {Object.keys(selectedItems).length === 0 ? (
-                <p className="bb-empty-packed">No items packed yet.</p>
+                <p className="bb-empty-packed">Box is empty. Select items to add.</p>
               ) : (
                 Object.entries(selectedItems).map(([id, qty]) => {
                   const prod = catalogProducts.find(p => String(getProdId(p)) === String(id));
