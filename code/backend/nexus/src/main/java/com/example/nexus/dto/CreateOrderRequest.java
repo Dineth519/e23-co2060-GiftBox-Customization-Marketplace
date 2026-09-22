@@ -13,6 +13,11 @@ public class CreateOrderRequest {
     private String giftMessage;
     private String recipientName;
     private String wrappingStyle;
+    private String ribbonColor;
+    private String cardTemplate;
+    private String senderName;
+    private Boolean hasWaxSeal;
+    private java.time.LocalDate deliveryDate;
     private List<OrderItemRequest> items;
 
     @Data
