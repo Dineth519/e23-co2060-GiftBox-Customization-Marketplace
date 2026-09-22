@@ -108,6 +108,7 @@ public class AssemblyService {
                 item.received(), item.condition(), item.id(), id);
         // READY means assembled and waiting for the administrator, never delivered.
         String lifecycle = "review".equals(next) ? "READY" : "assembling".equals(next) ? "ASSEMBLING" : "CONFIRMED";
+        db.update("INSERT IGNORE INTO assemblers (assembler_id, full_name, phone_number) VALUES (?, 'Assembler', '000')", assemblerId);
         db.update("UPDATE orders SET assembler_id = ?, assembly_status = ?, receipt_confirmed = ?, `checks` = ?, " +
                         "assembler_notes = ?, issue = ?, assembly_activity = ?, assembly_revision = assembly_revision + 1, " +
                         "assembly_submitted_at = ?, status = ? WHERE order_id = ?",
