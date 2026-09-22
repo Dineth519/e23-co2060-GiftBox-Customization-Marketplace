@@ -67,6 +67,9 @@ public class Order {
     @JsonProperty("order_type")
     private String orderType;
 
+    @Column(name = "custom_box_details", columnDefinition = "LONGTEXT")
+    private String customBoxDetails;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     @JsonProperty("created_at")
     private LocalDateTime createdAt;

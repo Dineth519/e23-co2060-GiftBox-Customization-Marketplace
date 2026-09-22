@@ -158,6 +158,31 @@ const Login = () => {
             navigate('/vendor');
           } else if (userRole === 'CUSTOMER') {
             const returnTo = sessionStorage.getItem('giftora_return_to');
+            const draftCart = sessionStorage.getItem('giftora_box_draft');
+            if (draftCart) {
+              try {
+                const parsedDraft = JSON.parse(draftCart);
+                const itemsList = [];
+                if (parsedDraft.selectedItems) {
+                  Object.entries(parsedDraft.selectedItems).forEach(([id, qty]) => {
+                    itemsList.push({ productId: parseInt(id), quantity: qty });
+                  });
+                }
+                const syncPayload = {
+                  customerId: data.userId,
+                  partnerId: 1, // Defaulting partnerId if not available
+                  items: itemsList
+                };
+                await fetch(`${apiUrl}/api/db-cart/sync`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${data.accessToken}` },
+                  body: JSON.stringify(syncPayload),
+                });
+                console.log('✅ Cart synced to database successfully!');
+              } catch (e) {
+                console.error('Failed to sync cart:', e);
+              }
+            }
             sessionStorage.removeItem('giftora_return_to');
             navigate(returnTo === '/build-box' ? returnTo : '/customer/home');
           } else if (userRole === 'ASSEMBLER') {

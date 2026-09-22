@@ -175,15 +175,16 @@ e23-co2060-GiftBox-Customization-Marketplace/
 │               ├── auth/
 │               │   ├── Login.jsx
 │               │   └── VendorRegistration.jsx
-│               ├── box_build/
-│               │   └── BoxBuilderPage.jsx
 │               ├── customer/
-│               │   ├── GiftCustomizer.jsx
+│               │   ├── BoxBuilderPage.jsx
+│               │   ├── BoxBuilderPage.css
 │               │   ├── OrderDetail.jsx
 │               │   ├── Orders.jsx
 │               │   └── Profile.jsx
 │               ├── landingpage/
 │               │   ├── AboutUsPage.jsx
+│               │   ├── BoxBuilderPage.jsx
+│               │   ├── BoxBuilderPage.css
 │               │   ├── LandingPage.jsx
 │               │   └── ProductsPage.jsx
 │               └── vendor/

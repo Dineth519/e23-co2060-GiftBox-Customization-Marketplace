@@ -1,3 +1,4 @@
+// Public gift builder, presented within the landing-page layout.
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/landingpage/Header';
@@ -121,26 +122,12 @@ const BoxBuilderPage = () => {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  // Fetch product catalog on mount with fallback
+  // Use cart items as the only available inventory for the box builder
   useEffect(() => {
-    const fetchCatalog = async () => {
-      setIsLoadingCatalog(true);
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/products`);
-        if (res.ok) {
-          const data = await res.json();
-          setCatalogProducts(data.length > 0 ? data : FALLBACK_PRODUCTS);
-        } else {
-          setCatalogProducts(FALLBACK_PRODUCTS);
-        }
-      } catch (err) {
-        setCatalogProducts(FALLBACK_PRODUCTS);
-      } finally {
-        setIsLoadingCatalog(false);
-      }
-    };
-    fetchCatalog();
-  }, []);
+    setIsLoadingCatalog(true);
+    setCatalogProducts(cartItems || []);
+    setIsLoadingCatalog(false);
+  }, [cartItems]);
 
   // Sync Item Trim Constraints when Box Size Decreases
   useEffect(() => {
@@ -486,7 +473,7 @@ const BoxBuilderPage = () => {
                   <span className="bb-selected-label">Packed Items:</span>
                   <div className="bb-selected-chips">
                     {Object.entries(selectedItems).length === 0 ? (
-                      <span className="bb-empty-chip-text">No items packed yet</span>
+                      <span className="bb-empty-chip-text">Your box is empty. Please select items from the catalog below.</span>
                     ) : (
                       Object.entries(selectedItems).map(([id, qty]) => {
                         if (qty <= 0) return null;
@@ -514,7 +501,12 @@ const BoxBuilderPage = () => {
 
               {/* Catalog Grid */}
               {isLoadingCatalog ? (
-                <div className="bb-loading-spinner">Loading curated catalog...</div>
+                <div className="bb-loading-spinner">Loading items...</div>
+              ) : catalogProducts.length === 0 ? (
+                <div className="bb-empty-catalog">
+                  <p>Your shopping cart is empty. Please add items to your cart first before building a box.</p>
+                  <button className="bb-btn-secondary" style={{marginTop: '16px'}} onClick={() => navigate('/')}>Go to Shop</button>
+                </div>
               ) : availableItems.length === 0 ? (
                 <div className="bb-empty-catalog">
                   <p>No products match your current search criteria.</p>
@@ -751,7 +743,7 @@ const BoxBuilderPage = () => {
             <div className="bb-packed-items-list">
               <span className="bb-packed-title">Packed Items ({totalItemsCount})</span>
               {Object.keys(selectedItems).length === 0 ? (
-                <p className="bb-empty-packed">No items packed yet.</p>
+                <p className="bb-empty-packed">Box is empty. Select items to add.</p>
               ) : (
                 Object.entries(selectedItems).map(([id, qty]) => {
                   const prod = catalogProducts.find(p => String(getProdId(p)) === String(id));

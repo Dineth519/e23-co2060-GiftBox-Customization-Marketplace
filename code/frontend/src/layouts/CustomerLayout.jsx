@@ -3,7 +3,7 @@
 // It works exactly like SellerLayout — it wraps the Header on top
 // and the page content in the middle.
 //
-// Every customer page (GiftCustomizer, Orders, OrderDetail, Profile)
+// Every customer page (BoxBuilderPage, Orders, OrderDetail, Profile)
 // will be wrapped by this layout automatically through the router.
 
 import React, { useEffect } from 'react';
@@ -43,7 +43,7 @@ export default function CustomerLayout() {
       <Header />
 
       {/* Outlet renders whichever customer page is active:
-          /customize  → GiftCustomizer
+          /build-box  → BoxBuilderPage
           /orders     → Orders
           /orders/:id → OrderDetail
           /profile    → Profile */}
