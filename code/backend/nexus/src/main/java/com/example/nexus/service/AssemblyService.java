@@ -6,11 +6,13 @@ import java.util.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import tools.jackson.databind.json.JsonMapper;
 
 @Service
+@DependsOn("assemblyFlyway")
 public class AssemblyService {
     private final JdbcTemplate db;
     private final JsonMapper json = JsonMapper.builder().build();

@@ -70,10 +70,10 @@ public class Order {
     @Column(name = "custom_box_details", columnDefinition = "LONGTEXT")
     private String customBoxDetails;
 
-    @Column(name = "issue")
+    @Column(name = "issue", columnDefinition = "TEXT")
     private String issue;
 
-    @Column(name = "assembler_notes")
+    @Column(name = "assembler_notes", columnDefinition = "TEXT")
     @JsonProperty("assembler_notes")
     private String assemblerNotes;
 

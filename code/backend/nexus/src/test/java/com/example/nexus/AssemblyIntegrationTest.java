@@ -1,6 +1,7 @@
 package com.example.nexus;
 
 import com.example.nexus.controller.AssemblyWorkspaceController;
+import com.example.nexus.config.AssemblyMigrationConfig;
 import com.example.nexus.service.AssemblyRules;
 import com.example.nexus.service.AssemblyService;
 import java.util.*;
@@ -36,9 +37,13 @@ class AssemblyIntegrationTest {
         db.execute("CREATE TABLE gift_boxes (id INT PRIMARY KEY, vendor_id INT, name VARCHAR(150))");
         db.execute("CREATE TABLE orders (order_id INT PRIMARY KEY, assembler_id INT NULL, status ENUM('PENDING','CONFIRMED','RECEIVED','ASSEMBLING','READY','SHIPPED','DELIVERED','CANCELLED') DEFAULT 'PENDING', occasion VARCHAR(50), box_size VARCHAR(50), wrapping_style VARCHAR(50), recipient_name VARCHAR(100), gift_message TEXT, custom_box_details LONGTEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
         db.execute("CREATE TABLE order_items (id INT PRIMARY KEY, order_id INT, product_id INT, gift_box_id INT, quantity INT NOT NULL, FOREIGN KEY (order_id) REFERENCES orders(order_id))");
-        var flyway = Flyway.configure().dataSource(source).locations("classpath:db/migration").baselineVersion("21").load();
+        var flyway = Flyway.configure().dataSource(source).locations("classpath:db/migration").baselineVersion("21").target("22").load();
         flyway.baseline();
-        assertEquals(2, flyway.migrate().migrationsExecuted);
+        assertEquals(1, flyway.migrate().migrationsExecuted);
+        var assembly = new AssemblyMigrationConfig().assemblyFlyway(source, true);
+        assertEquals("23", assembly.info().current().getVersion().toString());
+        assertEquals(0, assembly.migrate().migrationsExecuted);
+        assertEquals("22", flyway.info().current().getVersion().toString());
         db.update("INSERT INTO vendors VALUES (1, 'Real vendor')");
         db.update("INSERT INTO products VALUES (1, 1, 'Real candle')");
         db.update("INSERT INTO gift_boxes VALUES (1, 1, 'Ready-made gift')");
@@ -137,5 +142,11 @@ class AssemblyIntegrationTest {
         var assembler = new UsernamePasswordAuthenticationToken("assembler", null, List.of(new SimpleGrantedAuthority("ROLE_ASSEMBLER")));
         assembler.setDetails(42);
         assertEquals(1, controller.list(assembler).size());
+    }
+    @Test void fullLengthIssueAndNotesAreStoredWithoutTruncation() {
+        var saved = update(new AssemblyRules.Change(0, "report", List.of(new AssemblyRules.Item(10, 1, "damaged")), NO, "n".repeat(1000), "i".repeat(500)));
+        assertEquals(500, saved.get("issue").toString().length());
+        assertEquals(1000, state(saved).get("notes").toString().length());
+        assertThrows(ResponseStatusException.class, () -> update(change(1, "report", 1, "damaged", NO, "i".repeat(501))));
     }
 }

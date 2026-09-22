@@ -1,4 +1,7 @@
 -- Keep assembly progress separate from the customer/vendor order lifecycle.
+-- Hibernate previously created these as VARCHAR(255); preserve longer issue/notes text.
+ALTER TABLE orders MODIFY COLUMN issue TEXT NULL, MODIFY COLUMN assembler_notes TEXT NULL;
+
 ALTER TABLE orders
     ADD COLUMN assembly_status VARCHAR(20) NOT NULL DEFAULT 'awaiting',
     ADD COLUMN assembly_revision INT NOT NULL DEFAULT 0,
