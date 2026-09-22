@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './VendorRegistration.css';
+import AuthLayout from './AuthLayout';
 
 const VendorRegistration = () => {
   const navigate = useNavigate();
@@ -68,6 +69,7 @@ const VendorRegistration = () => {
   };
 
   return (
+    <AuthLayout vendor>
     <div className="giftora-auth-page">
       <div className="giftora-vendor-card">
         {submitted ? (
@@ -91,8 +93,8 @@ const VendorRegistration = () => {
           </div>
         ) : (
           <>
-            <h2>Become a Vendor</h2>
-            <p className="auth-sub">Join our marketplace and reach thousands of customers island-wide.</p>
+            <h2>Create your vendor profile</h2>
+            <p className="auth-sub">Tell us about your business. Our team will review your application before activating your shop.</p>
 
             {error && (
               <div className="auth-error-box">
@@ -104,11 +106,11 @@ const VendorRegistration = () => {
               <div className="vendor-form-grid">
                 
                 {/* --- Basic Info --- */}
-                <div className="auth-input-row">
+                <div className="auth-input-row"><span className="auth-field-caption" aria-hidden="true">Shop / Store Name</span>
                   <input
                     type="text"
                     name="shopName"
-                    placeholder="Shop / Store Name"
+                    placeholder="Shop / Store Name" aria-label="Shop / Store Name"
                     value={formData.shopName}
                     onChange={handleChange}
                     disabled={loading}
@@ -116,11 +118,11 @@ const VendorRegistration = () => {
                   />
                 </div>
 
-                <div className="auth-input-row">
+                <div className="auth-input-row"><span className="auth-field-caption" aria-hidden="true">Owner Full Name</span>
                   <input
                     type="text"
                     name="ownerName"
-                    placeholder="Owner Full Name"
+                    placeholder="Owner Full Name" aria-label="Owner Full Name"
                     value={formData.ownerName}
                     onChange={handleChange}
                     disabled={loading}
@@ -128,11 +130,11 @@ const VendorRegistration = () => {
                   />
                 </div>
 
-                <div className="auth-input-row">
+                <div className="auth-input-row"><span className="auth-field-caption" aria-hidden="true">Business Email</span>
                   <input
                     type="email"
                     name="email"
-                    placeholder="Business Email"
+                    placeholder="Business Email" aria-label="Business Email"
                     value={formData.email}
                     onChange={handleChange}
                     disabled={loading}
@@ -140,11 +142,11 @@ const VendorRegistration = () => {
                   />
                 </div>
 
-                <div className="auth-input-row">
+                <div className="auth-input-row"><span className="auth-field-caption" aria-hidden="true">Business Phone Number</span>
                   <input
                     type="tel"
                     name="phone"
-                    placeholder="Business Phone Number"
+                    placeholder="Business Phone Number" aria-label="Business Phone Number"
                     value={formData.phone}
                     onChange={handleChange}
                     disabled={loading}
@@ -153,11 +155,11 @@ const VendorRegistration = () => {
                 </div>
 
                 {/* --- Business Details --- */}
-                <div className="auth-input-row">
+                <div className="auth-input-row"><span className="auth-field-caption" aria-hidden="true">Business Registration Number (BRN)</span>
                   <input
                     type="text"
                     name="businessRegNumber"
-                    placeholder="Business Registration Number (BRN)"
+                    placeholder="Business Registration Number (BRN)" aria-label="Business Registration Number (BRN)"
                     value={formData.businessRegNumber}
                     onChange={handleChange}
                     disabled={loading}
@@ -166,11 +168,11 @@ const VendorRegistration = () => {
                 </div>
 
 
-                <div className="auth-input-row">
+                <div className="auth-input-row"><span className="auth-field-caption" aria-hidden="true">Business Street Address</span>
                   <input
                     type="text"
                     name="address"
-                    placeholder="Business Street Address"
+                    placeholder="Business Street Address" aria-label="Business Street Address"
                     value={formData.address}
                     onChange={handleChange}
                     disabled={loading}
@@ -178,11 +180,11 @@ const VendorRegistration = () => {
                   />
                 </div>
 
-                <div className="auth-input-row">
+                <div className="auth-input-row"><span className="auth-field-caption" aria-hidden="true">City / District</span>
                   <input
                     type="text"
                     name="city"
-                    placeholder="City / District"
+                    placeholder="City / District" aria-label="City / District"
                     value={formData.city}
                     onChange={handleChange}
                     disabled={loading}
@@ -191,11 +193,11 @@ const VendorRegistration = () => {
                 </div>
 
                 {/* --- Security --- */}
-                <div className="auth-input-row">
+                <div className="auth-input-row"><span className="auth-field-caption" aria-hidden="true">Password</span>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
-                    placeholder="Password"
+                    placeholder="Password" aria-label="Password"
                     value={formData.password}
                     onChange={handleChange}
                     disabled={loading}
@@ -212,11 +214,11 @@ const VendorRegistration = () => {
                   </button>
                 </div>
 
-                <div className="auth-input-row">
+                <div className="auth-input-row"><span className="auth-field-caption" aria-hidden="true">Confirm Password</span>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="confirmPassword"
-                    placeholder="Confirm Password"
+                    placeholder="Confirm Password" aria-label="Confirm Password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     disabled={loading}
@@ -239,12 +241,13 @@ const VendorRegistration = () => {
             </form>
 
             <p className="auth-toggle-text">
-              Already a vendor? <span className="auth-toggle-link" onClick={() => navigate('/login')}>Sign in here</span>
+              Already a vendor? <button type="button" className="auth-toggle-link" onClick={() => navigate('/login')}>Sign in here</button>
             </p>
           </>
         )}
       </div>
     </div>
+    </AuthLayout>
   );
 };
 

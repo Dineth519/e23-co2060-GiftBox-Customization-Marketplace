@@ -30,6 +30,51 @@ function useReveal(threshold = 0.1) {
   return [ref, visible];
 }
 
+// Custom Dropdown Component
+const CustomDropdown = ({ options, value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(opt => opt.value === value) || options[0];
+
+  return (
+    <div className="custom-dropdown" ref={dropdownRef}>
+      <div className={`dropdown-trigger ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(!isOpen)}>
+        {selectedOption.icon && <span className="dropdown-icon">{selectedOption.icon}</span>}
+        <span className="dropdown-label" style={{ flex: 1, textAlign: 'left' }}>{selectedOption.label}</span>
+        <svg className="custom-dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      {isOpen && (
+        <div className={`dropdown-menu ${options.length > 5 ? 'multi-column' : ''}`}>
+          {options.map((opt) => (
+            <div 
+              key={opt.value} 
+              className={`dropdown-item ${value === opt.value ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+            >
+              {opt.icon && <span className="item-icon">{opt.icon}</span>}
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CustomerHome = () => {
   const navigate = useNavigate();
   const { addToCart, addedId } = useCart();
@@ -52,7 +97,20 @@ const CustomerHome = () => {
       fetch(`${process.env.REACT_APP_API_URL}/api/categories`).then(res => res.ok ? res.json() : [])
     ])
       .then(([productsData, categoriesData]) => {
-        setAllProducts(productsData);
+        // 1. Sort all products by ID descending so newest is first
+        productsData.sort((a, b) => b.id - a.id);
+        
+        // 2. Keep the top 8 newest products at the beginning
+        const newest = productsData.slice(0, 8);
+        const rest = productsData.slice(8);
+        
+        // 3. Shuffle the rest of the products so they are mixed (not all same category together)
+        for (let i = rest.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [rest[i], rest[j]] = [rest[j], rest[i]];
+        }
+        
+        setAllProducts([...newest, ...rest]);
         setDbCategories(categoriesData);
         setLoading(false);
       })
@@ -72,6 +130,14 @@ const CustomerHome = () => {
     const names = allProducts.map(p => getCategoryName(p.categoryId));
     return ['All', ...new Set(names)];
   }, [allProducts, dbCategories]);
+
+  const categoryOptions = useMemo(() => {
+    return categories.map(cat => ({
+      value: cat,
+      label: cat,
+      icon: CAT_ICONS[cat] || null
+    }));
+  }, [categories]);
 
   const displayProducts = useMemo(() => {
     let f = [...allProducts];
@@ -103,7 +169,7 @@ const CustomerHome = () => {
             <button className="btn-primary" onClick={() => document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})}>
               Shop Now <FaArrowRight className="btn-icon" />
             </button>
-            <button className="btn-secondary" onClick={() => navigate('/build-box')}>Custom Gift Box</button>
+            <button className="btn-secondary" onClick={() => navigate('/customer/build-box')}>Custom Gift Box</button>
           </div>
         </div>
       </section>
@@ -115,8 +181,21 @@ const CustomerHome = () => {
           <p className="section-subtitle">Search, filter, and find the perfect gift</p>
         </div>
 
-        {/* Toolbar: Search + Filter + Sort */}
+        {/* Toolbar: Filter + Sort + Search */}
         <div className="home-toolbar">
+          <div className="home-filters">
+            <CustomDropdown 
+              options={categoryOptions} 
+              value={activeCategory} 
+              onChange={setActiveCategory} 
+            />
+            <CustomDropdown 
+              options={SORT_OPTIONS} 
+              value={sortBy} 
+              onChange={setSortBy} 
+            />
+          </div>
+
           <div className="home-search-bar">
             <FaSearch className="search-icon" />
             <input 
@@ -126,15 +205,6 @@ const CustomerHome = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             {searchQuery && <FaTimes className="clear-search" onClick={() => setSearchQuery('')} />}
-          </div>
-
-          <div className="home-filters">
-            <select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)}>
-              {categories.map(cat => <option key={cat} value={cat}>{CAT_ICONS[cat] ? `${CAT_ICONS[cat]} ` : ''}{cat}</option>)}
-            </select>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-            </select>
           </div>
         </div>
 
@@ -155,7 +225,8 @@ const CustomerHome = () => {
                   <div className="ppc-overlay">
                     <button
                       className="ppc-action ppc-action--primary"
-                      onClick={() => addToCart(p)}
+                      disabled={!(Number(p.stockQuantity) > 0)}
+                        onClick={() => addToCart(p)}
                     >
                       {justAdded ? '✓ Added!' : '🛒 Add to Cart'}
                     </button>
@@ -166,16 +237,14 @@ const CustomerHome = () => {
                 {/* Body */}
                 <div className="ppc-body">
                   <div className="ppc-name">{p.name}</div>
-                  <div className="ppc-vendor">by Giftora Exclusive</div>
-                  <div className="ppc-stars-row">
-                    <span className="ppc-stars">★★★★★</span>
-                    <span className="ppc-rating">5.0</span>
-                  </div>
+                  <div className="ppc-vendor">{p.vendorName ? `Sold by ${p.vendorName}` : 'Seller details unavailable'}</div>
+                  <div className="ppc-stars-row">{Number(p.stockQuantity) > 0 ? `In stock · ${p.stockQuantity} available` : 'Out of stock'}</div>
                   <div className="ppc-footer">
                     <span className="ppc-price">LKR {Number(p.price).toLocaleString()}</span>
                     <button
                       className={`ppc-add ${justAdded ? 'ppc-add--added' : ''}`}
-                      onClick={() => addToCart(p)}
+                      disabled={!(Number(p.stockQuantity) > 0)}
+                        onClick={() => addToCart(p)}
                       title="Add to cart"
                     >
                       {justAdded
@@ -232,19 +301,22 @@ const CustomerHome = () => {
                 {CAT_ICONS[getCategoryName(quickView.categoryId)] ? `${CAT_ICONS[getCategoryName(quickView.categoryId)]} ` : ''}{getCategoryName(quickView.categoryId)}
               </div>
               <h3 className="qv-name">{quickView.name}</h3>
-              <div className="qv-stars-row">★★★★★ <span>5.0 · Premium Quality</span></div>
+              <div className="qv-stars-row">{quickView.vendorName ? `Sold by ${quickView.vendorName}` : 'Seller details unavailable'}</div>
               <div className="qv-price">LKR {Number(quickView.price).toLocaleString()}</div>
               <div className="qv-sep" />
-              <p className="qv-desc">A premium curated gift from Giftora's exclusive collection. Hand-packed with love, beautifully presented, and ready to create a lasting memory.</p>
+              <p className="qv-desc" style={{ whiteSpace: 'pre-line' }}>{quickView.description?.trim() || 'The seller has not added a detailed description yet.'}</p>
+              {quickView.subCategory && <p className="qv-desc">Product type: {quickView.subCategory}</p>}
+              <p className="qv-desc">{Number(quickView.stockQuantity) > 0 ? `In stock · ${quickView.stockQuantity} available` : 'Out of stock'}</p>
               <div className="qv-features">
-                {['🎀 Gift Wrapped','✍️ Personal Note','🚚 Island-wide Delivery'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
+                {['Build a gift box to choose wrapping and a personal note. Delivery details are confirmed at checkout.'].map((f,i) => <span key={i} className="qv-feat">{f}</span>)}
               </div>
               <div className="qv-actions">
                 <button
                   className="qv-cta qv-cta--primary"
+                  disabled={!(Number(quickView.stockQuantity) > 0)}
                   onClick={() => { addToCart(quickView); setQuickView(null); }}
                 >
-                  🛒 Add to Cart
+                  {Number(quickView.stockQuantity) > 0 ? 'Add to Cart' : 'Out of stock'}
                 </button>
                 <button className="qv-cta qv-cta--outline" onClick={() => { setQuickView(null); document.getElementById('marketplace').scrollIntoView({behavior:'smooth'}); }}>View All →</button>
               </div>

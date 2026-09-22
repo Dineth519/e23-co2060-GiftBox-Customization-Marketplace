@@ -9,6 +9,7 @@ const Header = () => {
 
   // Scroll state — makes header background appear when scrolling down
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Scroll listener — adds background effect on scroll
   useEffect(() => {
@@ -28,7 +29,8 @@ const Header = () => {
         </div>
 
         {/* ── Nav Links ── */}
-        <nav className="header-nav">
+        <button className="public-menu-toggle" aria-label="Toggle navigation" aria-expanded={menuOpen} aria-controls="public-navigation" onClick={() => setMenuOpen(!menuOpen)}>Menu</button>
+        <nav id="public-navigation" className={`header-nav ${menuOpen ? 'public-nav-open' : ''}`} onKeyDown={event => { if (event.key === 'Escape') setMenuOpen(false); }}>
           {[
             { label: 'Products',    route: '/products' },
             { label: 'About Us',    route: '/about-us' },
@@ -38,7 +40,7 @@ const Header = () => {
             <button
               key={item.label}
               className="nav-link"
-              onClick={() => navigate(item.route)}
+              onClick={() => { setMenuOpen(false); navigate(item.route); }}
             >
               {item.label}
             </button>

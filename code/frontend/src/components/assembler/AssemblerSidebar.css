@@ -1,0 +1,35 @@
+.assembler-sidebar {
+    width: 240px; flex: 0 0 240px; height: 100vh; height: 100dvh;
+    position: sticky; top: 0; display: flex; flex-direction: column;
+    padding: 30px 20px 22px; box-sizing: border-box; overflow-y: auto;
+    background: linear-gradient(155deg, #1a2942, #142137 65%, #1b2b44);
+    color: #f8f6f1; font-family: inherit;
+}
+.assembler-sidebar .asm-brand { display: flex; align-items: center; gap: 10px; padding: 0 8px; margin-bottom: 28px; }
+.assembler-sidebar .asm-brand > svg { color: #c9a961; flex-shrink: 0; }
+.assembler-sidebar .asm-brand-name { display: block; font-family: Georgia, serif; font-size: 32px; line-height: 1.2; }
+.assembler-sidebar .asm-brand-subtitle { display: block; font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: #c2cbd9; margin-top: 3px; }
+.assembler-sidebar .asm-navigation { display: flex; flex-direction: column; gap: 7px; }
+.assembler-sidebar .asm-nav-link, .assembler-sidebar .asm-logout { display: flex; align-items: center; gap: 13px; min-height: 46px; padding: 10px 12px; box-sizing: border-box; border-radius: 7px; color: #e3e8ef; font-size: 14px; text-decoration: none; transition: background-color 150ms ease; }
+.assembler-sidebar .asm-nav-link svg { flex-shrink: 0; }
+.assembler-sidebar .asm-nav-link:hover, .assembler-sidebar .asm-logout:hover { background: #263851; color: white; }
+.assembler-sidebar .asm-nav-link.is-active { background: #2a3b5d; color: white; box-shadow: inset 3px 0 #c9a961; }
+.assembler-sidebar .asm-nav-link:focus-visible, .assembler-sidebar .asm-logout:focus-visible { outline: 2px solid #e6c985; outline-offset: 3px; }
+.assembler-sidebar .asm-sidebar-footer { margin-top: auto; padding-top: 20px; }
+.assembler-sidebar .asm-profile { display: flex; align-items: center; gap: 12px; border-top: 1px solid #ffffff24; padding: 20px 8px 8px; }
+.assembler-sidebar .asm-avatar { width: 34px; height: 34px; flex: 0 0 34px; border-radius: 50%; background: #e9e7e1; color: #24334d; display: grid; place-items: center; font-weight: 700; }
+.assembler-sidebar .asm-profile-details { min-width: 0; }
+.assembler-sidebar .asm-profile-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.assembler-sidebar .asm-profile-role { display: block; color: #b5bfd0; font-size: 12px; margin-top: 3px; }
+.assembler-sidebar .asm-logout { width: 100%; background: transparent; border: 0; cursor: pointer; font-family: inherit; text-align: left; }
+@media (max-width: 900px) { .assembler-sidebar { width: 210px; flex-basis: 210px; padding-inline: 14px; } }
+@media (max-width: 600px) {
+    .assembler-sidebar { width: 100%; height: auto; position: static; flex-basis: auto; padding: 18px 14px; }
+    .assembler-sidebar .asm-brand { margin-bottom: 16px; }
+    .assembler-sidebar .asm-navigation { flex-direction: row; flex-wrap: wrap; gap: 5px; }
+    .assembler-sidebar .asm-nav-link { font-size: 12px; padding: 8px 10px; gap: 7px; }
+    .assembler-sidebar .asm-sidebar-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #ffffff24; margin-top: 16px; padding-top: 10px; gap: 12px; }
+    .assembler-sidebar .asm-profile { border: 0; padding: 0; min-width: 0; }
+    .assembler-sidebar .asm-logout { width: auto; flex-shrink: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .assembler-sidebar .asm-nav-link, .assembler-sidebar .asm-logout { transition: none; } }

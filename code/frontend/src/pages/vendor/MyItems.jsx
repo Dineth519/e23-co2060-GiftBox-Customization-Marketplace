@@ -25,6 +25,8 @@ const ProductCard = ({ product, isEditing, editForm, onEditChange, onStartEdit, 
     return (
       <div className="product-card" style={{ padding: '15px', background: '#FDFBF7', border: '1px solid #E0D8C8', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <h4 style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#1A2340' }}>Edit Item</h4>
+        <label>Product type<input name="subCategory" value={editForm.subCategory} onChange={onEditChange} placeholder="For example: Bracelet" /></label>
+        <label>Description<textarea name="description" value={editForm.description} onChange={onEditChange} rows={4} placeholder="Material, size, colour, care instructions, and included items" /></label>
         
         <input name="name" value={editForm.name} onChange={onEditChange} placeholder="Product Name" style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }} />
         <input name="price" type="number" value={editForm.price} onChange={onEditChange} placeholder="Price" style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }} />
@@ -87,6 +89,8 @@ const TableRow = ({ product, index, isEditing, editForm, onEditChange, onStartEd
     return (
       <tr style={{ background: '#FDFBF7' }}>
         <td colSpan="8" style={{ padding: '15px' }}>
+          <label>Product type<input name="subCategory" value={editForm.subCategory} onChange={onEditChange} placeholder="For example: Bracelet" /></label>
+          <label>Description<textarea name="description" value={editForm.description} onChange={onEditChange} rows={4} placeholder="Material, size, colour, care instructions, and included items" /></label>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <input name="name" value={editForm.name} onChange={onEditChange} placeholder="Name" style={{ flex: 2, padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }} />
             <input name="price" type="number" value={editForm.price} onChange={onEditChange} placeholder="Price" style={{ flex: 1, padding: '6px', border: '1px solid #ccc', borderRadius: '4px' }} />
@@ -212,7 +216,7 @@ const MyItems = () => {
   // ── Inline Edit Handlers ──
   const handleStartEdit = (product) => {
     setEditingId(product.id);
-    setEditForm({ name: product.name, price: product.price, stock: product.stock, status: product.status });
+    setEditForm({ name: product.name, price: product.price, stock: product.stock, status: product.status === 'Low Stock' ? 'Active' : product.status, description: product.description || '', subCategory: product.subCategory || '' });
   };
 
   const handleEditChange = (e) => {
@@ -242,6 +246,8 @@ const MyItems = () => {
       // Backend payload
       const payload = {
         name: editForm.name,
+        description: editForm.description,
+        subCategory: editForm.subCategory,
         price: parseFloat(editForm.price),
         stockQuantity: newStock,
         isActive: isActiveSelected ? 1 : 0
@@ -263,6 +269,8 @@ const MyItems = () => {
         p.id === id ? { 
           ...p, 
           name: editForm.name, 
+          description: editForm.description,
+          subCategory: editForm.subCategory,
           price: editForm.price, 
           stock: newStock, 
           status: newCalculatedStatus // Updated status: Active / Low Stock / Out of Stock

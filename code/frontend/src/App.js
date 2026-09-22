@@ -10,14 +10,13 @@ import Verify from './pages/customer/Verify.jsx';
 import VendorLanding from './pages/landingpage/VendorLanding.jsx';
 
 //Customer
-import GiftCustomizer from './pages/customer/GiftCustomizer.jsx';
 import CustomerOrders from './pages/customer/Orders.jsx';
 import OrderDetail from './pages/customer/OrderDetail.jsx';
 import CustomerLayout from './layouts/CustomerLayout.jsx';  
 import CustomerCart from './pages/customer/CustomerCart.jsx';
 import CustomerProfile from './pages/customer/Profile.jsx'
 import AboutUs from './pages/customer/AboutUsPage.jsx';
-import BoxBuilder from './pages/customer/BoxBuilderPage.jsx'
+import CustomerBoxBuilderPage from './pages/customer/BoxBuilderPage.jsx';
 import Checkout from './pages/customer/Checkout.jsx';
 import CustomerSettings from './pages/customer/Settings.jsx';
 
@@ -51,7 +50,16 @@ import { CartProvider } from './context/CartContext.jsx';
 import CartPage from './pages/landingpage/CartPage.jsx';
 
 // Box Builder
-import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
+import PublicBoxBuilderPage from './pages/landingpage/BoxBuilderPage.jsx';
+
+// Assembler
+import AssemblerLayout from './layouts/AssemblerLayout.jsx';
+import AssemblerDashboard from './pages/assembler/Dashboard.jsx';
+import AssemblerOrderQueue from './pages/assembler/OrderQueue.jsx';
+import AssemblerOrderWorkspace from './pages/assembler/OrderWorkspace.jsx';
+import AssemblerIssues from './pages/assembler/Issues.jsx';
+import AssemblerCompleted from './pages/assembler/Completed.jsx';
+import AssemblerPackingGuide from './pages/assembler/PackingGuide.jsx';
 
 // Scroll to top helper on route navigation
 const ScrollToTop = () => {
@@ -103,21 +111,21 @@ function App() {
           <Route path="/vendor-register" element={<VendorRegistration />} />
           <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/build-box" element={<BoxBuilderPage />} />
+          <Route path="/build-box" element={<PublicBoxBuilderPage />} />
           <Route path="/test-address" element={<LayoutWrapper><AddressForm /></LayoutWrapper>} />
 
           {/* Customer routes */}
           <Route path="/customer" element={<CustomerLayout />}>
             <Route index element={<Navigate to="home" replace />} />
             <Route path="home" element={<CustomerHome />} />
-            <Route path="customize" element={<GiftCustomizer />} />
+            <Route path="customize" element={<Navigate to="/customer/build-box" replace />} />
             <Route path="orders" element={<CustomerOrders />} />
             <Route path="orders/:orderId" element={<OrderDetail />} />
             <Route path="profile" element={<CustomerProfile />} />
             <Route path="cart" element={<CustomerCart />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="about-us" element={<AboutUs />} />
-            <Route path="build-box" element={<BoxBuilder />} />
+            <Route path="build-box" element={<CustomerBoxBuilderPage />} />
             <Route path="settings" element={<CustomerSettings />} />
 
           </Route>
@@ -149,7 +157,21 @@ function App() {
               </Routes>
             </AdminLayout>
           } />
-
+          {/* Assembler routes using AssemblerLayout for sidebar and route guard */}
+          <Route path="/assembler/*" element={
+              <AssemblerLayout>
+                  <Routes>
+                      <Route path="/" element={<AssemblerDashboard />} />
+                      <Route path="queue" element={<AssemblerOrderQueue />} />
+                      <Route path="orders/:orderId" element={<AssemblerOrderWorkspace />} />
+                      <Route path="issues" element={<AssemblerIssues />} />
+                      <Route path="completed" element={<AssemblerCompleted />} />
+                      <Route path="packing-guide" element={<AssemblerPackingGuide />} />
+                      <Route path="*" element={<Navigate to="/assembler" replace />} />
+                  </Routes>
+              </AssemblerLayout>
+          } />
+          
           {/* Catch-all route that redirects to home page */}
           <Route path="*" element={<Navigate to="/" />} />
 

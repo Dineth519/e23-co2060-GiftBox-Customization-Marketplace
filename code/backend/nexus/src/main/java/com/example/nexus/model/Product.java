@@ -15,6 +15,12 @@ public class Product {
     @Column(name = "vendor_id", nullable = false)
     private Integer vendorId;
 
+    @Transient
+    private String vendorName;
+
+    public String getVendorName() { return vendorName; }
+    public void setVendorName(String vendorName) { this.vendorName = vendorName; }
+
     @JsonProperty("categoryId")
     @Column(name = "category_id")
     private Integer categoryId;
