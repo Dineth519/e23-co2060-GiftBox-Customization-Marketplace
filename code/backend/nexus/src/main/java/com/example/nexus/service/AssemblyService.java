@@ -47,6 +47,7 @@ public class AssemblyService {
     private List<Map<String, Object>> items(int id) {
         return db.queryForList("SELECT oi.id, oi.quantity AS expected, oi.received_quantity AS received, " +
                 "oi.received_condition AS `condition`, COALESCE(p.name, gb.name, 'Unavailable product') AS name, " +
+                "COALESCE(p.image_url, gb.image_url) AS imageUrl, " +
                 "COALESCE(v.shop_name, 'Vendor not recorded') AS vendor " +
                 "FROM order_items oi LEFT JOIN products p ON p.id = oi.product_id " +
                 "LEFT JOIN gift_boxes gb ON gb.id = oi.gift_box_id " +
@@ -107,6 +108,7 @@ public class AssemblyService {
                 item.received(), item.condition(), item.id(), id);
         // READY means assembled and waiting for the administrator, never delivered.
         String lifecycle = "review".equals(next) ? "READY" : "assembling".equals(next) ? "ASSEMBLING" : "CONFIRMED";
+        db.update("INSERT IGNORE INTO assemblers (assembler_id, full_name, phone_number) VALUES (?, 'Assembler', '000')", assemblerId);
         db.update("UPDATE orders SET assembler_id = ?, assembly_status = ?, receipt_confirmed = ?, `checks` = ?, " +
                         "assembler_notes = ?, issue = ?, assembly_activity = ?, assembly_revision = assembly_revision + 1, " +
                         "assembly_submitted_at = ?, status = ? WHERE order_id = ?",
