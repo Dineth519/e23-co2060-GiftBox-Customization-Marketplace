@@ -8,23 +8,10 @@ const Header = () => {
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
 
   const userId = localStorage.getItem('userId');
   const username = localStorage.getItem('username') || 'Customer';
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   useEffect(() => {
     async function fetchName() {
@@ -53,12 +40,6 @@ const Header = () => {
   }, [userId, username]);
 
 
-  // Handle logout logic
-  const handleExit = () => {
-    localStorage.clear();
-    console.log("User logged out");
-    navigate('/', { replace: true }); 
-  };
 
   return (
     <header className="topbar-container">
@@ -73,8 +54,10 @@ const Header = () => {
       {/* Center — Nav Links */}
       <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', marginRight: '32px' }}>
         {[
-          { label: 'Build a Box',  route: '/customer/build-box' },
-          { label: 'About Us',     route: '/customer/about-us' },
+          { label: 'Build a Box',      route: '/customer/build-box' },
+          { label: 'Orders',           route: '/customer/orders' },
+          { label: 'Account Settings', route: '/customer/settings' },
+          { label: 'About Us',         route: '/customer/about-us' },
         ].map(item => (
           <button
             key={item.label}
@@ -115,8 +98,8 @@ const Header = () => {
           <span className="notification-badge"></span>
         </button>
 
-        <div className="profile-wrapper" ref={dropdownRef} style={{ position: 'relative' }}>
-          <div className="profile-section" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+        <div className="profile-wrapper" style={{ position: 'relative' }}>
+          <div className="profile-section" onClick={() => navigate('/customer/profile')} style={{ cursor: 'pointer' }}>
             <div className="profile-info">
               <span className="profile-name" style={{ textTransform: 'capitalize' }}>{displayName}</span>
               <span className="profile-role">Customer</span>
@@ -128,33 +111,7 @@ const Header = () => {
                 <User size={18} />
               )}
             </div>
-            <ChevronDown size={14} style={{ color: '#FFFFFF', transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
           </div>
-
-          {isDropdownOpen && (
-            <div className="profile-dropdown">
-              <div className="dropdown-arrow"></div>
-              <ul className="dropdown-menu">
-                <li onClick={() => { setIsDropdownOpen(false); navigate('/customer/profile'); }}>
-                  <UserCircle size={16} />
-                  <span>Profile</span>
-                </li>
-                <li onClick={() => { setIsDropdownOpen(false); navigate('/customer/orders'); }}>
-                  <Package size={16} />
-                  <span>Orders</span>
-                </li>
-                <li onClick={() => { setIsDropdownOpen(false); navigate('/customer/settings'); }}>
-                  <Settings size={16} />
-                  <span>Account Settings</span>
-                </li>
-                <div className="dropdown-divider"></div>
-                <li onClick={handleExit} className="dropdown-signout">
-                  <LogOut size={16} />
-                  <span>Sign out</span>
-                </li>
-              </ul>
-            </div>
-          )}
         </div>
 
       </div>

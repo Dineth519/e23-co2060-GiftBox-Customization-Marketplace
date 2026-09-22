@@ -29,11 +29,6 @@
   height: 48px;
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(201, 169, 97, 0.4));
-  transition: transform 0.3s ease;
-}
-
-.topbar-logo:hover {
-  transform: scale(1.05);
 }
 
 .brand-text-wrapper {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, User, LogOut } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
 import './TopBar.css';
 import logo from '../../assets/logo.png';
 
@@ -34,11 +34,6 @@ const TopBar = () => {
     fetchName();
   }, [userId, username]);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate('/', { replace: true });
-  };
-
   return (
     <header className="topbar-container">
 
@@ -71,30 +66,6 @@ const TopBar = () => {
           </div>
         </div>
 
-        {/* Logout Button */}
-        <button 
-          className="logout-btn" 
-          onClick={handleLogout}
-          title="Logout"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(231, 76, 60, 0.1)',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '8px',
-            cursor: 'pointer',
-            color: '#E74C3C',
-            marginLeft: '12px',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.2)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.1)'}
-        >
-          <LogOut size={20} />
-        </button>
-        
       </div>
 
     </header>

@@ -30,6 +30,51 @@ function useReveal(threshold = 0.1) {
   return [ref, visible];
 }
 
+// Custom Dropdown Component
+const CustomDropdown = ({ options, value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(opt => opt.value === value) || options[0];
+
+  return (
+    <div className="custom-dropdown" ref={dropdownRef}>
+      <div className={`dropdown-trigger ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(!isOpen)}>
+        {selectedOption.icon && <span className="dropdown-icon">{selectedOption.icon}</span>}
+        <span className="dropdown-label" style={{ flex: 1, textAlign: 'left' }}>{selectedOption.label}</span>
+        <svg className="custom-dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      {isOpen && (
+        <div className={`dropdown-menu ${options.length > 5 ? 'multi-column' : ''}`}>
+          {options.map((opt) => (
+            <div 
+              key={opt.value} 
+              className={`dropdown-item ${value === opt.value ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+            >
+              {opt.icon && <span className="item-icon">{opt.icon}</span>}
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CustomerHome = () => {
   const navigate = useNavigate();
   const { addToCart, addedId } = useCart();
@@ -52,7 +97,20 @@ const CustomerHome = () => {
       fetch(`${process.env.REACT_APP_API_URL}/api/categories`).then(res => res.ok ? res.json() : [])
     ])
       .then(([productsData, categoriesData]) => {
-        setAllProducts(productsData);
+        // 1. Sort all products by ID descending so newest is first
+        productsData.sort((a, b) => b.id - a.id);
+        
+        // 2. Keep the top 8 newest products at the beginning
+        const newest = productsData.slice(0, 8);
+        const rest = productsData.slice(8);
+        
+        // 3. Shuffle the rest of the products so they are mixed (not all same category together)
+        for (let i = rest.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [rest[i], rest[j]] = [rest[j], rest[i]];
+        }
+        
+        setAllProducts([...newest, ...rest]);
         setDbCategories(categoriesData);
         setLoading(false);
       })
@@ -72,6 +130,14 @@ const CustomerHome = () => {
     const names = allProducts.map(p => getCategoryName(p.categoryId));
     return ['All', ...new Set(names)];
   }, [allProducts, dbCategories]);
+
+  const categoryOptions = useMemo(() => {
+    return categories.map(cat => ({
+      value: cat,
+      label: cat,
+      icon: CAT_ICONS[cat] || null
+    }));
+  }, [categories]);
 
   const displayProducts = useMemo(() => {
     let f = [...allProducts];
@@ -115,8 +181,21 @@ const CustomerHome = () => {
           <p className="section-subtitle">Search, filter, and find the perfect gift</p>
         </div>
 
-        {/* Toolbar: Search + Filter + Sort */}
+        {/* Toolbar: Filter + Sort + Search */}
         <div className="home-toolbar">
+          <div className="home-filters">
+            <CustomDropdown 
+              options={categoryOptions} 
+              value={activeCategory} 
+              onChange={setActiveCategory} 
+            />
+            <CustomDropdown 
+              options={SORT_OPTIONS} 
+              value={sortBy} 
+              onChange={setSortBy} 
+            />
+          </div>
+
           <div className="home-search-bar">
             <FaSearch className="search-icon" />
             <input 
@@ -126,15 +205,6 @@ const CustomerHome = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             {searchQuery && <FaTimes className="clear-search" onClick={() => setSearchQuery('')} />}
-          </div>
-
-          <div className="home-filters">
-            <select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)}>
-              {categories.map(cat => <option key={cat} value={cat}>{CAT_ICONS[cat] ? `${CAT_ICONS[cat]} ` : ''}{cat}</option>)}
-            </select>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-            </select>
           </div>
         </div>
 

@@ -228,7 +228,6 @@ export default function Settings() {
         <div className="ct-hero__orb ct-hero__orb--1"></div>
         <div className="ct-hero__orb ct-hero__orb--2"></div>
         <div className="ct-hero__inner">
-          <button className="st-back-btn" onClick={() => navigate('/customer/profile')}>&larr; Back to Profile</button>
           <h1 className="ct-hero__title" style={{ marginTop: '16px' }}>Account Settings</h1>
           <p className="ct-hero__subtitle">Update your personal information, security, and addresses.</p>
         </div>
@@ -251,6 +250,20 @@ export default function Settings() {
             {tab.label}
           </button>
         ))}
+        
+        <div className="st-tab-divider" style={{ height: '1px', background: '#E5E7EB', margin: '16px 0' }}></div>
+        
+        <button
+          className="st-tab st-tab-logout"
+          onClick={() => {
+            localStorage.clear();
+            navigate('/', { replace: true });
+          }}
+          style={{ color: '#EF4444' }}
+        >
+          <span className="st-tab-icon">🚪</span>
+          Sign out
+        </button>
       </div>
 
       {/* ── TAB CONTENT ── */}

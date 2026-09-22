@@ -756,7 +756,22 @@ const FeaturedProducts = () => {
     fetch(`${process.env.REACT_APP_API_URL}/api/products`)
       .then(response => response.json())
       .then(data => {
-        setDbProducts(data.slice(0, 6));
+        // Sort all products by ID descending so newest is first
+        data.sort((a, b) => b.id - a.id);
+        
+        // Keep the top 2 newest products at the beginning
+        const newest = data.slice(0, 2);
+        const rest = data.slice(2);
+        
+        // Shuffle the rest of the products so they are mixed
+        for (let i = rest.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [rest[i], rest[j]] = [rest[j], rest[i]];
+        }
+        
+        // Take 6 items total for the featured grid
+        const mixed = [...newest, ...rest].slice(0, 6);
+        setDbProducts(mixed);
         setLoading(false);
       })
       .catch(error => {
