@@ -6,6 +6,14 @@ import { CHECKS, receiptsReady, canSubmit } from './workspaceState';
 import { fetchAssemblyOrder, saveAssemblyOrder } from './assemblyApi';
 import './OrderWorkspace.css';
 
+function ItemImage({ item }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [item.imageUrl]);
+  return item.imageUrl && !failed
+    ? <img className="aw-product-image" src={item.imageUrl} alt={item.name} loading="lazy" onError={() => setFailed(true)} />
+    : <span className="aw-product-icon" aria-label="Product image unavailable">{item.name?.slice(0, 2).toUpperCase()}</span>;
+}
+
 export default function OrderWorkspace() {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
@@ -101,7 +109,7 @@ function Workspace({ order }) {
           {tab === 'receipt' && <>
             <div className="aw-section-heading"><div><h2>Item receipt</h2><p>Check each vendor delivery against the expected quantity.</p></div><strong>{received} / {order.total} received</strong></div>
             <p className="aw-small">Check the ordered products and quantities below. Editing receipts resets packing checks.</p>
-            {state.items.map(item => <article className="aw-item" key={item.id}><div className="aw-item-heading"><span className="aw-product-icon" aria-hidden="true">{item.name?.slice(0, 2).toUpperCase()}</span><div><h3>{item.name}</h3><p>{item.vendor}</p></div><span>Expected: {item.expected}</span></div>
+            {state.items.map(item => <article className="aw-item" key={item.id}><div className="aw-item-heading"><ItemImage item={item} /><div><h3>{item.name}</h3><p>{item.vendor}</p></div><span>Expected: {item.expected}</span></div>
               <div className="aw-item-fields"><label>Received quantity<select disabled={locked} value={item.received} onChange={event => updateItem(item.id, 'received', Number(event.target.value))}>{Array.from({ length: item.expected + 1 }, (_, i) => <option key={i} value={i}>{i}</option>)}</select></label><label>Item condition<select disabled={locked} value={item.condition} onChange={event => updateItem(item.id, 'condition', event.target.value)}><option value="unchecked">Not inspected</option><option value="good">Good condition</option><option value="damaged">Damaged</option><option value="incorrect">Incorrect item</option></select></label></div>
               <p className="aw-small">{item.received < item.expected ? (item.expected - item.received) + ' item(s) still missing.' : 'All expected items received.'}</p>
             </article>)}

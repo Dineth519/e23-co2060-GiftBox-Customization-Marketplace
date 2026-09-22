@@ -34,6 +34,8 @@
 .aw-small { font-size: 11px; line-height: 1.7; color: #788497; margin: 12px 0; }
 .aw-item { border: 1px solid #e5e8ed; padding: 16px; border-radius: 8px; margin: 14px 0; }
 .aw-item-heading { display: flex; gap: 10px; align-items: center; }
+.aw-product-image { width: 72px; height: 72px; flex-shrink: 0; object-fit: contain; background: #faf8f3; border: 1px solid #e4e2dd; border-radius: 7px; }
+.aw-item-heading > div { min-width: 0; overflow-wrap: anywhere; }
 .aw-product-icon { display: grid; place-items: center; width: 40px; height: 40px; background: #f4eee1; color: #8a6928; border-radius: 7px; font-size: 12px; flex-shrink: 0; }
 .aw-item-heading p { color: #768195; font-size: 11px; }
 .aw-item-heading > span:last-child { margin-left: auto; font-size: 11px; }
