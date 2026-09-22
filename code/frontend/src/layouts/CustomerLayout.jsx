@@ -21,7 +21,6 @@ const workspacePages = {
 
 export default function CustomerLayout() {
   const location = useLocation();
-  const isHome = location.pathname === '/customer/home';
   const page = workspacePages[location.pathname.replace(/\/$/, '')];
 
   useEffect(() => {
@@ -37,7 +36,7 @@ export default function CustomerLayout() {
   }
 
   return (
-    <div className={isHome ? undefined : `customer-workspace${page ? ' customer-workspace--headed' : ''}`} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className={`customer-workspace${page ? ' customer-workspace--headed' : ''}`} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
       {/* Header shown at top of every customer page */}
       <Header />

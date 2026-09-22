@@ -2,6 +2,72 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe('pk_test_51UIPGXBkZFvVdDzSFdXK26Pho1vSKVLgw9SM6oAyXsdSfkfLW9NdH8ZyVWdmwcSxWqPqQcQrXQcVsFVocUM3J3Wv00Sf8i2Zgx');
+
+const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [saveCard, setSaveCard] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setIsProcessing(true);
+    setErrorMsg('');
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/orders`,
+          setup_future_usage: saveCard ? 'off_session' : undefined
+        },
+        redirect: 'if_required'
+      });
+      if (error) {
+        setErrorMsg(error.message);
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        onPaymentSuccess();
+      }
+    } catch (err) {
+      setErrorMsg('Payment failed.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form id="bb-checkout-form" onSubmit={handleSubmit} style={{ marginTop: '24px' }}>
+      <PaymentElement options={{ wallets: { link: 'never' } }} />
+      <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <input 
+          type="checkbox" 
+          id="bbSaveCardOption" 
+          checked={saveCard} 
+          onChange={(e) => setSaveCard(e.target.checked)} 
+        />
+        <label htmlFor="bbSaveCardOption" style={{ fontSize: '14px', color: 'var(--text-primary)' }}>
+          Save card details securely for future purchases
+        </label>
+      </div>
+      {errorMsg && <div style={{ color: 'red', marginTop: '12px' }}>{errorMsg}</div>}
+      <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
+        <button type="button" className="bb-btn-back" onClick={onBack} disabled={isProcessing || submitting}>
+          <span>←</span>
+          <span>Back</span>
+        </button>
+        <button type="submit" className="bb-btn-submit" disabled={!stripe || isProcessing || submitting}>
+          {isProcessing || submitting ? 'Processing...' : `Pay • LKR ${grandTotal.toLocaleString()}`}
+        </button>
+      </div>
+    </form>
+  );
+};
+
 import './BoxBuilderPage.css';
 
 // Safe helper to extract product ID regardless of backend field naming (_id, id, productId)
@@ -108,12 +174,22 @@ const BoxBuilderPage = () => {
   const [cardTemplate, setCardTemplate] = useState(CARD_TEMPLATES[1]);
   const [hasWaxSeal, setHasWaxSeal] = useState(true);
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [city, setCity] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+
   const [deliveryDate, setDeliveryDate] = useState('');
 
   // App UI Feedback States
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [toastMessage, setToastMessage] = useState(null);
+    const [toastMessage, setToastMessage] = useState(null);
+  const [clientSecret, setClientSecret] = useState(null);
+  const [showDraftsModal, setShowDraftsModal] = useState(false);
+  const [savedDrafts, setSavedDrafts] = useState([]);
+  
+
 
   // Auto-dismiss toast
   const triggerToast = (msg) => {
@@ -122,6 +198,31 @@ const BoxBuilderPage = () => {
   };
 
   // Use cart items as the only available inventory for the box builder
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/users/${userId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.name) setContactName(data.name);
+          const addrParts = [data.addressLine1, data.addressLine2].filter(p => p && p.trim() !== '');
+          if (addrParts.length > 0) setDeliveryAddress(addrParts.join(', '));
+          if (data.city) setCity(data.city);
+          if (data.postalCode) setZipCode(data.postalCode);
+          if (data.phoneNumber) setMobileNumber(data.phoneNumber);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user profile", err);
+      }
+    };
+    fetchUserData();
+  }, []);
+
   useEffect(() => {
     setIsLoadingCatalog(true);
     setCatalogProducts(cartItems || []);
@@ -194,6 +295,32 @@ const BoxBuilderPage = () => {
   const waxSealFee = hasWaxSeal ? 250 : 0;
   const grandTotal = itemsSubtotal + (boxSize?.fee || 0) + waxSealFee;
 
+  useEffect(() => {
+    if (activeStep === 5) {
+      setClientSecret(null);
+      fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/payments/create-intent`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: JSON.stringify({ amount: grandTotal })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+        } else {
+          triggerToast('Failed to initialize payment.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        triggerToast('Payment system offline.');
+      });
+    }
+  }, [activeStep, grandTotal]);
+
   // Item Handlers
   const handleAddItem = (product) => {
     const prodId = getProdId(product);
@@ -226,13 +353,55 @@ const BoxBuilderPage = () => {
     setRibbonColor(wrap.defaultRibbon);
   };
 
+    // Restore Draft on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('giftora_customer_drafts');
+    if (stored) {
+      try {
+        setSavedDrafts(JSON.parse(stored));
+      } catch (e) {
+        console.error('Failed to parse drafts', e);
+      }
+    }
+  }, []);
+
   const handleSaveDraft = () => {
-    localStorage.setItem('giftora_customer_draft_box', JSON.stringify({
+    const newDraft = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
       occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress,
-      ribbonColor, senderName, cardTemplate, hasWaxSeal, deliveryDate
-    }));
-    triggerToast('Draft saved successfully! You can resume building later.');
+      ribbonColor, senderName, cardTemplate, hasWaxSeal, deliveryDate,
+      totalItemsCount, grandTotal
+    };
+    const updatedDrafts = [newDraft, ...savedDrafts];
+    setSavedDrafts(updatedDrafts);
+    localStorage.setItem('giftora_customer_drafts', JSON.stringify(updatedDrafts));
+    triggerToast('Draft saved successfully! You can load it later from the top menu.');
   };
+
+  const loadDraft = (draft) => {
+    if (draft.occasion) setOccasion(draft.occasion);
+    if (draft.boxSize) setBoxSize(draft.boxSize);
+    if (draft.selectedItems) setSelectedItems(draft.selectedItems);
+    if (draft.recipientName) setRecipientName(draft.recipientName);
+    if (draft.giftMessage) setGiftMessage(draft.giftMessage);
+    if (draft.wrappingStyle) setWrappingStyle(draft.wrappingStyle);
+    if (draft.deliveryAddress) setDeliveryAddress(draft.deliveryAddress);
+    if (draft.ribbonColor) setRibbonColor(draft.ribbonColor);
+    if (draft.senderName) setSenderName(draft.senderName);
+    if (draft.cardTemplate) setCardTemplate(draft.cardTemplate);
+    if (draft.hasWaxSeal !== undefined) setHasWaxSeal(draft.hasWaxSeal);
+    if (draft.deliveryDate) setDeliveryDate(draft.deliveryDate);
+    setShowDraftsModal(false);
+    triggerToast('Draft loaded successfully!');
+  };
+
+  const deleteDraft = (draftId) => {
+    const updatedDrafts = savedDrafts.filter(d => d.id !== draftId);
+    setSavedDrafts(updatedDrafts);
+    localStorage.setItem('giftora_customer_drafts', JSON.stringify(updatedDrafts));
+  };
+
 
   // Submit Order Process for Authenticated Logged In Users
   const handlePlaceOrder = async () => {
@@ -285,18 +454,8 @@ const BoxBuilderPage = () => {
       setSubmitSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      triggerToast('Direct ordering offline - shifting to cart module...');
-      if (addToCart) {
-        addToCart({
-          id: `custom-box-${Date.now()}`,
-          name: `${boxSize.title} - ${occasion} Edition`,
-          price: grandTotal,
-          quantity: 1,
-          customDetails: orderPayload
-        });
-      }
-      setSubmitSuccess(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      console.error('Error placing custom box order:', err);
+      triggerToast('Failed to process order. Please contact support.');
     } finally {
       setSubmitting(false);
     }
@@ -342,6 +501,9 @@ const BoxBuilderPage = () => {
           <h1 className="bb-hero-title">
             Gift Box <span className="bb-hero-accent">Craft Studio</span>
           </h1>
+          <button className="bb-btn-drafts-top" onClick={() => setShowDraftsModal(true)}>
+            📋 View Saved Drafts
+          </button>
         </div>
       </section>
 
@@ -351,14 +513,15 @@ const BoxBuilderPage = () => {
           { step: 1, label: ' Framework & Size' },
           { step: 2, label: ' Wrap & Styling' },
           { step: 3, label: ' Select Inventory' },
-          { step: 4, label: ' Card & Dispatch' }
+          { step: 4, label: ' Personalization' },
+          { step: 5, label: ' Checkout' }
         ].map((item) => (
           <button
             key={item.step}
             aria-label={`Step ${item.step}: ${item.label.trim()}`}
             aria-current={activeStep === item.step ? 'step' : undefined}
             className={`bb-step-btn ${activeStep === item.step ? 'active' : ''} ${activeStep > item.step ? 'completed' : ''}`}
-            onClick={() => setActiveStep(item.step)}
+            style={{ cursor: 'default' }}
           >
             <span className="bb-step-num">{item.step}</span>
             <span className="bb-step-lbl">{item.label}</span>
@@ -419,10 +582,10 @@ const BoxBuilderPage = () => {
                 ))}
               </div>
 
-              <button className="bb-btn-forward" onClick={() => setActiveStep(2)}>
-                Next: Wrap & Ribbon Styling →
-              </button>
-            </div>
+              <div className="bb-step-nav-row" style={{ marginTop: "32px" }}>
+                <button className="bb-btn-forward" onClick={() => setActiveStep(2)}>Next: Wrap & Ribbon Styling →</button>
+              </div>
+              </div>
           )}
 
           {/* STEP 2: WRAPPING & RIBBON STYLING */}
@@ -467,8 +630,11 @@ const BoxBuilderPage = () => {
                 ))}
               </div>
 
-              <div className="bb-step-nav-row">
-                <button className="bb-btn-secondary" onClick={() => setActiveStep(1)}>← Back</button>
+              <div className="bb-step-nav-row" style={{ marginTop: "32px" }}>
+                <button className="bb-btn-back" onClick={() => setActiveStep(1)}>
+                  <span>←</span>
+                  <span>Back</span>
+                </button>
                 <button className="bb-btn-forward" onClick={() => setActiveStep(3)}>Next: Select Items →</button>
               </div>
             </div>
@@ -603,13 +769,16 @@ const BoxBuilderPage = () => {
               )}
 
               <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
-                <button className="bb-btn-secondary" onClick={() => setActiveStep(2)}>← Back</button>
+                <button className="bb-btn-back" onClick={() => setActiveStep(2)}>
+                  <span>←</span>
+                  <span>Back</span>
+                </button>
                 <button
                   className="bb-btn-forward"
                   disabled={totalItemsCount === 0}
                   onClick={() => setActiveStep(4)}
                 >
-                  Next: Greeting & Dispatch →
+                  Next: Personalization →
                 </button>
               </div>
             </div>
@@ -687,45 +856,125 @@ const BoxBuilderPage = () => {
                     </label>
                   </div>
                 </div>
+              </div>
+
+              <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
+                <button className="bb-btn-back" onClick={() => setActiveStep(3)}>
+                  <span>←</span>
+                  <span>Back</span>
+                </button>
+                <button
+                  className="bb-btn-secondary"
+                  onClick={handleSaveDraft}
+                  style={{ whiteSpace: 'nowrap', padding: '0 24px', display: 'flex', alignItems: 'center', fontWeight: '600' }}
+                >
+                  💾 Save Draft
+                </button>
+                <button
+                  className="bb-btn-forward"
+                  disabled={!recipientName.trim()}
+                  onClick={() => {
+                    if (!recipientName.trim()) {
+                      triggerToast('Please specify a recipient name.');
+                      return;
+                    }
+                    setActiveStep(5);
+                  }}
+                >
+                  Next: Checkout & Dispatch →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 5: CHECKOUT & DISPATCH */}
+          {activeStep === 5 && (
+            <div className="bb-step-view">
+              <div className="bb-step-header">
+                <h3>Checkout & Dispatch</h3>
+                <p>Provide consignment address and secure payment details.</p>
+              </div>
+
+              <div className="bb-form-layout">
+                <div className="bb-field-row">
+                  <div className="bb-field">
+                    <label>Contact Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. John Doe"
+                      value={contactName}
+                      onChange={(e) => setContactName(e.target.value)}
+                    />
+                  </div>
+                  <div className="bb-field">
+                    <label>Mobile Number *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 077 123 4567"
+                      value={mobileNumber}
+                      onChange={(e) => setMobileNumber(e.target.value)}
+                    />
+                  </div>
+                </div>
 
                 <div className="bb-field">
                   <label>Delivery Destination Address *</label>
                   <input
                     type="text"
-                    placeholder="Street, City, Zip / Postal Code"
+                    placeholder="Street, Building, Apartment"
                     value={deliveryAddress}
                     onChange={(e) => setDeliveryAddress(e.target.value)}
                   />
                 </div>
 
-                <div className="bb-field">
-                  <label>Preferred Delivery Date</label>
-                  <input
-                    type="date"
-                    min={new Date().toISOString().split('T')[0]}
-                    value={deliveryDate}
-                    onChange={(e) => setDeliveryDate(e.target.value)}
-                  />
+                <div className="bb-field-row">
+                  <div className="bb-field">
+                    <label>Town / City *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Colombo 07"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                    />
+                  </div>
+                  <div className="bb-field">
+                    <label>Zip / Postal Code</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 00700"
+                      value={zipCode}
+                      onChange={(e) => setZipCode(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="bb-field-row">
+                  <div className="bb-field">
+                    <label>Preferred Delivery Date</label>
+                    <input
+                      type="date"
+                      min={new Date().toISOString().split('T')[0]}
+                      value={deliveryDate}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
-                <button className="bb-btn-secondary" onClick={() => setActiveStep(3)}>← Back</button>
-                <button
-                  className="bb-btn-secondary"
-                  onClick={handleSaveDraft}
-                  style={{ marginRight: '16px' }}
-                >
-                  Save Draft
-                </button>
-                <button
-                  className="bb-btn-submit"
-                  disabled={submitting}
-                  onClick={handlePlaceOrder}
-                >
-                  {submitting ? 'Processing Submission...' : `Complete Order • LKR ${grandTotal.toLocaleString()}`}
-                </button>
-              </div>
+              {clientSecret ? (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <CheckoutForm 
+                    grandTotal={grandTotal} 
+                    onPaymentSuccess={handlePlaceOrder} 
+                    onBack={() => setActiveStep(4)} 
+                    submitting={submitting} 
+                  />
+                </Elements>
+              ) : (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  Loading secure checkout...
+                </div>
+              )}
             </div>
           )}
 
@@ -821,8 +1070,39 @@ const BoxBuilderPage = () => {
         </aside>
 
       </div>
+          {/* DRAFTS MODAL */}
+      {showDraftsModal && (
+        <div className="bb-drafts-overlay" onClick={() => setShowDraftsModal(false)}>
+          <div className="bb-drafts-modal" onClick={e => e.stopPropagation()}>
+            <div className="bb-drafts-header">
+              <h3>Your Saved Drafts</h3>
+              <button className="bb-drafts-close" onClick={() => setShowDraftsModal(false)}>✕</button>
+            </div>
+
+            <div className="bb-drafts-list">
+              {savedDrafts.length === 0 ? (
+                <div className="bb-empty-drafts">You have no saved drafts yet.</div>
+              ) : (
+                savedDrafts.map(draft => (
+                  <div key={draft.id} className="bb-draft-card">
+                    <div className="bb-draft-info">
+                      <h4>{draft.occasion} • {draft.boxSize?.title || 'Unknown Box'}</h4>
+                      <p>Saved on {draft.date} • {draft.totalItemsCount || 0} items packed</p>
+                    </div>
+                    <div className="bb-draft-actions">
+                      <button className="bb-draft-load" onClick={() => loadDraft(draft)}>Load</button>
+                      <button className="bb-draft-del" onClick={() => deleteDraft(draft.id)}>Delete</button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
 
 export default BoxBuilderPage;

@@ -16,7 +16,7 @@
   background: var(--ct-surface);
   border-radius: var(--ct-radius-xl);
   width: 90%;
-  max-width: 550px;
+  max-width: 850px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
@@ -25,6 +25,22 @@
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: var(--ct-font);
   color: var(--ct-text);
+}
+
+/* Custom Scrollbar for Modal */
+.co-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+.co-modal-content::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 16px 0;
+}
+.co-modal-content::-webkit-scrollbar-thumb {
+  background-color: var(--ct-border-gray);
+  border-radius: 10px;
+}
+.co-modal-content::-webkit-scrollbar-thumb:hover {
+  background-color: var(--ct-text-muted);
 }
 
 .co-modal-close {
@@ -86,6 +102,28 @@
 
 .co-form-section {
   margin-bottom: 28px;
+}
+
+.co-modal-form-split {
+  display: flex;
+  gap: 40px;
+}
+
+.co-modal-left {
+  flex: 1;
+}
+
+.co-modal-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .co-modal-form-split {
+    flex-direction: column;
+    gap: 0;
+  }
 }
 
 .co-form-section h3 {
