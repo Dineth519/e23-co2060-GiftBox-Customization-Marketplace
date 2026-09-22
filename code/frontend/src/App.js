@@ -60,7 +60,7 @@ import AssemblerOrderQueue from './pages/assembler/OrderQueue.jsx';
 import AssemblerOrderWorkspace from './pages/assembler/OrderWorkspace.jsx';
 import AssemblerIssues from './pages/assembler/Issues.jsx';
 import AssemblerCompleted from './pages/assembler/Completed.jsx';
-import AssemblerPlaceholder from './pages/assembler/Placeholder.jsx';
+import AssemblerPackingGuide from './pages/assembler/PackingGuide.jsx';
 
 // Scroll to top helper on route navigation
 const ScrollToTop = () => {
@@ -167,7 +167,7 @@ function App() {
                       <Route path="orders/:orderId" element={<AssemblerOrderWorkspace />} />
                       <Route path="issues" element={<AssemblerIssues />} />
                       <Route path="completed" element={<AssemblerCompleted />} />
-                      <Route path="packing-guide" element={<AssemblerPlaceholder section="packing-guide" />} />
+                      <Route path="packing-guide" element={<AssemblerPackingGuide />} />
                       <Route path="*" element={<Navigate to="/assembler" replace />} />
                   </Routes>
               </AssemblerLayout>
