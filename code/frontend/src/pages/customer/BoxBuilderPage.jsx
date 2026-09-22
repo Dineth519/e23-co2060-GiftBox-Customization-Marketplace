@@ -128,6 +128,30 @@ const BoxBuilderPage = () => {
     setIsLoadingCatalog(false);
   }, [cartItems]);
 
+  // Restore Draft on mount
+  useEffect(() => {
+    const draft = localStorage.getItem('giftora_customer_draft_box');
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        if (parsed.occasion) setOccasion(parsed.occasion);
+        if (parsed.boxSize) setBoxSize(parsed.boxSize);
+        if (parsed.selectedItems) setSelectedItems(parsed.selectedItems);
+        if (parsed.recipientName) setRecipientName(parsed.recipientName);
+        if (parsed.giftMessage) setGiftMessage(parsed.giftMessage);
+        if (parsed.wrappingStyle) setWrappingStyle(parsed.wrappingStyle);
+        if (parsed.deliveryAddress) setDeliveryAddress(parsed.deliveryAddress);
+        if (parsed.ribbonColor) setRibbonColor(parsed.ribbonColor);
+        if (parsed.senderName) setSenderName(parsed.senderName);
+        if (parsed.cardTemplate) setCardTemplate(parsed.cardTemplate);
+        if (parsed.hasWaxSeal !== undefined) setHasWaxSeal(parsed.hasWaxSeal);
+        if (parsed.deliveryDate) setDeliveryDate(parsed.deliveryDate);
+      } catch (e) {
+        console.error('Failed to parse draft', e);
+      }
+    }
+  }, []);
+
   // Sync Item Trim Constraints when Box Size Decreases
   useEffect(() => {
     if (!boxSize) return;
@@ -202,6 +226,14 @@ const BoxBuilderPage = () => {
     setRibbonColor(wrap.defaultRibbon);
   };
 
+  const handleSaveDraft = () => {
+    localStorage.setItem('giftora_customer_draft_box', JSON.stringify({
+      occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress,
+      ribbonColor, senderName, cardTemplate, hasWaxSeal, deliveryDate
+    }));
+    triggerToast('Draft saved successfully! You can resume building later.');
+  };
+
   // Submit Order Process for Authenticated Logged In Users
   const handlePlaceOrder = async () => {
     if (totalItemsCount === 0) {
@@ -249,6 +281,7 @@ const BoxBuilderPage = () => {
 
       if (!res.ok) throw new Error('Failed to place order');
       
+      localStorage.removeItem('giftora_customer_draft_box');
       setSubmitSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
@@ -669,6 +702,7 @@ const BoxBuilderPage = () => {
                   <label>Preferred Delivery Date</label>
                   <input
                     type="date"
+                    min={new Date().toISOString().split('T')[0]}
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
                   />
@@ -677,6 +711,13 @@ const BoxBuilderPage = () => {
 
               <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
                 <button className="bb-btn-secondary" onClick={() => setActiveStep(3)}>← Back</button>
+                <button
+                  className="bb-btn-secondary"
+                  onClick={handleSaveDraft}
+                  style={{ marginRight: '16px' }}
+                >
+                  Save Draft
+                </button>
                 <button
                   className="bb-btn-submit"
                   disabled={submitting}

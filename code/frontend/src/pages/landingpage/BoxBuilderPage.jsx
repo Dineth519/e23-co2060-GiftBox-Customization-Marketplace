@@ -207,43 +207,28 @@ const BoxBuilderPage = () => {
   const canPlaceOrder = () => !isLoadingCatalog && totalItemsCount > 0 &&
     totalItemsCount <= boxSize.limit && recipientName.trim() && deliveryAddress.trim();
 
-  const handlePlaceOrder = async () => {
+  const handleSignInToBuy = () => {
     if (!canPlaceOrder() || submitting) return;
-    const token = localStorage.getItem('accessToken');
-    const customerId = Number(localStorage.getItem('userId'));
-    if (!token || !customerId || localStorage.getItem('role') !== 'CUSTOMER') {
-      sessionStorage.setItem('giftora_box_draft', JSON.stringify({
-        occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress,
-        ribbonColor, senderName, cardTemplate, hasWaxSeal, deliveryDate
-      }));
-      sessionStorage.setItem('giftora_return_to', '/build-box');
-      navigate('/login');
-      return;
-    }
-    
-    setSubmitting(true);
-    const orderPayload = {
-      customerId, deliveryAddress, occasion, boxSize: boxSize.id,
-      giftMessage, recipientName, wrappingStyle: wrappingStyle.id,
-      items: Object.entries(selectedItems).map(([id, qty]) => ({ productId: parseInt(id), quantity: qty }))
-    };
-
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/orders/custom-box`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(orderPayload)
-      });
-      if (!res.ok) throw new Error('Failed to place order');
-      sessionStorage.removeItem('giftora_box_draft');
-      setSubmitSuccess(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (err) {
-      triggerToast('Could not place your order. Your selections are still here. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
+    sessionStorage.setItem('giftora_box_draft', JSON.stringify({
+      occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress,
+      ribbonColor, senderName, cardTemplate, hasWaxSeal, deliveryDate
+    }));
+    sessionStorage.setItem('giftora_return_to', '/build-box'); // Wait, if they sign in to buy, they should probably go back to the builder to place the order, or go to cart? Let's send them to /build-box to let them click Complete Order.
+    navigate('/login');
   };
+
+  const handleSaveDraft = () => {
+    sessionStorage.setItem('giftora_box_draft', JSON.stringify({
+      occasion, selectedItems, boxSize, recipientName, giftMessage, wrappingStyle, deliveryAddress,
+      ribbonColor, senderName, cardTemplate, hasWaxSeal, deliveryDate
+    }));
+    sessionStorage.setItem('giftora_return_to', '/customer/home'); // Or /build-box
+    triggerToast('Draft saved! Redirecting to sign in to save it permanently.');
+    setTimeout(() => {
+      navigate('/login');
+    }, 1500);
+  };
+
 
   if (submitSuccess) {
     return (
@@ -652,6 +637,7 @@ const BoxBuilderPage = () => {
                   <label>Preferred Delivery Date</label>
                   <input
                     type="date"
+                    min={new Date().toISOString().split('T')[0]}
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
                   />
@@ -661,11 +647,18 @@ const BoxBuilderPage = () => {
               <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
                 <button className="bb-btn-secondary" onClick={() => setActiveStep(3)}>← Back</button>
                 <button
-                  className="bb-btn-submit"
-                  disabled={submitting}
-                  onClick={handlePlaceOrder}
+                  className="bb-btn-secondary"
+                  onClick={handleSaveDraft}
+                  style={{ marginRight: '16px' }}
                 >
-                  {submitting ? 'Processing Submission...' : `Complete Order • LKR ${grandTotal.toLocaleString()}`}
+                  Save Draft
+                </button>
+                <button
+                  className="bb-btn-submit"
+                  disabled={submitting || !canPlaceOrder()}
+                  onClick={handleSignInToBuy}
+                >
+                  {submitting ? 'Processing Submission...' : `Sign in to buy • LKR ${grandTotal.toLocaleString()}`}
                 </button>
               </div>
             </div>
@@ -680,13 +673,23 @@ const BoxBuilderPage = () => {
             <span className="bb-live-tag">Interactive</span>
           </div>
 
-            <button 
-              className="bb-btn-submit" 
-              onClick={handlePlaceOrder}
-              disabled={submitting || !canPlaceOrder()}
-            >
-              {submitting ? 'Processing...' : (localStorage.getItem('role') === 'CUSTOMER' && localStorage.getItem('accessToken') ? 'Place Order' : 'Sign in to place order')}
-            </button>
+            <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
+              <button 
+                className="bb-btn-secondary" 
+                onClick={handleSaveDraft}
+                style={{flex: 1, padding: '12px'}}
+              >
+                Save Draft
+              </button>
+              <button 
+                className="bb-btn-submit" 
+                onClick={handleSignInToBuy}
+                disabled={submitting || !canPlaceOrder()}
+                style={{flex: 1, padding: '12px'}}
+              >
+                {submitting ? 'Processing...' : 'Sign in to buy'}
+              </button>
+            </div>
             
           <div className="bb-box-canvas" style={{ backgroundColor: wrappingStyle.color }}>
             <div className="bb-canvas-ribbon-v" style={{ backgroundColor: ribbonColor }} />
