@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Bell, User, ChevronDown, LogOut, Settings, Package, UserCircle } from 'lucide-react';
 import CartBadge from './CartBadge.jsx';
 import './Header.css';
 
 const Header = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isWorkspace = pathname.startsWith('/customer/') && pathname !== '/customer/home';
   const [displayName, setDisplayName] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState(null);
 
@@ -52,18 +54,19 @@ const Header = () => {
       </div>
 
       {/* Center — Nav Links */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', marginRight: '32px' }}>
+      <nav className="customer-nav" aria-label="Customer navigation" style={isWorkspace ? undefined : { display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', marginRight: '32px' }}>
         {[
           { label: 'Build a Box',      route: '/customer/build-box' },
           { label: 'Orders',           route: '/customer/orders' },
           { label: 'Account Settings', route: '/customer/settings' },
           { label: 'About Us',         route: '/customer/about-us' },
         ].map(item => (
-          <button
+          <NavLink
             key={item.label}
-            onClick={() => navigate(item.route)}
-            className="nav-link-btn" 
-            style={{
+            to={item.route}
+            className={({ isActive }) => `nav-link-btn${isActive ? ' active' : ''}`}
+            style={isWorkspace ? undefined : {
+              textDecoration: 'none',
               background: 'none',
               border: 'none',
               color: '#E8E8E8',
@@ -75,17 +78,17 @@ const Header = () => {
               transition: 'all 0.2s ease',
               letterSpacing: '0.3px',
             }}
-            onMouseEnter={e => {
+            onMouseEnter={isWorkspace ? undefined : e => {
               e.target.style.background = 'rgba(201, 169, 97, 0.12)';
               e.target.style.color = '#C9A961';
             }}
-            onMouseLeave={e => {
+            onMouseLeave={isWorkspace ? undefined : e => {
               e.target.style.background = 'none';
               e.target.style.color = '#E8E8E8';
             }}
           >
             {item.label}
-          </button>
+          </NavLink>
         ))}
       </nav>
 

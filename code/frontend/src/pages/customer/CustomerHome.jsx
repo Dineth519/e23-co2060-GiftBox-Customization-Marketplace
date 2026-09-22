@@ -169,7 +169,7 @@ const CustomerHome = () => {
             <button className="btn-primary" onClick={() => document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})}>
               Shop Now <FaArrowRight className="btn-icon" />
             </button>
-            <button className="btn-secondary" onClick={() => navigate('/build-a-box')}>Custom Gift Box</button>
+            <button className="btn-secondary" onClick={() => navigate('/customer/build-box')}>Custom Gift Box</button>
           </div>
         </div>
       </section>

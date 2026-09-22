@@ -285,7 +285,7 @@ const BoxBuilderPage = () => {
 
   if (submitSuccess) {
     return (
-      <div className="bb-page">
+      <div className="bb-page customer-box-builder">
         <div className="bb-success-screen">
           <div className="bb-success-card">
             <div className="bb-success-icon">🎁</div>
@@ -299,7 +299,7 @@ const BoxBuilderPage = () => {
               <div><span>Total Paid:</span> <strong>LKR {grandTotal.toLocaleString()}</strong></div>
             </div>
             <div className="bb-success-actions">
-              <button className="bb-btn-primary" onClick={() => navigate('/')}>Return to Storefront</button>
+              <button className="bb-btn-primary" onClick={() => navigate('/customer/orders')}>View My Orders</button>
             </div>
           </div>
         </div>
@@ -308,7 +308,7 @@ const BoxBuilderPage = () => {
   }
 
   return (
-    <div className="bb-page">
+    <div className="bb-page customer-box-builder">
       {/* Toast Alert */}
       {toastMessage && (
         <div className="bb-toast-notification">
@@ -336,6 +336,8 @@ const BoxBuilderPage = () => {
         ].map((item) => (
           <button
             key={item.step}
+            aria-label={`Step ${item.step}: ${item.label.trim()}`}
+            aria-current={activeStep === item.step ? 'step' : undefined}
             className={`bb-step-btn ${activeStep === item.step ? 'active' : ''} ${activeStep > item.step ? 'completed' : ''}`}
             onClick={() => setActiveStep(item.step)}
           >

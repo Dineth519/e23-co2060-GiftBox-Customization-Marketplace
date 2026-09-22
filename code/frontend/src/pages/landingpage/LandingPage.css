@@ -3405,6 +3405,9 @@ html, body {
   width: 600px; 
   max-width: 100%; 
   height: auto;
-  padding-right: 80px; 
+  object-fit: contain;
+  padding: 0;
+  transform: none;
+  mask-image: none;
+  -webkit-mask-image: none;
 }
-

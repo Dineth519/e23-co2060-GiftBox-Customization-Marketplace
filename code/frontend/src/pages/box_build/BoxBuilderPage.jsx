@@ -260,7 +260,7 @@ const BoxBuilderPage = () => {
 
   if (submitSuccess) {
     return (
-      <div className="bb-page">
+      <div className="bb-page public-box-builder">
         <Header />
         <div className="bb-success-screen">
           <div className="bb-success-card">
@@ -285,7 +285,7 @@ const BoxBuilderPage = () => {
   }
 
   return (
-    <div className="bb-page">
+    <div className="bb-page public-box-builder">
       <Header />
 
       {/* Toast Alert */}
@@ -298,10 +298,13 @@ const BoxBuilderPage = () => {
       {/* HERO SECTION */}
       <section className="bb-hero">
         <div className="bb-hero-inner" ref={heroRef}>
-          <span className="bb-hero-badge">Giftora Studio</span>
+          <span className="bb-hero-badge">A gift, made personal</span>
           <h1 className="bb-hero-title">
-            Gift Box <span className="bb-hero-accent">Craft Studio</span>
+            A little thought.<br />
+            An unforgettable <span className="bb-hero-accent">gift.</span>
           </h1>
+          <p className="bb-hero-sub">Create something that feels like them. Choose your box, discover thoughtful gifts, and finish with a personal message.</p>
+          <div className="public-builder-details"><span>Curated by you</span><span>Beautifully wrapped</span><span>Made for every occasion</span></div>
         </div>
       </section>
 
@@ -315,6 +318,8 @@ const BoxBuilderPage = () => {
         ].map((item) => (
           <button
             key={item.step}
+            aria-label={`Step ${item.step}: ${item.label.trim()}`}
+            aria-current={activeStep === item.step ? 'step' : undefined}
             className={`bb-step-btn ${activeStep === item.step ? 'active' : ''} ${activeStep > item.step ? 'completed' : ''}`}
             onClick={() => setActiveStep(item.step)}
           >

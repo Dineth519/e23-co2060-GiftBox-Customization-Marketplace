@@ -13,8 +13,8 @@ import { useCart } from '../../context/CartContext';
 // Stylesheet
 import './LandingPage.css';
 import './ProductsPage.css'; // For Quick View modal styles
-import landingPage1Img from '../../assets/landingpage/landing_page_1.png';
-import landingPage2Img from '../../assets/landingpage/landing_page_2.png';
+import landingPage1Img from '../../assets/landingpage/curate-gift-box-v2.png';
+import landingPage2Img from '../../assets/landingpage/gift-recipient-v2.png';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
