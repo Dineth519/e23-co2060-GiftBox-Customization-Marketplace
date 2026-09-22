@@ -8,16 +8,20 @@ import AboutUsPage from './pages/landingpage/AboutUsPage.jsx';
 import CustomerHome from './pages/customer/CustomerHome.jsx';
 import Verify from './pages/customer/Verify.jsx';
 import VendorLanding from './pages/landingpage/VendorLanding.jsx';
+import ProductsPage from './pages/landingpage/ProductsPage.jsx';
+import CartPage from './pages/landingpage/CartPage.jsx';
+import AddressForm from './components/user/AddressForm.jsx';
+import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
 
-//Customer
+// Customer
 import GiftCustomizer from './pages/customer/GiftCustomizer.jsx';
 import CustomerOrders from './pages/customer/Orders.jsx';
 import OrderDetail from './pages/customer/OrderDetail.jsx';
 import CustomerLayout from './layouts/CustomerLayout.jsx';  
 import CustomerCart from './pages/customer/CustomerCart.jsx';
-import CustomerProfile from './pages/customer/Profile.jsx'
+import CustomerProfile from './pages/customer/Profile.jsx';
 import AboutUs from './pages/customer/AboutUsPage.jsx';
-import BoxBuilder from './pages/customer/BoxBuilderPage.jsx'
+import BoxBuilder from './pages/customer/BoxBuilderPage.jsx';
 import Checkout from './pages/customer/Checkout.jsx';
 import CustomerSettings from './pages/customer/Settings.jsx';
 
@@ -42,15 +46,10 @@ import MyItems from './pages/vendor/MyItems.jsx';
 import AddItems from './pages/vendor/AddItems.jsx';
 import Orders from './pages/vendor/Orders.jsx';
 import VendorSettings from './pages/vendor/Settings.jsx';
+import CreateGiftBox from './pages/vendor/CreateGiftBox.jsx';
 
-// Landingpage
-import ProductsPage from './pages/landingpage/ProductsPage.jsx';
-import AddressForm from './components/user/AddressForm.jsx';
+// Context
 import { CartProvider } from './context/CartContext.jsx';
-import CartPage from './pages/landingpage/CartPage.jsx';
-
-// Box Builder
-import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
 
 // Scroll to top helper on route navigation
 const ScrollToTop = () => {
@@ -66,15 +65,8 @@ const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
 
-  // Log current path and admin status for debugging
-  useEffect(() => {
-    console.log("Current Path:", location.pathname);
-    console.log("Is Admin View:", isAdminPath);
-  }, [location]);
-
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Display sidebar on admin paths */}
       {isAdminPath && <Sidebar />} 
       <div style={{ flex: 1, background: isAdminPath ? '#deebf7' : '#ffffff' }}>
         {children}
@@ -82,8 +74,6 @@ const LayoutWrapper = ({ children }) => {
     </div>
   );
 };
-
-// Main application component that sets up routing for admin, user, and seller sections
 
 function App() {
   return (
@@ -99,7 +89,7 @@ function App() {
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
           <Route path="/vendor-landing" element={<VendorLanding />} />
           <Route path="/vendor-register" element={<VendorRegistration />} />
-          <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
+          <Route path="/verify" element={<LayoutWrapper><Verify /></LayoutWrapper>} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/build-box" element={<BoxBuilderPage />} />
           <Route path="/test-address" element={<LayoutWrapper><AddressForm /></LayoutWrapper>} />
@@ -117,42 +107,34 @@ function App() {
             <Route path="about-us" element={<AboutUs />} />
             <Route path="build-box" element={<BoxBuilder />} />
             <Route path="settings" element={<CustomerSettings />} />
-
           </Route>
 
           {/* Vendor routes */}
-          <Route path="/vendor/*" element={
-            <VendorLayout>
-              <Routes>
-                <Route path="/" element={<VendorDashboard />} />
-                <Route path="my-items" element={<MyItems />} />
-                <Route path="add-items" element={<AddItems />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="settings" element={<VendorSettings />} />
-              </Routes>
-            </VendorLayout>
-          } />
+          <Route path="/vendor" element={<VendorLayout />}>
+            <Route index element={<VendorDashboard />} />
+            <Route path="create-box" element={<CreateGiftBox />} />
+            <Route path="my-items" element={<MyItems />} />
+            <Route path="add-items" element={<AddItems />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="settings" element={<VendorSettings />} />
+          </Route>
 
-          {/* Admin routes using AdminLayout for sidebar and styling */}
-          <Route path="/admin/*" element={
-            <AdminLayout>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="vendors" element={<Vendors />} />
-                <Route path="vendors/pending" element={<PendingVendors />} />
-                <Route path="customers" element={<Customers />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="staff-management" element={<StaffManagement />} />
-              </Routes>
-            </AdminLayout>
-          } />
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="vendors" element={<Vendors />} />
+            <Route path="vendors/pending" element={<PendingVendors />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="staff-management" element={<StaffManagement />} />
+          </Route>
 
           {/* Catch-all route that redirects to home page */}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
       </Router>
-    </CartProvider>                                     
+    </CartProvider>                                      
   );
 }
 

@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts';
 import {
-  FaShoppingCart, FaDollarSign, FaBoxOpen, FaStar,
-  FaArrowUp, FaArrowDown, FaStore, FaClock
+  FaShoppingCart, FaDollarSign, FaBoxOpen, FaStar, FaClock
 } from 'react-icons/fa';
 import './VendorDashboard.css';
 
 // ── Config ────────────────────────────────────────────────────
-const API_BASE  = `${process.env.REACT_APP_API_URL}/api`;
+const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
 const getSellerId = () => {
   const localId = localStorage.getItem('userId');
-  return localId ? parseInt(localId, 10) : 2; // fallback to 2 for development or preview
+  return localId ? parseInt(localId, 10) : 2;
 };
 
 const STATUS_COLOR_MAP = {
@@ -47,7 +47,6 @@ const timeAgo = (dateStr) => {
 };
 
 // ── Sub-components ────────────────────────────────────────────
-
 const CustomTooltip = ({ active, payload, label, prefix = '' }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -95,6 +94,7 @@ const StatusPill = ({ status }) => {
 
 // ── Main Component ────────────────────────────────────────────
 const VendorDashboard = () => {
+  const navigate = useNavigate();
   const [stats,    setStats]    = useState(null);
   const [weekly,   setWeekly]   = useState([]);
   const [monthly,  setMonthly]  = useState([]);
@@ -109,7 +109,6 @@ const VendorDashboard = () => {
     const fetchAll = async () => {
       setLoading(true);
       try {
-        // 1. Dashboard stats
         const dashRes = await fetch(`${API_BASE}/vendor/${SELLER_ID}/dashboard`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
@@ -117,7 +116,6 @@ const VendorDashboard = () => {
           const dash = await dashRes.json();
           setStats(dash);
 
-          // Weekly chart data
           if (dash.weeklyData?.length) {
             setWeekly(dash.weeklyData.map(d => ({
               day: d.day, orders: Number(d.orders), revenue: Number(d.revenue),
@@ -126,7 +124,6 @@ const VendorDashboard = () => {
             setWeekly([]);
           }
 
-          // Monthly chart data
           if (dash.monthlyRevenue?.length) {
             setMonthly(dash.monthlyRevenue.map(d => ({
               month: d.month, revenue: Number(d.revenue),
@@ -135,7 +132,6 @@ const VendorDashboard = () => {
             setMonthly([]);
           }
 
-          // Pie chart data
           if (dash.statusDistribution) {
             const total = Object.values(dash.statusDistribution).reduce((a, b) => a + Number(b), 0);
             setPieData(Object.entries(dash.statusDistribution).map(([name, val]) => ({
@@ -148,13 +144,12 @@ const VendorDashboard = () => {
           }
         }
 
-        // 2. Recent orders
         const ordersRes = await fetch(`${API_BASE}/vendors/${SELLER_ID}/orders`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         if (ordersRes.ok) {
           const orders = await ordersRes.json();
-          setRecent(orders.slice(0, 5)); // latest 5 only
+          setRecent(orders.slice(0, 5));
         } else {
           setRecent([]);
         }
@@ -173,25 +168,27 @@ const VendorDashboard = () => {
     fetchAll();
   }, [SELLER_ID]);
 
-  // ── Derived stats ──
-  const ordersToday  = stats ? stats.ordersToday : 0;
-  const revenueToday = stats ? fmtLKR(stats.revenueToday) : '0';
+  const ordersToday   = stats ? stats.ordersToday : 0;
+  const revenueToday  = stats ? fmtLKR(stats.revenueToday) : '0';
   const totalProducts = stats ? stats.totalProducts : 0;
 
   return (
     <div className="sd-page">
 
       {/* ── Welcome Banner ── */}
-      <div className="sd-banner">
+      <div className="sd-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1>Welcome back! 👋</h1>
           <p>Here's what's happening with your shop today.</p>
         </div>
-        <div className="sd-banner-date">
-          <p className="date-label">Today</p>
-          <p className="date-value">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className="sd-banner-date">
+            <p className="date-label">Today</p>
+            <p className="date-value">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -199,8 +196,8 @@ const VendorDashboard = () => {
       <div className="sd-stats-grid">
         <StatCard icon={<FaShoppingCart />} title="Orders Today"   value={ordersToday} sub="Updated live" />
         <StatCard icon={<FaDollarSign />}   title="Revenue Today"  value={`LKR ${revenueToday}`} sub="Gross sales" />
-        <StatCard icon={<FaBoxOpen />}      title="Total Products" value={totalProducts} sub="Active catalog items" />
-        <StatCard icon={<FaStar />}         title="Avg Rating"     value="N/A" sub="No ratings yet" />
+        <StatCard icon={<FaBoxOpen />}       title="Total Products" value={totalProducts} sub="Active catalog items" />
+        <StatCard icon={<FaStar />}          title="Avg Rating"     value="N/A" sub="No ratings yet" />
       </div>
 
       {/* ── Charts Row 1: Orders + Revenue ── */}
