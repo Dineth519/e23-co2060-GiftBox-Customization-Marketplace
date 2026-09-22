@@ -1,0 +1,11 @@
+.aq-breadcrumb { display: flex; gap: 10px; font-size: 12px; color: #69778b; margin-bottom: 22px; }
+.aq-breadcrumb a { color: #344864; text-decoration: underline; }
+.aq-count { display: inline-block; margin-left: 7px; padding: 2px 6px; border-radius: 12px; background: #f0f2f5; color: #536176; font-size: 10px; }
+.ao-filter-active .aq-count { background: #f6ecd6; color: #72571f; }
+.aq-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px; padding: 18px 0; border-bottom: 1px solid #eef0f3; }
+.aq-toolbar label { display: flex; flex-direction: column; gap: 7px; font-size: 11px; color: #657084; }
+.aq-toolbar select { min-width: 145px; padding: 10px 30px 10px 10px; border: 1px solid #dce0e7; border-radius: 6px; background: #fff; color: #1a2340; font: inherit; font-size: 13px; cursor: pointer; }
+.aq-toolbar select:focus-visible { outline: 3px solid #b68a32; outline-offset: 3px; }
+.aq-toolbar button { margin-left: auto; padding: 10px 0; border: 0; background: transparent; color: #715621; font-size: 12px; text-decoration: underline; }
+.ao-queue-footer a { color: #715621; text-decoration: underline; }
+@media (max-width: 600px) { .aq-toolbar { gap: 12px; } .aq-toolbar label { flex: 1 1 130px; } .aq-toolbar select { min-width: 0; width: 100%; } }

@@ -1,62 +1,44 @@
-// File path: code/frontend/src/components/assembler/AssemblerSidebar.jsx
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, LogOut } from 'lucide-react';
-import './AssemblerSidebar.css'; // External CSS file for styling
+import { Gift, House, List, TriangleAlert, CircleCheck, BookOpen, LogOut } from 'lucide-react';
+import './AssemblerSidebar.css';
 
-const AssemblerSidebar = () => {
+const links = [
+    ['/assembler', 'Overview', House],
+    ['/assembler/queue', 'Order Queue', List],
+    ['/assembler/issues', 'Issues', TriangleAlert],
+    ['/assembler/completed', 'Completed', CircleCheck],
+    ['/assembler/packing-guide', 'Packing Guide', BookOpen],
+];
+
+export default function AssemblerSidebar() {
     const navigate = useNavigate();
-
-    // Handle user logout
-    // Uses localStorage.clear() to match the pattern used in
-    // Admin/Vendor/Customer layouts across the app (consistency)
+    const username = localStorage.getItem('username')?.trim() || 'Assembler';
     const handleLogout = () => {
-        // Ask for confirmation to prevent accidental logout
-        if (window.confirm('Are you sure you want to logout?')) {
-            // Clear all auth-related data (token, userRole, username, userId)
-            localStorage.clear();
-
-            // Redirect to login page
-            navigate('/login');
-        }
+        if (!window.confirm('Are you sure you want to log out?')) return;
+        ['accessToken', 'refreshToken', 'role', 'userRole', 'userId', 'username'].forEach(key => localStorage.removeItem(key));
+        navigate('/login', { replace: true });
     };
-
     return (
-        <div className="assembler-sidebar">
-
-            {/* Sidebar Header */}
-            <div className="sidebar-header">
-                <h2>Giftora Assembler</h2>
+        <aside className="assembler-sidebar" aria-label="Assembler sidebar">
+            <div className="asm-brand">
+                <Gift size={34} strokeWidth={1.5} aria-hidden="true" />
+                <div><span className="asm-brand-name">Giftora</span><span className="asm-brand-subtitle">Assembly team</span></div>
             </div>
-
-            {/* Navigation Links */}
-            <nav className="sidebar-nav">
-
-                {/* Dashboard Link */}
-                <NavLink
-                    to="/assembler"
-                    end
-                    className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
-                >
-                    <LayoutDashboard size={20} />
-                    <span>Dashboard</span>
-                </NavLink>
-
-                {/* NOTE: Task Queue link removed temporarily.
-                    Add it back once the /assembler/queue route
-                    and its page component are created in App.js */}
-
+            <nav className="asm-navigation" aria-label="Assembler navigation">
+                {links.map(([to, label, Icon]) => (
+                    <NavLink key={to} to={to} end={to === '/assembler'} className={({ isActive }) => 'asm-nav-link' + (isActive ? ' is-active' : '')}>
+                        <Icon size={21} aria-hidden="true" /><span>{label}</span>
+                    </NavLink>
+                ))}
             </nav>
-
-            {/* Logout Section */}
-            <div className="sidebar-footer">
-                <button onClick={handleLogout} className="logout-btn">
-                    <LogOut size={20} />
-                    <span>Logout</span>
-                </button>
+            <div className="asm-sidebar-footer">
+                <div className="asm-profile">
+                    <span className="asm-avatar" aria-hidden="true">{Array.from(username)[0].toUpperCase()}</span>
+                    <div className="asm-profile-details"><span className="asm-profile-name" title={username}>{username}</span><span className="asm-profile-role">Assembler</span></div>
+                </div>
+                <button type="button" className="asm-logout" onClick={handleLogout}><LogOut size={20} aria-hidden="true" /><span>Logout</span></button>
             </div>
-        </div>
+        </aside>
     );
-};
-
-export default AssemblerSidebar;
+}

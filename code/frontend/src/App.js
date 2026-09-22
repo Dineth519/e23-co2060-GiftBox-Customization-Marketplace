@@ -56,6 +56,11 @@ import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
 // Assembler
 import AssemblerLayout from './layouts/AssemblerLayout.jsx';
 import AssemblerDashboard from './pages/assembler/Dashboard.jsx';
+import AssemblerOrderQueue from './pages/assembler/OrderQueue.jsx';
+import AssemblerOrderWorkspace from './pages/assembler/OrderWorkspace.jsx';
+import AssemblerIssues from './pages/assembler/Issues.jsx';
+import AssemblerCompleted from './pages/assembler/Completed.jsx';
+import AssemblerPackingGuide from './pages/assembler/PackingGuide.jsx';
 
 // Scroll to top helper on route navigation
 const ScrollToTop = () => {
@@ -158,7 +163,12 @@ function App() {
               <AssemblerLayout>
                   <Routes>
                       <Route path="/" element={<AssemblerDashboard />} />
-                      {/* Add more assembler pages here later, e.g. Order Detail, QA Checklist */}
+                      <Route path="queue" element={<AssemblerOrderQueue />} />
+                      <Route path="orders/:orderId" element={<AssemblerOrderWorkspace />} />
+                      <Route path="issues" element={<AssemblerIssues />} />
+                      <Route path="completed" element={<AssemblerCompleted />} />
+                      <Route path="packing-guide" element={<AssemblerPackingGuide />} />
+                      <Route path="*" element={<Navigate to="/assembler" replace />} />
                   </Routes>
               </AssemblerLayout>
           } />
