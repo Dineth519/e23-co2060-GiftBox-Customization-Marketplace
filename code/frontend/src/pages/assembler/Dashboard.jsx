@@ -3,7 +3,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Package, Box, Settings, CircleCheck, Clock, TriangleAlert, Search, ArrowUpRight, ArrowRight, Inbox, BookOpen } from 'lucide-react';
 import { STATUS, selectQueueOrders } from './overviewData';
 import './Dashboard.css';
-import { getDemoOrders } from './workspaceState';
+import { useAssemblyOrders, AssemblyLoadState } from './assemblyApi';
 
 const metrics = [
   { status: 'awaiting', icon: Package, hint: 'Waiting for vendor deliveries' },
@@ -34,11 +34,11 @@ export default function AssemblerDashboard({ queueMode = false }) {
   const [due, setDue] = useState('all');
   const [sort, setSort] = useState('due');
   const navigate = useNavigate();
-  const [demoOrders] = useState(getDemoOrders);
-  const orders = selectQueueOrders(demoOrders, { status, query, box, due, sort });
-  const onHold = demoOrders.filter(order => order.status === 'hold').length;
-  const attention = demoOrders.filter(order => order.issue || order.status === 'hold' || (order.status === 'awaiting' && order.due === 'Today'));
-  const inProgress = selectQueueOrders(demoOrders, { status: 'assembling' }).slice(0, 3);
+  const { orders: liveOrders, loading, error, reload } = useAssemblyOrders();
+  const orders = selectQueueOrders(liveOrders, { status, query, box, due, sort });
+  const onHold = liveOrders.filter(order => order.status === 'hold').length;
+  const attention = liveOrders.filter(order => order.issue || order.status === 'hold' || (order.status === 'awaiting' && ['Today', 'Overdue'].includes(order.due)));
+  const inProgress = selectQueueOrders(liveOrders, { status: 'assembling' }).slice(0, 3);
   const openWorkspace = order => {
     navigate('/assembler/orders/' + order.id);
   };
@@ -50,17 +50,19 @@ export default function AssemblerDashboard({ queueMode = false }) {
       {queueMode && <nav className="aq-breadcrumb" aria-label="Breadcrumb"><Link to="/assembler">Overview</Link><span aria-hidden="true">/</span><span aria-current="page">Order Queue</span></nav>}
       <header className="ao-header">
         <div>
-          <div className="ao-title-row"><h1 id="ao-title">{queueMode ? 'Order Queue' : 'Assembly overview'}</h1><span className="ao-sample">Sample data</span></div>
+          <div className="ao-title-row"><h1 id="ao-title">{queueMode ? 'Order Queue' : 'Assembly overview'}</h1><button type="button" className="ao-sample" onClick={reload} disabled={loading}>Refresh</button></div>
           <p>{queueMode ? 'Find a gift box, check item arrivals, and plan your next assembly.' : 'Receive items. Prepare gifts. Keep every detail right.'}</p>
         </div>
         <div className="ao-date"><span>Today</span><time dateTime={new Date().toLocaleDateString('en-CA')}>{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</time></div>
       </header>
 
+      <AssemblyLoadState loading={loading} error={error} reload={reload} />
+      {!loading && !error && liveOrders.length === 0 && <p role="status">No confirmed orders are available. Orders appear here after vendor confirmation.</p>}
       {!queueMode && <div className="ao-metrics" aria-label="Assembly summary">
         {metrics.map(({ status: key, icon: Icon, hint }) => (
           <Link key={key} className="ao-metric" to={'/assembler/queue?status=' + key}>
             <span className={'ao-metric-icon ao-tone-' + STATUS[key].tone}><Icon size={24} aria-hidden="true" /></span>
-            <span><span className="ao-metric-label">{STATUS[key].label}</span><strong>{String(demoOrders.filter(order => order.status === key).length).padStart(2, '0')}</strong><span className="ao-metric-hint">{hint}</span></span>
+            <span><span className="ao-metric-label">{STATUS[key].label}</span><strong>{String(liveOrders.filter(order => order.status === key).length).padStart(2, '0')}</strong><span className="ao-metric-hint">{hint}</span></span>
             <ArrowUpRight className="ao-metric-arrow" size={16} aria-hidden="true" />
           </Link>
         ))}
@@ -84,7 +86,7 @@ export default function AssemblerDashboard({ queueMode = false }) {
             <div className="ao-work-custom"><span>Wrap<strong>{order.wrap}</strong></span><span>Ribbon<strong>{order.ribbon}</strong></span></div>
             <button type="button" className="ao-order-button" onClick={() => openWorkspace(order)} aria-label={'Continue order ' + order.id}>Continue <ArrowRight size={16} aria-hidden="true" /></button>
           </article>) : <div className="ao-summary-empty"><Box size={28} aria-hidden="true" /><p>No boxes are currently in assembly.</p><Link to="/assembler/queue?status=ready">Find a box ready to assemble</Link></div>}
-          <p className="ao-summary-note">Continue opens the packing workspace. Demo progress is saved on this browser.</p>
+          <p className="ao-summary-note">Continue opens the packing workspace. Save progress to keep your changes.</p>
         </section>
         <section className="ao-quick-links" aria-label="Quick links"><Link to="/assembler/queue"><span><strong>Open Order Queue</strong><small>Search and manage the complete work list</small></span><ArrowRight size={20} aria-hidden="true" /></Link><Link to="/assembler/packing-guide"><span><strong>Packing Guide</strong><small>Preparation standards and quality checks</small></span><BookOpen size={20} aria-hidden="true" /></Link></section>
       </div>}
@@ -95,11 +97,11 @@ export default function AssemblerDashboard({ queueMode = false }) {
           <label className="ao-search"><Search size={18} aria-hidden="true" /><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search order ID..." aria-label="Search by order ID" /></label>
         </div>
         <div className="ao-filters" role="group" aria-label="Filter orders by status">
-          {['all', ...Object.keys(STATUS)].map(key => <button type="button" key={key} aria-pressed={status === key} className={status === key ? 'ao-filter-active' : ''} onClick={() => setStatus(key)}>{key === 'all' ? 'All orders' : STATUS[key].label}{queueMode && <span className="aq-count">{demoOrders.filter(order => key === 'all' || order.status === key).length}</span>}</button>)}
+          {['all', ...Object.keys(STATUS)].map(key => <button type="button" key={key} aria-pressed={status === key} className={status === key ? 'ao-filter-active' : ''} onClick={() => setStatus(key)}>{key === 'all' ? 'All orders' : STATUS[key].label}{queueMode && <span className="aq-count">{liveOrders.filter(order => key === 'all' || order.status === key).length}</span>}</button>)}
         </div>
         {queueMode && <div className="aq-toolbar">
           <label>Box size<select value={box} onChange={event => setBox(event.target.value)}><option value="all">All sizes</option>{['Small', 'Medium', 'Large'].map(size => <option key={size}>{size}</option>)}</select></label>
-          <label>Due<select value={due} onChange={event => setDue(event.target.value)}><option value="all">Any time</option>{['Today', 'Tomorrow', 'In 2 days'].map(day => <option key={day}>{day}</option>)}</select></label>
+          <label>Due<select value={due} onChange={event => setDue(event.target.value)}><option value="all">Any time</option>{['Overdue', 'Today', 'Tomorrow', 'In 2 days', 'Not scheduled'].map(day => <option key={day}>{day}</option>)}</select></label>
           <label>Sort by<select value={sort} onChange={event => setSort(event.target.value)}><option value="due">Due soonest</option><option value="id">Order ID</option></select></label>
           {hasFilters && <button type="button" onClick={reset}>Reset filters</button>}
         </div>}
@@ -116,12 +118,12 @@ export default function AssemblerDashboard({ queueMode = false }) {
             </tr>)}</tbody>
           </table>
         </div>
-        {orders.length === 0 && <div className="ao-empty"><Inbox size={32} aria-hidden="true" /><h3>No matching orders</h3><p>Try another order ID or clear the filters.</p><button type="button" onClick={reset}>Clear filters</button></div>}
-        <div className="ao-queue-footer"><span role="status">{orders.length} of {demoOrders.length} sample orders</span>{hasFilters && <button type="button" onClick={reset}>Clear filters</button>}{!queueMode && <Link to="/assembler/queue">View full queue</Link>}</div>
+        {!loading && !error && orders.length === 0 && <div className="ao-empty"><Inbox size={32} aria-hidden="true" /><h3>No matching orders</h3><p>Try another order ID or clear the filters.</p><button type="button" onClick={reset}>Clear filters</button></div>}
+        <div className="ao-queue-footer"><span role="status">{orders.length} of {liveOrders.length} orders</span>{hasFilters && <button type="button" onClick={reset}>Clear filters</button>}{!queueMode && <Link to="/assembler/queue">View full queue</Link>}</div>
         {onHold > 0 && <button type="button" className="ao-alert" onClick={() => { setSearchParams({ status: 'hold' }, { replace: true }); setBox('all'); setDue('all'); }}><TriangleAlert size={19} aria-hidden="true" /><span><strong>{onHold} {onHold === 1 ? 'order needs' : 'orders need'} attention</strong> — review held orders</span><ArrowRight size={18} aria-hidden="true" /></button>}
       </section>}
 
-      <footer className="ao-bottom"><p>Frontend demo. Sample orders include progress saved on this browser; no live orders are changed.</p><Link to="/assembler/packing-guide"><BookOpen size={17} aria-hidden="true" />Packing guide<ArrowRight size={15} aria-hidden="true" /></Link></footer>
+      <footer className="ao-bottom"><p>Confirmed orders available to you. Saving an unassigned order assigns it to you.</p><Link to="/assembler/packing-guide"><BookOpen size={17} aria-hidden="true" />Packing guide<ArrowRight size={15} aria-hidden="true" /></Link></footer>
 
 
     </section>

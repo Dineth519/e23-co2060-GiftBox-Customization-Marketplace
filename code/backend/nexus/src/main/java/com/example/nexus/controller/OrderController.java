@@ -179,6 +179,15 @@ public class OrderController {
             order.setGiftMessage(request.getGiftMessage());
             order.setRecipientName(request.getRecipientName());
             order.setWrappingStyle(request.getWrappingStyle());
+            // Preserve the customer's packing choices for the assembler workspace.
+            Map<String, Object> customization = new java.util.LinkedHashMap<>();
+            customization.put("ribbonColor", request.getRibbonColor());
+            customization.put("cardTemplate", request.getCardTemplate());
+            customization.put("senderName", request.getSenderName());
+            customization.put("hasWaxSeal", request.getHasWaxSeal());
+            customization.put("deliveryDate", request.getDeliveryDate() == null ? null : request.getDeliveryDate().toString());
+            order.setCustomBoxDetails(tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(customization));
+            order.setDueDate(request.getDeliveryDate() == null ? null : request.getDeliveryDate().atStartOfDay());
             order.setStatus("PENDING");
             order.setOrderType("CUSTOM_BOX");
             order.setTotalAmount(totalAmount);
