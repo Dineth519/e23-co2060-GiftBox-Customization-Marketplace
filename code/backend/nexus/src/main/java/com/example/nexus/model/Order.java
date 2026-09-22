@@ -70,6 +70,24 @@ public class Order {
     @Column(name = "custom_box_details", columnDefinition = "LONGTEXT")
     private String customBoxDetails;
 
+    @Column(name = "issue", columnDefinition = "TEXT")
+    private String issue;
+
+    @Column(name = "assembler_notes", columnDefinition = "TEXT")
+    @JsonProperty("assembler_notes")
+    private String assemblerNotes;
+
+    @Column(name = "receipt_confirmed")
+    @JsonProperty("receipt_confirmed")
+    private Boolean receiptConfirmed;
+
+    @Column(name = "checks")
+    private String checks;
+
+    @Column(name = "due_date")
+    @JsonProperty("due_date")
+    private LocalDateTime dueDate;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
