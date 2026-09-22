@@ -188,7 +188,7 @@ public class OrderController {
             customization.put("deliveryDate", request.getDeliveryDate() == null ? null : request.getDeliveryDate().toString());
             order.setCustomBoxDetails(tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(customization));
             order.setDueDate(request.getDeliveryDate() == null ? null : request.getDeliveryDate().atStartOfDay());
-            order.setStatus("PENDING");
+            order.setStatus("CONFIRMED");
             order.setOrderType("CUSTOM_BOX");
             order.setTotalAmount(totalAmount);
 
