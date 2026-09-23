@@ -63,5 +63,5 @@ export function useAssemblyOrders() {
   return { orders, loading, error, reload };
 }
 export function AssemblyLoadState({ loading, error, reload }) {
-  return <>{loading && <p role="status">Loading assembly orders…</p>}{error && <p role="alert">{error} <button type="button" onClick={reload}>Retry</button></p>}</>;
+  return <>{error && <p role="alert">{error} <button type="button" onClick={reload}>Retry</button></p>}</>;
 }
