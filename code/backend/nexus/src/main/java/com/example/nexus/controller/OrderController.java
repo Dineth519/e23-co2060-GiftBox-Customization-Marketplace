@@ -186,17 +186,23 @@ public class OrderController {
             }
 
             BigDecimal totalAmount = BigDecimal.ZERO;
-            
+            BigDecimal adminRevenue = BigDecimal.ZERO;
+            BigDecimal vendorRevenue = BigDecimal.ZERO;
+            BigDecimal commissionRate = new BigDecimal("0.10");
+            BigDecimal vendorRate = new BigDecimal("0.90");
+
             // Calculate box fee for custom boxes
             if ("CUSTOM_BOX".equals(orderType)) {
                 BigDecimal boxFee = getBoxFee(request.getBoxSize());
                 totalAmount = totalAmount.add(boxFee);
+                // Box fee entirely goes to admin
+                adminRevenue = adminRevenue.add(boxFee);
             }
 
-            // Group items by vendorId
+            // Group items by vendorId for SubOrders
             java.util.Map<Integer, BigDecimal> vendorTotals = new java.util.HashMap<>();
             java.util.Map<Integer, java.util.List<CreateOrderRequest.OrderItemRequest>> itemsByVendor = new java.util.HashMap<>();
-            
+
             for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
                 Product product = productRepository.findById(itemReq.getProductId())
                         .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemReq.getProductId()));
@@ -211,6 +217,10 @@ public class OrderController {
                 
                 vendorTotals.put(product.getVendorId(), vendorTotals.getOrDefault(product.getVendorId(), BigDecimal.ZERO).add(itemSubtotal));
                 itemsByVendor.computeIfAbsent(product.getVendorId(), k -> new java.util.ArrayList<>()).add(itemReq);
+                
+                // Item revenue split
+                adminRevenue = adminRevenue.add(itemSubtotal.multiply(commissionRate));
+                vendorRevenue = vendorRevenue.add(itemSubtotal.multiply(vendorRate));
             }
 
             // Create and save the Parent Order
@@ -219,10 +229,9 @@ public class OrderController {
             order.setVendorId(null); // Parent order is multi-vendor
             order.setDeliveryAddress(request.getDeliveryAddress());
             order.setOrderType(orderType);
-            order.setStatus("PROCESSING");
-            order.setTotalAmount(totalAmount);
-
+            
             if ("CUSTOM_BOX".equals(orderType)) {
+                order.setStatus("CONFIRMED"); // Ensure custom boxes start as CONFIRMED for assembler
                 order.setOccasion(request.getOccasion());
                 order.setBoxSize(request.getBoxSize());
                 order.setGiftMessage(request.getGiftMessage());
@@ -234,9 +243,17 @@ public class OrderController {
                 customization.put("senderName", request.getSenderName());
                 customization.put("hasWaxSeal", request.getHasWaxSeal());
                 customization.put("deliveryDate", request.getDeliveryDate() == null ? null : request.getDeliveryDate().toString());
-                order.setCustomBoxDetails(tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(customization));
+                
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                order.setCustomBoxDetails(mapper.writeValueAsString(customization));
                 order.setDueDate(request.getDeliveryDate() == null ? null : request.getDeliveryDate().atStartOfDay());
+            } else {
+                order.setStatus("PROCESSING");
             }
+
+            order.setTotalAmount(totalAmount);
+            order.setAdminRevenue(adminRevenue);
+            order.setVendorRevenue(vendorRevenue);
 
             Order savedOrder = orderRepository.saveAndFlush(order);
 

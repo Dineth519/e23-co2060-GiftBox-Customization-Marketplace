@@ -95,6 +95,9 @@ const CustomerCart = () => {
             <button className="cart-checkout-btn" onClick={() => setIsCheckoutModalOpen(true)}>
               Proceed to Checkout →
             </button>
+            <button className="cart-checkout-btn cart-build-box-btn" style={{ marginTop: '10px', background: 'transparent', color: '#B8860B', border: '1px solid #B8860B' }} onClick={() => navigate('/customer/build-box')}>
+              🎁 Build a Gift Box Instead
+            </button>
           </div>
         </div>
         )}

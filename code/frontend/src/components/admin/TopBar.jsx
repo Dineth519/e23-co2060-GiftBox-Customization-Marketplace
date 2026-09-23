@@ -49,23 +49,6 @@ const TopBar = () => {
       {/* Right Section: Notifications, Profile & Logout */}
       <div className="topbar-actions">
         
-        {/* Notification Button */}
-        <button className="notification-btn">
-          <Bell className="notification-icon" />
-          <span className="notification-badge"></span>
-        </button>
-        
-        {/* Profile Section */}
-        <div className="profile-section">
-          <div className="profile-info">
-            <span className="profile-name" style={{ textTransform: 'capitalize' }}>{displayName}</span>
-            <span className="profile-role">Administrator</span>
-          </div>
-          <div className="profile-avatar">
-            <User size={18} />
-          </div>
-        </div>
-
       </div>
 
     </header>

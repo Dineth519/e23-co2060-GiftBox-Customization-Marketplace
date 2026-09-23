@@ -133,6 +133,27 @@
   color: var(--ct-gold);
 }
 
+.pf-summary-logout {
+  padding: 9px 20px;
+  background: transparent;
+  border: 1.5px solid rgba(231, 76, 60, 0.3);
+  border-radius: var(--ct-radius-sm);
+  color: #E74C3C;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--ct-font);
+  transition: all var(--ct-transition);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.pf-summary-logout:hover {
+  background: rgba(231, 76, 60, 0.08);
+  border-color: #E74C3C;
+}
+
 /* ── Detail Cards Grid ── */
 .pf-details-grid {
   max-width: 900px;

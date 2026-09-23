@@ -5,24 +5,46 @@ import './Footer.css';
 const Footer = ({ customer = false }) => {
   const navigate = useNavigate();
 
-  const FOOTER_COLS = [
-    { heading: 'Shop',    links: [
-      { label: 'Gift Bundles', path: '/products' },
-      { label: 'Build a Box', path: customer ? '/customer/build-box' : '/build-box' },
-      { label: 'Featured', path: '/products' },
-      { label: 'New Arrivals', path: '/products' }
+  const LANDING_COLS = [
+    { heading: 'Shop', links: [
+      { label: 'Gift Bundles',  path: '/products' },
+      { label: 'Build a Box',   path: '/build-box' },
+      { label: 'New Arrivals',  path: '/products' },
+      { label: 'My Cart',       path: '/cart' },
     ]},
     { heading: 'Vendors', links: [
-      { label: 'Join Giftora', path: '/vendor-register' },
-      { label: 'Vendor Login', path: '/login' },
-      { label: 'Guidelines', path: '/vendor-landing' },
-      { label: 'Benefits', path: '/vendor-landing' }
+      { label: 'Join Giftora',     path: '/vendor-register' },
+      { label: 'Vendor Login',     path: '/login' },
+      { label: 'Vendor Dashboard', path: '/vendor' },
     ]},
     { heading: 'Support', links: [
-      { label: 'About the Project', path: customer ? '/customer/about-us' : '/about-us' },
-      { label: customer ? 'Track My Orders' : 'Sign In to Track Orders', path: customer ? '/customer/orders' : '/login' },
+      { label: 'About the Project', path: '/about-us' },
+      { label: 'Sign In',           path: '/login' },
+      { label: 'Contact Us',        path: '/about-us' },
     ]},
   ];
+
+  const CUSTOMER_COLS = [
+    { heading: 'Shop', links: [
+      { label: 'Gift Bundles',  path: '/customer/home' },
+      { label: 'Build a Box',   path: '/customer/build-box' },
+      { label: 'New Arrivals',  path: '/customer/home' },
+      { label: 'My Cart',       path: '/customer/cart' },
+    ]},
+    { heading: 'My Account', links: [
+      { label: 'My Orders',   path: '/customer/orders' },
+      { label: 'My Profile',  path: '/customer/profile' },
+      { label: 'Settings',    path: '/customer/settings' },
+      { label: 'Checkout',    path: '/customer/checkout' },
+    ]},
+    { heading: 'Support', links: [
+      { label: 'About the Project', path: '/customer/about-us' },
+      { label: 'Contact Us',        path: '/customer/about-us' },
+    ]},
+  ];
+
+  const FOOTER_COLS = customer ? CUSTOMER_COLS : LANDING_COLS;
+
 
   return (
     <footer className="giftora-footer">

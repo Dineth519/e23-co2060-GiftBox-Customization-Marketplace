@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 import './Profile.css';
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
@@ -152,7 +153,19 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          <button className="pf-summary-edit" onClick={() => goToSettings('info')}>Edit</button>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <button className="pf-summary-edit" onClick={() => goToSettings('info')}>Edit</button>
+            <button 
+              className="pf-summary-logout" 
+              onClick={() => {
+                localStorage.clear();
+                navigate('/', { replace: true });
+              }}
+            >
+              <LogOut size={16} style={{ marginRight: '6px' }} />
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* ── DETAIL CARDS ── */}

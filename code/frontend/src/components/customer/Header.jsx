@@ -7,7 +7,7 @@ import './Header.css';
 const Header = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const isWorkspace = pathname.startsWith('/customer/') && pathname !== '/customer/home';
+  const isWorkspace = pathname.startsWith('/customer/');
   const [displayName, setDisplayName] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState(null);
 
@@ -56,6 +56,7 @@ const Header = () => {
       {/* Center — Nav Links */}
       <nav className="customer-nav" aria-label="Customer navigation" style={isWorkspace ? undefined : { display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', marginRight: '32px' }}>
         {[
+          { label: 'Home',            route: '/customer/home' },
           { label: 'Build a Box',      route: '/customer/build-box' },
           { label: 'Orders',           route: '/customer/orders' },
           { label: 'Account Settings', route: '/customer/settings' },
@@ -95,11 +96,7 @@ const Header = () => {
       {/* Right — Notifications, Profile & Exit */}
       <div className="topbar-actions">
         <CartBadge />
-        
-        <button className="notification-btn">
-          <Bell className="notification-icon" size={20} />
-          <span className="notification-badge"></span>
-        </button>
+
 
         <div className="profile-wrapper" style={{ position: 'relative' }}>
           <div className="profile-section" onClick={() => navigate('/customer/profile')} style={{ cursor: 'pointer' }}>
