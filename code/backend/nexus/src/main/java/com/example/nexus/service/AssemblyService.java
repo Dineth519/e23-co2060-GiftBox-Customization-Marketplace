@@ -16,7 +16,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class AssemblyService {
     private final JdbcTemplate db;
     private final JsonMapper json = JsonMapper.builder().build();
-    private static final Set<String> ACTIVE = Set.of("CONFIRMED", "ASSEMBLING", "READY");
+    private static final Set<String> ACTIVE = Set.of("CONFIRMED", "ASSEMBLING", "READY", "DELIVERED");
     private static final List<Boolean> EMPTY_CHECKS = Collections.nCopies(6, false);
 
     public AssemblyService(JdbcTemplate db) { this.db = db; }
@@ -24,7 +24,7 @@ public class AssemblyService {
     public List<Map<String, Object>> list(int assemblerId) {
         // Unassigned confirmed orders form the shared queue. First save claims an order atomically.
         return db.queryForList("SELECT * FROM orders WHERE (assembler_id = ? OR assembler_id IS NULL) " +
-                "AND status IN ('CONFIRMED','ASSEMBLING','READY') ORDER BY due_date IS NULL, due_date, created_at", assemblerId)
+                "AND status IN ('CONFIRMED','ASSEMBLING','READY','DELIVERED') ORDER BY due_date IS NULL, due_date, created_at", assemblerId)
                 .stream().map(this::view).toList();
     }
 
@@ -63,7 +63,7 @@ public class AssemblyService {
         if (revision != change.revision()) throw new ResponseStatusException(HttpStatus.CONFLICT,
                 "This order changed in another session. Reload it before saving again.");
         String previous = str(order.get("assembly_status"));
-        AssemblyRules.require(!"review".equals(previous), "Submitted orders are locked for admin review.");
+        AssemblyRules.require(!"completed".equals(previous), "Completed orders are locked for admin review.");
         List<Map<String, Object>> existingItems = items(id);
         AssemblyRules.require(change.items() != null && !existingItems.isEmpty() && change.items().size() == existingItems.size(),
                 "The receipt must include every order item.");
@@ -94,11 +94,10 @@ public class AssemblyService {
         if ("confirm".equals(change.action())) confirmed = true;
         if (Set.of("report", "resolve").contains(change.action())) confirmed = false;
         String message = switch (change.action()) {
-            case "confirm" -> "All items received and inspected.";
-            case "start" -> "Assembly started.";
+            case "confirm" -> "All items received; assembly started.";
             case "report" -> "Issue reported: " + issue;
             case "resolve" -> "Issue resolved; confirm receipt to continue.";
-            case "submit" -> "Packing and quality checks completed; submitted for admin approval.";
+            case "submit" -> "Assembly and quality checks completed; order is ready for delivery.";
             default -> "Progress saved.";
         };
         List<Object> activity = new ArrayList<>(readList(order.get("assembly_activity")));
@@ -106,14 +105,14 @@ public class AssemblyService {
         for (AssemblyRules.Item item : change.items()) db.update(
                 "UPDATE order_items SET received_quantity = ?, received_condition = ? WHERE id = ? AND order_id = ?",
                 item.received(), item.condition(), item.id(), id);
-        // READY means assembled and waiting for the administrator, never delivered.
-        String lifecycle = "review".equals(next) ? "READY" : "assembling".equals(next) ? "ASSEMBLING" : "CONFIRMED";
+        // DELIVERED means assembled and directly marked as delivered, skipping admin approval.
+        String lifecycle = "completed".equals(next) ? "DELIVERED" : "assembling".equals(next) ? "ASSEMBLING" : "CONFIRMED";
         db.update("INSERT IGNORE INTO assemblers (assembler_id, full_name, phone_number) VALUES (?, 'Assembler', '000')", assemblerId);
         db.update("UPDATE orders SET assembler_id = ?, assembly_status = ?, receipt_confirmed = ?, `checks` = ?, " +
                         "assembler_notes = ?, issue = ?, assembly_activity = ?, assembly_revision = assembly_revision + 1, " +
                         "assembly_submitted_at = ?, status = ? WHERE order_id = ?",
                 assemblerId, next, confirmed, json.writeValueAsString(checks), change.notes(), issue,
-                json.writeValueAsString(activity), "review".equals(next) ? Timestamp.valueOf(LocalDateTime.now()) : null, lifecycle, id);
+                json.writeValueAsString(activity), "completed".equals(next) ? Timestamp.valueOf(LocalDateTime.now()) : null, lifecycle, id);
         return get(id, assemblerId);
     }
 
