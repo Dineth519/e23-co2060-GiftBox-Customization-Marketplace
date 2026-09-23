@@ -104,7 +104,10 @@ const trackingSteps = [
 // Colour coding for the status badge — same as Orders.jsx
 const statusConfig = {
   'Pending':          { color: '#EF9F27', bg: 'rgba(239,159,39,0.1)'  },
+  'CONFIRMED':        { color: '#EF9F27', bg: 'rgba(239,159,39,0.1)'  },
   'Processing':       { color: '#378ADD', bg: 'rgba(55,138,221,0.1)'  },
+  'ASSEMBLING':       { color: '#378ADD', bg: 'rgba(55,138,221,0.1)'  },
+  'READY':            { color: '#378ADD', bg: 'rgba(55,138,221,0.1)'  },
   'Out for Delivery': { color: '#7F77DD', bg: 'rgba(127,119,221,0.1)' },
   'Delivered':        { color: '#1D9E75', bg: 'rgba(29,158,117,0.1)'  },
   'Cancelled':        { color: '#E24B4A', bg: 'rgba(226,75,74,0.1)'   },
@@ -163,9 +166,17 @@ export default function OrderDetail() {
   }, [orderId]); // re-runs if orderId in URL changes
 
   // ── Helper: which step index is currently active ──────────────────────────
-  // Returns 0 for Pending, 1 for Processing, 2 for Out for Delivery, 3 for Delivered
+  // Returns 0 for Pending, 1 for Processing/Assembling, 2 for Out for Delivery, 3 for Delivered
   function getActiveStep(status) {
-    const index = trackingSteps.findIndex((s) => s.key === status);
+    if (!status) return 0;
+    const s = status.toUpperCase();
+    if (s === 'PENDING' || s === 'CONFIRMED') return 0;
+    if (s === 'PROCESSING' || s === 'ASSEMBLING' || s === 'READY') return 1;
+    if (s === 'OUT FOR DELIVERY' || s === 'DISPATCHED') return 2;
+    if (s === 'DELIVERED') return 3;
+    
+    // Fallback to old behavior
+    const index = trackingSteps.findIndex((step) => step.key.toUpperCase() === s);
     return index === -1 ? 0 : index;
   }
 
