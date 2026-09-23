@@ -44,6 +44,14 @@ public class Order {
     @JsonProperty("total_amount")
     private BigDecimal totalAmount;
 
+    @Column(name = "admin_revenue")
+    @JsonProperty("admin_revenue")
+    private BigDecimal adminRevenue;
+
+    @Column(name = "vendor_revenue")
+    @JsonProperty("vendor_revenue")
+    private BigDecimal vendorRevenue;
+
     @Column(name = "occasion")
     private String occasion;
 

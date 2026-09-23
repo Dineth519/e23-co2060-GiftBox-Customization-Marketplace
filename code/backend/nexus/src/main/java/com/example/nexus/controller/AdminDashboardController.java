@@ -26,25 +26,25 @@ public class AdminDashboardController {
                 "SELECT COUNT(*) FROM users WHERE role = 'CUSTOMER'", Integer.class);
             response.put("totalCustomers", totalCustomers != null ? totalCustomers : 0);
 
-            // 2. Gift Boxes Created Count
-            Integer giftBoxesCreated = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM gift_boxes", Integer.class);
-            response.put("giftBoxesCreated", giftBoxesCreated != null ? giftBoxesCreated : 0);
+            // 2. Total Vendors Count
+            Integer totalVendors = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM vendors", Integer.class);
+            response.put("totalVendors", totalVendors != null ? totalVendors : 0);
 
             // 3. Orders Today / Total Orders Count
             Integer totalOrders = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM orders", Integer.class);
             response.put("totalOrders", totalOrders != null ? totalOrders : 0);
 
-            // 4. Total Revenue (LKR)
+            // 4. Total Admin Revenue (LKR)
             Double totalRevenue = jdbcTemplate.queryForObject(
-                "SELECT COALESCE(SUM(total_amount), 0) FROM orders", Double.class);
+                "SELECT COALESCE(SUM(admin_revenue), 0) FROM orders", Double.class);
             response.put("totalRevenue", totalRevenue != null ? totalRevenue : 0.0);
 
-            // 5. Recent Orders (Latest 5 orders)
+            // 5. Recent Orders
             List<Map<String, Object>> recentOrders = jdbcTemplate.queryForList(
                 "SELECT order_id AS orderId, recipient_name AS recipientName, wrapping_style AS wrapStyle, status, total_amount AS totalAmount, created_at AS createdAt " +
-                "FROM orders ORDER BY order_id DESC LIMIT 5"
+                "FROM orders ORDER BY order_id DESC LIMIT 10"
             );
             response.put("recentOrders", recentOrders);
 
@@ -54,7 +54,7 @@ public class AdminDashboardController {
                 "FROM vendors v " +
                 "LEFT JOIN products p ON v.vendor_id = p.vendor_id " +
                 "GROUP BY v.vendor_id, v.shop_name " +
-                "ORDER BY productCount DESC LIMIT 5"
+                "ORDER BY productCount DESC LIMIT 10"
             );
             response.put("topVendors", topVendors);
 
@@ -64,12 +64,20 @@ public class AdminDashboardController {
             );
             response.put("orderStatusDistribution", orderStatusDistribution);
 
-            // 8. Monthly Revenue (For Bar Chart) - Last 6 months
+            // 8. Monthly Revenue and Orders (For Bar/Area Charts) - Last 6 months
             List<Map<String, Object>> monthlyRevenue = jdbcTemplate.queryForList(
-                "SELECT DATE_FORMAT(created_at, '%b') AS month, COALESCE(SUM(total_amount), 0) AS revenue " +
+                "SELECT DATE_FORMAT(created_at, '%b') AS month, COALESCE(SUM(admin_revenue), 0) AS revenue, COUNT(order_id) AS orderCount " +
                 "FROM orders GROUP BY DATE_FORMAT(created_at, '%b'), DATE_FORMAT(created_at, '%Y-%m') ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC LIMIT 6"
             );
             response.put("monthlyRevenue", monthlyRevenue);
+
+            // 9. Weekly Revenue (For Line Chart) - Last 7 Days (Admin Revenue)
+            List<Map<String, Object>> weeklyRevenue = jdbcTemplate.queryForList(
+                "SELECT DATE_FORMAT(created_at, '%W') AS day, COALESCE(SUM(admin_revenue), 0) AS revenue " +
+                "FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " +
+                "GROUP BY DATE_FORMAT(created_at, '%W'), DATE(created_at) ORDER BY DATE(created_at) ASC"
+            );
+            response.put("weeklyRevenue", weeklyRevenue);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {

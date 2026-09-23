@@ -150,10 +150,17 @@ public class OrderController {
             }
 
             BigDecimal totalAmount = BigDecimal.ZERO;
+            BigDecimal adminRevenue = BigDecimal.ZERO;
+            BigDecimal vendorRevenue = BigDecimal.ZERO;
+            BigDecimal commissionRate = new BigDecimal("0.10");
+            BigDecimal vendorRate = new BigDecimal("0.90");
 
             // Calculate box fee
             BigDecimal boxFee = getBoxFee(request.getBoxSize());
             totalAmount = totalAmount.add(boxFee);
+            
+            // Box fee entirely goes to admin
+            adminRevenue = adminRevenue.add(boxFee);
 
             // Fetch products and calculate total items price, check stock
             for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
@@ -167,6 +174,10 @@ public class OrderController {
 
                 BigDecimal itemSubtotal = product.getPrice().multiply(new BigDecimal(itemReq.getQuantity()));
                 totalAmount = totalAmount.add(itemSubtotal);
+                
+                // Item revenue split
+                adminRevenue = adminRevenue.add(itemSubtotal.multiply(commissionRate));
+                vendorRevenue = vendorRevenue.add(itemSubtotal.multiply(vendorRate));
             }
 
             // Create and save the Order
@@ -188,9 +199,11 @@ public class OrderController {
             customization.put("deliveryDate", request.getDeliveryDate() == null ? null : request.getDeliveryDate().toString());
             order.setCustomBoxDetails(tools.jackson.databind.json.JsonMapper.builder().build().writeValueAsString(customization));
             order.setDueDate(request.getDeliveryDate() == null ? null : request.getDeliveryDate().atStartOfDay());
-            order.setStatus("PENDING");
+            order.setStatus("CONFIRMED"); // Ensure custom boxes start as CONFIRMED for assembler
             order.setOrderType("CUSTOM_BOX");
             order.setTotalAmount(totalAmount);
+            order.setAdminRevenue(adminRevenue);
+            order.setVendorRevenue(vendorRevenue);
 
             Order savedOrder = orderRepository.saveAndFlush(order);
 
@@ -271,10 +284,17 @@ public class OrderController {
                 java.util.List<CreateOrderRequest.OrderItemRequest> vendorItems = entry.getValue();
 
                 BigDecimal totalAmount = BigDecimal.ZERO;
+                BigDecimal adminRevenue = BigDecimal.ZERO;
+                BigDecimal vendorRevenue = BigDecimal.ZERO;
+                BigDecimal commissionRate = new BigDecimal("0.10");
+                BigDecimal vendorRate = new BigDecimal("0.90");
+
                 for (CreateOrderRequest.OrderItemRequest itemReq : vendorItems) {
                     Product product = productRepository.findById(itemReq.getProductId()).get();
                     BigDecimal itemSubtotal = product.getPrice().multiply(new BigDecimal(itemReq.getQuantity()));
                     totalAmount = totalAmount.add(itemSubtotal);
+                    adminRevenue = adminRevenue.add(itemSubtotal.multiply(commissionRate));
+                    vendorRevenue = vendorRevenue.add(itemSubtotal.multiply(vendorRate));
                 }
 
                 Order order = new Order();
@@ -284,6 +304,8 @@ public class OrderController {
                 order.setStatus("PENDING");
                 order.setOrderType("STANDARD");
                 order.setTotalAmount(totalAmount);
+                order.setAdminRevenue(adminRevenue);
+                order.setVendorRevenue(vendorRevenue);
 
                 Order savedOrder = orderRepository.saveAndFlush(order);
 
