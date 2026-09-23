@@ -49,13 +49,6 @@ const TopBar = () => {
       {/* Right Section: Notifications, Profile & Logout */}
       <div className="topbar-actions">
         
-        {/* Notification Button */}
-        <button className="notification-btn">
-          <Bell className="notification-icon" />
-          <span className="notification-badge"></span>
-        </button>
-
-
       </div>
 
     </header>

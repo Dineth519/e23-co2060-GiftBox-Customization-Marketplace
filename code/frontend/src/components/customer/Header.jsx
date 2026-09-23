@@ -96,11 +96,7 @@ const Header = () => {
       {/* Right — Notifications, Profile & Exit */}
       <div className="topbar-actions">
         <CartBadge />
-        
-        <button className="notification-btn">
-          <Bell className="notification-icon" size={20} />
-          <span className="notification-badge"></span>
-        </button>
+
 
         <div className="profile-wrapper" style={{ position: 'relative' }}>
           <div className="profile-section" onClick={() => navigate('/customer/profile')} style={{ cursor: 'pointer' }}>

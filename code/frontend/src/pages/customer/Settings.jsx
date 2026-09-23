@@ -253,17 +253,6 @@ export default function Settings() {
         
         <div className="st-tab-divider" style={{ height: '1px', background: '#E5E7EB', margin: '16px 0' }}></div>
         
-        <button
-          className="st-tab st-tab-logout"
-          onClick={() => {
-            localStorage.clear();
-            navigate('/', { replace: true });
-          }}
-          style={{ color: '#EF4444' }}
-        >
-          <span className="st-tab-icon">🚪</span>
-          Sign out
-        </button>
       </div>
 
       {/* ── TAB CONTENT ── */}
