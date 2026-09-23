@@ -32,10 +32,11 @@ const Header = () => {
         <button className="public-menu-toggle" aria-label="Toggle navigation" aria-expanded={menuOpen} aria-controls="public-navigation" onClick={() => setMenuOpen(!menuOpen)}>Menu</button>
         <nav id="public-navigation" className={`header-nav ${menuOpen ? 'public-nav-open' : ''}`} onKeyDown={event => { if (event.key === 'Escape') setMenuOpen(false); }}>
           {[
+            { label: 'Home',        route: '/' },
             { label: 'Products',    route: '/products' },
-            { label: 'About Us',    route: '/about-us' },
             { label: 'Build a Box', route: '/build-box' },
             { label: 'Join as Vendor', route: '/vendor-landing' },
+            { label: 'About Us',    route: '/about-us' },
           ].map(item => (
             <button
               key={item.label}
