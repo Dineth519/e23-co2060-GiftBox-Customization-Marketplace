@@ -118,21 +118,27 @@
 
 .header-btn-gold {
   padding: 10px 22px;
-  background: linear-gradient(135deg, var(--gold), var(--gold-light));
-  color: white;
+  background: #C9A961;
+  color: #101B2B;
   font-size: 14px;
   font-weight: 600;
   border-radius: 50px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(201, 169, 97, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
   transition: all 0.3s var(--ease-out);
   font-family: var(--font-body);
 }
 
 .header-btn-gold:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(201, 169, 97, 0.55);
+  background: #D5B775;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.header-btn-gold:focus-visible {
+  outline: 2px solid #D5B775;
+  outline-offset: 4px;
 }
 
 /* Responsive */

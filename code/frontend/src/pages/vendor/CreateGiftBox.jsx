@@ -32,7 +32,7 @@ const CreateGiftBox = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const res = await fetch(`${API_BASE}/vendors/${sellerId}/items`, {
+        const res = await fetch(`${API_BASE}/vendors/${sellerId}/products`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
         });
         if (res.ok) {

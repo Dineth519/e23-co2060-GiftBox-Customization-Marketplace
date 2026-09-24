@@ -4,6 +4,7 @@ export function filterVendorOrders(orders, status = 'All', search = '') {
     const matchesStatus = status === 'All' || order.status === status;
     const matchesSearch = !query
       || String(order.order_id).includes(query)
+      || (order.customer_name || '').toLowerCase().includes(query)
       || (order.delivery_address || '').toLowerCase().includes(query);
     return matchesStatus && matchesSearch;
   });
@@ -23,3 +24,11 @@ export function vendorOrderStats(orders) {
 export const canVendorSetOrderStatus = (currentStatus, newStatus) =>
   currentStatus === 'PENDING_VENDOR_ACCEPTANCE' && ['ACCEPTED_BY_VENDOR', 'REJECTED'].includes(newStatus)
   || currentStatus === 'ACCEPTED_BY_VENDOR' && newStatus === 'SENT_TO_ASSEMBLY';
+
+export function resolveVendorOrderImageUrl(imageUrl, apiBase = process.env.REACT_APP_API_URL || '') {
+  if (!imageUrl) return '';
+  if (/^(https?:)?\/\//i.test(imageUrl) || /^(data|blob):/i.test(imageUrl)) return imageUrl;
+
+  const base = apiBase.replace(/\/$/, '');
+  return `${base}/${imageUrl.replace(/^\//, '')}`;
+}

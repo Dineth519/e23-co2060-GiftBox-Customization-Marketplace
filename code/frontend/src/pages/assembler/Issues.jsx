@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, ArrowRight, CircleCheck, Search, SearchX, RefreshCw } from 'lucide-react';
 import { useAssemblyOrders, AssemblyLoadState } from './assemblyApi';
-import { filterOrders, STATUS } from './overviewData';
+import { filterOrders, STATUS, hasAssemblyIssue } from './overviewData';
 import './Issues.css';
 
 export default function AssemblerIssues() {
@@ -10,12 +10,7 @@ export default function AssemblerIssues() {
   const [query, setQuery] = useState('');
   
   // An order is an issue if it's explicitly on hold, has an issue text, or has damaged/incorrect items
-  const issues = orders.filter(order => {
-    const hasBadItems = order.workspace?.items?.some(item => 
-      item.condition === 'damaged' || item.condition === 'incorrect'
-    );
-    return order.status === 'hold' || order.issue?.trim() || hasBadItems;
-  });
+  const issues = orders.filter(hasAssemblyIssue);
   
   const visible = filterOrders(issues, 'all', query);
   const held = issues.filter(order => order.status === 'hold').length;

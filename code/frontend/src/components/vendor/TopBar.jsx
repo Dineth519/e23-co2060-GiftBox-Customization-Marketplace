@@ -70,30 +70,6 @@ const TopBar = () => {
           </div>
         </div>
 
-        {/* Logout Button */}
-        <button 
-          className="logout-btn" 
-          onClick={handleLogout}
-          title="Logout"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(231, 76, 60, 0.1)',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '8px',
-            cursor: 'pointer',
-            color: '#E74C3C',
-            marginLeft: '8px',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.2)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.1)'}
-        >
-          <LogOut size={20} />
-        </button>
-
       </div>
 
     </header>

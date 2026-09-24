@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import AssemblerProfile from '../../pages/assembler/Profile';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Gift, House, List, TriangleAlert, CircleCheck, BookOpen, LogOut } from 'lucide-react';
 import './AssemblerSidebar.css';
@@ -13,6 +14,7 @@ const links = [
 
 export default function AssemblerSidebar() {
     const navigate = useNavigate();
+    const [profileOpen, setProfileOpen] = useState(false);
     const username = localStorage.getItem('username')?.trim() || 'Assembler';
     const handleLogout = () => {
         if (!window.confirm('Are you sure you want to log out?')) return;
@@ -34,12 +36,13 @@ export default function AssemblerSidebar() {
                 ))}
             </nav>
             <div className="asm-sidebar-footer">
-                <div className="asm-profile">
+                <button type="button" aria-label="View my profile" aria-haspopup="dialog" onClick={() => setProfileOpen(true)} className="asm-profile">
                     <span className="asm-avatar" aria-hidden="true">{Array.from(username)[0].toUpperCase()}</span>
                     <div className="asm-profile-details"><span className="asm-profile-name" title={username}>{username}</span><span className="asm-profile-role">Assembler</span></div>
-                </div>
+                </button>
                 <button type="button" className="asm-logout" onClick={handleLogout}><LogOut size={20} aria-hidden="true" /><span>Logout</span></button>
             </div>
+            {profileOpen && <AssemblerProfile isOpen onClose={() => setProfileOpen(false)} />}
         </aside>
     );
 }

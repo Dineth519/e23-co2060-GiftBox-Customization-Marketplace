@@ -18,11 +18,7 @@ import landingPage2Img from '../../assets/landingpage/gift-recipient-v2.png';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const FEATURES = [
-  { icon: '🎨', title: 'Fully Custom',   desc: 'Build your own box from scratch' },
-  { icon: '🚀', title: 'Fast Delivery',  desc: 'Explore our gifting workflow'     },
-  { icon: '💝', title: 'Luxury Packing', desc: 'Premium gift wrapping included'  },
-];
+
 
 const TESTIMONIALS = [
   { name: 'Priya M.',       location: 'Colombo',   quote: 'Absolutely stunning gift box. My friend was in tears — the packaging alone felt like unwrapping a treasure.',    stars: 5, initial: 'P' },
@@ -31,11 +27,7 @@ const TESTIMONIALS = [
   { name: 'Dinesh K.',      location: 'Negombo',   quote: "Third time ordering — never disappointed. Giftora has ruined every other gift shop for me. The gold ribbon is *chef's kiss*.",  stars: 5, initial: 'D' },
 ];
 
-const STATS = [
-  { value: 'Mix', label: 'Products from multiple vendors' },
-  { value: 'Create', label: 'A personalized gift box' },
-  { value: 'Explore', label: 'Student project demo' },
-];
+
 
 // ─── NEW DATA ─────────────────────────────────────────────────────────────────
 
@@ -305,7 +297,6 @@ function CountdownTimer({ expiry }) {
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 const HeroSection = () => {
-  const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setTimeout(() => setMounted(true), 80); }, []);
@@ -313,13 +304,8 @@ const HeroSection = () => {
 
   return (
     <section className="hero">
-      <div className="hero-video-overlay" />
 
-      {/* Ambient orbs — always visible, more visible if no video */}
-      <div className="hero-orb hero-orb--gold hero-orb--prominent" />
-      <div className="hero-orb hero-orb--blue hero-orb--prominent" />
-      <div className="hero-orb hero-orb--mid" />
-      <div className="hero-grain" />
+
 
 
 
@@ -327,66 +313,25 @@ const HeroSection = () => {
         {/* ── Left content ── */}
         <div className="hero__content">
           <div className="hero__eyebrow">
-            <span className="eyebrow-dot" />
-            <span>Build a Gift Box with Giftora</span>
+            <span>Little things. Chosen by you.</span>
           </div>
 
           <h1 className="hero__title">
-            Curate the <br />
-            <span className="hero__title-accent">Perfect Gift</span>
+            A gift that’s <br />
+            <span className="hero__title-accent">so very them.</span>
           </h1>
 
           <p className="hero__subtitle">
-            Choose items from multiple vendors and we'll hand-pack them into one
-            luxury gift box — delivered with love, island-wide.
+            Choose the gifts, wrapping, and words that feel right for them.
+            We’ll bring it together.
           </p>
 
-          <div className="hero__cta-group">
-            <button className="btn-hero-primary" onClick={() => navigate('/build-box')}>
-              <span className="btn-icon">🎁</span>
-              <span>Start Customizing</span>
-              <span className="btn-arrow">→</span>
-            </button>
-            <button className="btn-hero-secondary" onClick={() => navigate('/products')}>
-              Browse Gifts
-            </button>
-          </div>
 
-          <div className="hero__stats">
-            {STATS.map((s, i) => (
-              <div className="hero__stat" key={i}>
-                <div className="hero__stat-value">{s.value}</div>
-                <div className="hero__stat-label">{s.label}</div>
-              </div>
-            ))}
-          </div>
+
+
         </div>
 
-        {/* ── Right cards ── */}
-        <div className="hero__cards">
-          {FEATURES.map((f, i) => (
-            <button key={i} className="hero__feature-card" style={{ animationDelay: `${0.1 + i * 0.12}s` }}>
-              <div className="hero__feature-icon">{f.icon}</div>
-              <div className="hero__feature-body">
-                <div className="hero__feature-title">{f.title}</div>
-                <div className="hero__feature-desc">{f.desc}</div>
-              </div>
-              <span className="hero__feature-arrow">→</span>
-            </button>
-          ))}
 
-          <div className="hero__vendor-card">
-            <div className="vendor-card__glow" />
-            <div className="hero__vendor-icon">🏪</div>
-            <div className="hero__vendor-title">Are you a Vendor?</div>
-            <div className="hero__vendor-desc">
-              Join our marketplace and reach thousands of customers island-wide.
-            </div>
-            <button className="btn-vendor-join" onClick={() => navigate('/vendor-landing')}>
-              Join With Us →
-            </button>
-          </div>
-        </div>
       </div>
     </section>
   );

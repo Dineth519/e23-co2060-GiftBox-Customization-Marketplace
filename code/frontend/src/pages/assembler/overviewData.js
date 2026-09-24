@@ -6,6 +6,10 @@ export const STATUS = {
   completed: { label: 'Completed', tone: 'teal' },
   hold: { label: 'On hold', tone: 'red' },
 };
+export function hasAssemblyIssue(order) {
+  return Boolean(order.status === 'hold' || order.issue?.trim() ||
+    order.workspace?.items?.some(item => ['damaged', 'incorrect'].includes(item.condition)));
+}
 export function filterOrders(orders, status, query) {
   const search = query.trim().toLowerCase().replace(/^#/, '');
   return orders.filter(order => (status === 'all' || order.status === status) && order.id.toLowerCase().includes(search));

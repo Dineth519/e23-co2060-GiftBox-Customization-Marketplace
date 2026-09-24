@@ -56,9 +56,29 @@ public class OrderController {
             item.put("order_id", order.getOrderId());
             item.put("vendor_id", subOrder.getVendorId());
             item.put("status", subOrder.getStatus());
-            item.put("vendor_total", subOrder.getVendorTotal());
-            item.put("total_amount", subOrder.getVendorTotal());
-            item.put("delivery_address", order.getDeliveryAddress());
+            item.put("vendor_total", subOrder.getVendorTotal().multiply(new java.math.BigDecimal("0.9")));
+            item.put("total_amount", subOrder.getVendorTotal().multiply(new java.math.BigDecimal("0.9")));
+            String customerName = "Unknown";
+            if (order.getCustomerId() != null) {
+                com.example.nexus.model.User u = userRepository.findById(order.getCustomerId()).orElse(null);
+                if (u != null) customerName = u.getName();
+            }
+
+            List<Map<String, Object>> itemsList = orderItemRepository.findByOrderId(order.getOrderId()).stream()
+                .filter(oi -> {
+                    Product p = productRepository.findById(oi.getProductId()).orElse(null);
+                    return p != null && p.getVendorId().equals(subOrder.getVendorId());
+                }).map(oi -> {
+                    Product p = productRepository.findById(oi.getProductId()).orElse(null);
+                    Map<String, Object> i = new java.util.HashMap<>();
+                    i.put("quantity", oi.getQuantity());
+                    i.put("name", p != null ? p.getName() : "Unknown");
+                    i.put("imageUrl", p != null ? p.getImageUrl() : null);
+                    return i;
+                }).toList();
+
+            item.put("customer_name", customerName);
+            item.put("items", itemsList);
             item.put("special_notes", order.getSpecialNotes());
             item.put("created_at", subOrder.getCreatedAt());
             return item;
@@ -164,14 +184,21 @@ public class OrderController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Internal helper to update parent order status
+    // Make the order available to assemblers as soon as one vendor accepts it.
+    // This keeps a multi-vendor order from being blocked by vendors that have not
+    // yet responded. The assembler workflow itself changes CONFIRMED to ASSEMBLING.
     private void checkParentOrderStatus(Order order) {
         List<SubOrder> subs = subOrderRepository.findByOrder_OrderId(order.getOrderId());
-        boolean allResolved = !subs.isEmpty() && subs.stream().allMatch(sub ->
-                Set.of("SENT_TO_ASSEMBLY", "REJECTED").contains(sub.getStatus()));
-        boolean anySent = subs.stream().anyMatch(sub -> "SENT_TO_ASSEMBLY".equals(sub.getStatus()));
-        if (allResolved) {
-            order.setStatus(anySent ? "ASSEMBLING" : "CANCELLED");
+        boolean anyAccepted = subs.stream().anyMatch(sub ->
+                Set.of("ACCEPTED_BY_VENDOR", "SENT_TO_ASSEMBLY").contains(sub.getStatus()));
+        boolean allRejected = !subs.isEmpty()
+                && subs.stream().allMatch(sub -> "REJECTED".equals(sub.getStatus()));
+
+        if ("PENDING".equals(order.getStatus()) && anyAccepted) {
+            order.setStatus("CONFIRMED");
+            orderRepository.save(order);
+        } else if ("PENDING".equals(order.getStatus()) && allRejected) {
+            order.setStatus("CANCELLED");
             orderRepository.save(order);
         }
     }

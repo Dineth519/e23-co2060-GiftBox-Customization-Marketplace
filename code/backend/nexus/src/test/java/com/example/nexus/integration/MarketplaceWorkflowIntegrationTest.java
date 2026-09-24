@@ -183,11 +183,17 @@ class MarketplaceWorkflowIntegrationTest {
                         .header("Authorization", bearer(vendorToken))
                         .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"ACCEPTED_BY_VENDOR\"}"))
                 .andExpect(status().isOk());
+        assertEquals("CONFIRMED", orders.findById(orderId).orElseThrow().getStatus());
+        mvc.perform(get("/api/assembler/orders")
+                        .header("Authorization", bearer(assemblerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(String.valueOf(orderId)));
+
         mvc.perform(put("/api/sub-orders/{id}/status", subOrderId)
                         .header("Authorization", bearer(vendorToken))
                         .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"SENT_TO_ASSEMBLY\"}"))
                 .andExpect(status().isOk());
-        assertEquals("ASSEMBLING", orders.findById(orderId).orElseThrow().getStatus());
+        assertEquals("CONFIRMED", orders.findById(orderId).orElseThrow().getStatus());
 
         int orderItemId = orderItems.findByOrderId(orderId).get(0).getId();
         mvc.perform(put("/api/assembler/orders/{id}", orderId)

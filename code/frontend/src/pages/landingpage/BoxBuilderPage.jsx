@@ -11,11 +11,14 @@ const getProdId = (p) => p?.productId ?? p?.id ?? p?._id;
 
 // Master Static Data Definitions
 const OCCASIONS = [
-  { id: 'Birthday', icon: '🎂', label: 'Birthday', desc: 'Celebrate another trip around the sun' },
-  { id: 'Anniversary', icon: '💑', label: 'Anniversary', desc: 'Commemorate cherished milestones' },
-  { id: 'Wedding', icon: '💍', label: 'Wedding', desc: 'Elegant keepsakes for the newly married' },
-  { id: 'Corporate', icon: '💼', label: 'Corporate', desc: 'Professional appreciation & VIP gifts' },
-  { id: 'Just Because', icon: '🌸', label: 'Just Because', desc: 'Thoughtful surprises for any day' }
+  { id: 'Birthday', icon: '', label: 'Birthday', desc: 'Celebrate another trip around the sun' },
+  { id: 'Anniversary', icon: '', label: 'Anniversary', desc: 'Commemorate cherished milestones' },
+  { id: 'Wedding', icon: '', label: 'Wedding', desc: 'Elegant keepsakes for the newly married' },
+  { id: 'Corporate', icon: '', label: 'Corporate', desc: 'Professional appreciation & VIP gifts' },
+  { id: 'Just Because', icon: '', label: 'Just Because', desc: 'Thoughtful surprises for any day' },
+  { id: 'Graduation', icon: '', label: 'Graduation', desc: 'Celebrate academic achievements' },
+  { id: 'Baby Shower', icon: '', label: 'Baby Shower', desc: 'Welcome the newest little one' },
+  { id: 'Housewarming', icon: '', label: 'Housewarming', desc: 'Settle into a new cozy home' }
 ];
 
 const BOX_SIZES = [

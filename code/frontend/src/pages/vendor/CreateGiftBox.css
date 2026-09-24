@@ -1,7 +1,7 @@
 /* Container styling with theme beige background */
 .cgb-container {
   padding: 30px;
-  background-color: #f6f1ea;
+  background-color: #F6F1EA;
   min-height: 100vh;
   box-sizing: border-box;
   font-family: inherit;
@@ -42,14 +42,14 @@
 
 .cgb-title-wrap h2 {
   margin: 0 0 4px 0;
-  font-size: 1.4rem;
+  font-size: 24px;
   font-weight: 700;
   color: #1a2340;
 }
 
 .cgb-title-wrap p {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 14px;
   color: #8c7f6b;
 }
 
