@@ -4,6 +4,7 @@ import { Package, Box, Settings, CircleCheck, Clock, TriangleAlert, Search, Arro
 import { STATUS, selectQueueOrders } from './overviewData';
 import './Dashboard.css';
 import { useAssemblyOrders, AssemblyLoadState } from './assemblyApi';
+import { getMonthlyOutput } from './monthlyOutput';
 
 const metrics = [
   { status: 'awaiting', icon: Package, hint: 'Waiting for vendor deliveries' },
@@ -36,6 +37,7 @@ export default function AssemblerDashboard({ queueMode = false }) {
   const navigate = useNavigate();
   const { orders: allOrders, loading, error, reload } = useAssemblyOrders();
   const liveOrders = allOrders;
+  const monthlyOutput = getMonthlyOutput(liveOrders);
   const orders = selectQueueOrders(liveOrders, { status, query, box, due, sort });
   const onHold = liveOrders.filter(order => order.status === 'hold').length;
   const attention = liveOrders.filter(order => order.issue || order.status === 'hold' || (order.status === 'awaiting' && ['Today', 'Overdue'].includes(order.due)));
@@ -112,17 +114,17 @@ export default function AssemblerDashboard({ queueMode = false }) {
           </div>
         </section>
         <section className="ao-summary-panel" aria-labelledby="ao-graph-title" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div className="ao-summary-heading"><div><span className="ao-eyebrow">Performance</span><h2 id="ao-graph-title">Monthly Output</h2></div><span style={{ fontSize: '13px', color: '#10b981', fontWeight: 'bold', background: '#ecfdf5', padding: '4px 8px', borderRadius: '12px' }}>+31%</span></div>
-          <p className="ao-summary-intro">Boxes fully assembled and delivered.</p>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', padding: '32px 16px 8px', gap: '12px' }}>
-            {[
-              { month: 'Apr', val: 142 }, { month: 'May', val: 185 }, { month: 'Jun', val: 160 },
-              { month: 'Jul', val: 210 }, { month: 'Aug', val: 265 }, { month: 'Sep', val: 348 }
-            ].map((d, i, arr) => {
-              const max = Math.max(...arr.map(x => x.val));
+          <div className="ao-summary-heading"><div><span className="ao-eyebrow">Performance</span><h2 id="ao-graph-title">Monthly Output</h2></div></div>
+          <p className="ao-summary-intro">Completed assemblies by submission month · Last 6 months.</p>
+          {loading ? <p role="status">Loading monthly output…</p> : error ? <p role="status">Monthly output is unavailable. Use Retry above to reload.</p> : <>
+          {monthlyOutput.months.every(month => month.val === 0) && <p role="status">No dated assembly completions in the last six months.</p>}
+          {monthlyOutput.undated > 0 && <p role="status">{monthlyOutput.undated} completed {monthlyOutput.undated === 1 ? 'assembly has' : 'assemblies have'} no submission date and {monthlyOutput.undated === 1 ? 'is' : 'are'} excluded.</p>}
+          <div role="list" aria-label="Completed assemblies by month" style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', padding: '32px 16px 8px', gap: '12px' }}>
+            {monthlyOutput.months.map((d, i, arr) => {
+              const max = Math.max(1, ...arr.map(x => x.val));
               const height = (d.val / max) * 100;
               return (
-                <div key={d.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                <div key={d.key} role="listitem" aria-label={`${d.label}: ${d.val} completed assemblies`} title={`${d.label}: ${d.val}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                   <div style={{ width: '100%', height: '140px', display: 'flex', alignItems: 'flex-end', position: 'relative' }}>
                     <div style={{ width: '100%', maxWidth: '36px', margin: '0 auto', height: `${height}%`, backgroundColor: i === arr.length - 1 ? '#10b981' : '#d1fae5', borderRadius: '6px 6px 0 0', position: 'relative' }}>
                        <span style={{ position: 'absolute', top: '-24px', left: '50%', transform: 'translateX(-50%)', fontSize: '12px', color: i === arr.length - 1 ? '#047857' : '#9ca3af', fontWeight: 'bold' }}>{d.val}</span>
@@ -133,6 +135,7 @@ export default function AssemblerDashboard({ queueMode = false }) {
               );
             })}
           </div>
+          </>}
         </section>
         <section className="ao-quick-links" aria-label="Quick links"><Link to="/assembler/queue"><span><strong>Open Order Queue</strong><small>Search and manage the complete work list</small></span><ArrowRight size={20} aria-hidden="true" /></Link><Link to="/assembler/packing-guide"><span><strong>Packing Guide</strong><small>Preparation standards and quality checks</small></span><BookOpen size={20} aria-hidden="true" /></Link></section>
       </div>}
