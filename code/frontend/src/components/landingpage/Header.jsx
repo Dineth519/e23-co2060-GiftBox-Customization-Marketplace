@@ -66,7 +66,7 @@ const Header = () => {
             className="header-btn-gold"
             onClick={() => navigate('/build-box')}
           >
-            🎀 Start Building
+            Start Building
           </button>
         </div>
       </div>
