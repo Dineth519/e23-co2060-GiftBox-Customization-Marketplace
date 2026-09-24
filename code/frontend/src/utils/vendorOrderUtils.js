@@ -12,13 +12,14 @@ export function filterVendorOrders(orders, status = 'All', search = '') {
 export function vendorOrderStats(orders) {
   return {
     total: orders.length,
-    pending: orders.filter(order => order.status === 'PENDING').length,
-    delivered: orders.filter(order => order.status === 'DELIVERED').length,
+    pending: orders.filter(order => order.status === 'PENDING_VENDOR_ACCEPTANCE').length,
+    delivered: orders.filter(order => order.status === 'SENT_TO_ASSEMBLY').length,
     revenue: orders
-      .filter(order => order.status !== 'CANCELLED')
+      .filter(order => order.status !== 'REJECTED')
       .reduce((total, order) => total + Number(order.total_amount || 0), 0),
   };
 }
 
 export const canVendorSetOrderStatus = (currentStatus, newStatus) =>
-  currentStatus === 'PENDING' && ['CONFIRMED', 'CANCELLED'].includes(newStatus);
+  currentStatus === 'PENDING_VENDOR_ACCEPTANCE' && ['ACCEPTED_BY_VENDOR', 'REJECTED'].includes(newStatus)
+  || currentStatus === 'ACCEPTED_BY_VENDOR' && newStatus === 'SENT_TO_ASSEMBLY';

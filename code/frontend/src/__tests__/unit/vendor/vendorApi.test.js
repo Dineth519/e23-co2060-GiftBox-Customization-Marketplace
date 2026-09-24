@@ -8,9 +8,9 @@ beforeEach(() => {
 
 test('sends an authenticated order-status update', async () => {
   fetch.mockResolvedValue({ ok: true });
-  await updateVendorOrderStatus(101, 'CONFIRMED');
-  expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/api/orders/101/status'), expect.objectContaining({
-    method: 'PUT', body: JSON.stringify({ status: 'CONFIRMED' }),
+  await updateVendorOrderStatus(101, 'ACCEPTED_BY_VENDOR');
+  expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/api/sub-orders/101/status'), expect.objectContaining({
+    method: 'PUT', body: JSON.stringify({ status: 'ACCEPTED_BY_VENDOR' }),
     headers: expect.objectContaining({ Authorization: 'Bearer vendor-token' }),
   }));
 });
@@ -25,5 +25,5 @@ test('sends an authenticated product update', async () => {
 
 test('rejects a failed vendor update', async () => {
   fetch.mockResolvedValue({ ok: false });
-  await expect(updateVendorOrderStatus(101, 'CONFIRMED')).rejects.toThrow('Update failed');
+  await expect(updateVendorOrderStatus(101, 'ACCEPTED_BY_VENDOR')).rejects.toThrow('Update failed');
 });

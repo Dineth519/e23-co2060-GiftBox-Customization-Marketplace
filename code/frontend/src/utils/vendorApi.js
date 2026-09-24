@@ -8,8 +8,8 @@ async function checkedFetch(url, options, message) {
 
 const authHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('accessToken')}` });
 
-export const updateVendorOrderStatus = (orderId, status) => checkedFetch(
-  `${baseUrl()}/orders/${orderId}/status`,
+export const updateVendorOrderStatus = (subOrderId, status) => checkedFetch(
+  `${baseUrl()}/sub-orders/${subOrderId}/status`,
   { method: 'PUT', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify({ status }) },
   'Update failed',
 );
