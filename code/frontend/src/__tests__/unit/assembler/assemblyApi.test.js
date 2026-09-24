@@ -1,7 +1,7 @@
-import { apiCall } from '../../utils/api.js';
-import { saveAssemblyOrder } from './assemblyApi.js';
+import { apiCall } from '../../../utils/api.js';
+import { saveAssemblyOrder } from '../../../pages/assembler/assemblyApi.js';
 
-jest.mock('../../utils/api.js', () => ({ apiCall: jest.fn() }));
+jest.mock('../../../utils/api.js', () => ({ apiCall: jest.fn() }));
 const state = { revision: 0, items: [{ id: 10, received: 1, condition: 'damaged' }], checks: Array(6).fill(false), notes: '', issue: '' };
 
 test('sends damaged item progress without requiring an issue report', async () => {

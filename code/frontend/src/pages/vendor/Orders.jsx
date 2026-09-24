@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { filterVendorOrders, vendorOrderStats } from '../../utils/vendorOrderUtils';
+import { updateVendorOrderStatus } from '../../utils/vendorApi';
 import './Orders.css';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -160,15 +162,7 @@ const Orders = () => {
   // 2. Handle Status Change (Accept/Cancel)
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const res = await fetch(`${API_BASE}/orders/${id}/status`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-      if (!res.ok) throw new Error("Update failed");
+      await updateVendorOrderStatus(id, newStatus);
 
       setOrders(prev => prev.map(o => o.order_id === id ? { ...o, status: newStatus } : o));
       setSelected(null);
@@ -181,23 +175,13 @@ const Orders = () => {
 
   // ── Filtered + paginated data ──
   const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return orders.filter(o => {
-      const matchStatus = filter === 'All' || o.status === filter;
-      const matchSearch = !q || o.order_id.toString().includes(q) || (o.delivery_address && o.delivery_address.toLowerCase().includes(q));
-      return matchStatus && matchSearch;
-    });
+    return filterVendorOrders(orders, filter, search);
   }, [orders, filter, search]);
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const pageSlice = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  const stats = useMemo(() => ({
-    total: orders.length,
-    pending: orders.filter(o => o.status === 'PENDING').length,
-    delivered: orders.filter(o => o.status === 'DELIVERED').length,
-    revenue: orders.filter(o => o.status !== 'CANCELLED').reduce((s, o) => s + Number(o.total_amount), 0),
-  }), [orders]);
+  const stats = useMemo(() => vendorOrderStats(orders), [orders]);
 
   return (
     <div className="orders-page">

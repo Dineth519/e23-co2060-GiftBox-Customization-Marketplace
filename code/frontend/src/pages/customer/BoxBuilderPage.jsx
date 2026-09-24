@@ -4,6 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import {
+  addSelectedItem,
+  buildCustomOrderPayload,
+  calculateBoxTotal,
+  countSelectedItems,
+  filterProducts,
+  getProductId,
+  removeSelectedItem,
+  trimSelectionToLimit,
+  validateCustomOrder,
+} from '../../utils/customerOrderUtils';
+import { placeCustomBoxOrder } from '../../utils/customerOrderApi';
 
 const stripePromise = loadStripe('pk_test_51UIPGXBkZFvVdDzSFdXK26Pho1vSKVLgw9SM6oAyXsdSfkfLW9NdH8ZyVWdmwcSxWqPqQcQrXQcVsFVocUM3J3Wv00Sf8i2Zgx');
 
@@ -58,9 +70,6 @@ const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
 };
 
 import './BoxBuilderPage.css';
-
-// Safe helper to extract product ID regardless of backend field naming (_id, id, productId)
-const getProdId = (p) => p?.productId ?? p?.id ?? p?._id;
 
 // Master Static Data Definitions
 const OCCASIONS = [
@@ -245,44 +254,23 @@ const BoxBuilderPage = () => {
   // Sync Item Trim Constraints when Box Size Decreases
   useEffect(() => {
     if (!boxSize) return;
-    let currentTotal = Object.values(selectedItems).reduce((sum, q) => sum + q, 0);
-    if (currentTotal <= boxSize.limit) return;
-
-    const updated = { ...selectedItems };
-    const keys = Object.keys(updated);
-    for (let i = keys.length - 1; i >= 0 && currentTotal > boxSize.limit; i--) {
-      const excess = currentTotal - boxSize.limit;
-      const remove = Math.min(updated[keys[i]], excess);
-      updated[keys[i]] -= remove;
-      currentTotal -= remove;
-      if (updated[keys[i]] <= 0) delete updated[keys[i]];
-    }
+    const updated = trimSelectionToLimit(selectedItems, boxSize.limit);
+    if (updated === selectedItems) return;
     setSelectedItems(updated);
     triggerToast(`Capacity adjusted to match ${boxSize.title} limit (${boxSize.limit} items).`);
   }, [boxSize]);
 
   // Derived Values
   const availableItems = useMemo(() => {
-    return catalogProducts.filter(p => {
-      const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
-      const matchesSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    });
+    return filterProducts(catalogProducts, activeCategory, searchQuery);
   }, [catalogProducts, activeCategory, searchQuery]);
 
   const totalItemsCount = useMemo(() => {
-    return Object.values(selectedItems).reduce((sum, q) => sum + q, 0);
+    return countSelectedItems(selectedItems);
   }, [selectedItems]);
 
-  const itemsSubtotal = useMemo(() => {
-    return Object.entries(selectedItems).reduce((sum, [id, qty]) => {
-      const product = catalogProducts.find(p => String(getProdId(p)) === String(id));
-      return sum + (product ? product.price * qty : 0);
-    }, 0);
-  }, [selectedItems, catalogProducts]);
-
   const waxSealFee = hasWaxSeal ? 250 : 0;
-  const grandTotal = itemsSubtotal + (boxSize?.fee || 0) + waxSealFee;
+  const grandTotal = calculateBoxTotal(selectedItems, catalogProducts, boxSize?.fee, hasWaxSeal);
 
   useEffect(() => {
     if (activeStep === 5) {
@@ -312,29 +300,18 @@ const BoxBuilderPage = () => {
 
   // Item Handlers
   const handleAddItem = (product) => {
-    const prodId = getProdId(product);
+    const prodId = getProductId(product);
     if (!prodId) return;
 
     if (totalItemsCount >= boxSize.limit) {
       triggerToast(`Limit reached (${boxSize.limit} items max). Upgrade box size for more.`);
       return;
     }
-    setSelectedItems(prev => ({
-      ...prev,
-      [prodId]: (prev[prodId] || 0) + 1
-    }));
+    setSelectedItems(prev => addSelectedItem(prev, product, boxSize.limit));
   };
 
   const handleRemoveItem = (productId) => {
-    setSelectedItems(prev => {
-      const updated = { ...prev };
-      if (updated[productId] > 1) {
-        updated[productId] -= 1;
-      } else {
-        delete updated[productId];
-      }
-      return updated;
-    });
+    setSelectedItems(prev => removeSelectedItem(prev, productId));
   };
 
   const handleWrapStyleChange = (wrap) => {
@@ -394,53 +371,36 @@ const BoxBuilderPage = () => {
 
   // Submit Order Process for Authenticated Logged In Users
   const handlePlaceOrder = async () => {
-    if (totalItemsCount === 0) {
-      triggerToast('Your gift box is empty! Add items in Step 3.');
-      setActiveStep(3);
-      return;
-    }
-    if (!recipientName.trim()) {
-      triggerToast('Please specify a recipient name.');
-      return;
-    }
-    if (!deliveryAddress.trim()) {
-      triggerToast('Please provide a complete delivery address.');
+    const validationError = validateCustomOrder({ selectedItems, recipientName, deliveryAddress });
+    if (validationError) {
+      triggerToast(validationError);
+      if (totalItemsCount === 0) {
+        setActiveStep(3);
+      }
       return;
     }
 
     setSubmitting(true);
     
-    const orderPayload = {
-      customerId: parseInt(localStorage.getItem('userId')), // Use actual logged-in user ID
+    const orderPayload = buildCustomOrderPayload({
+      customerId: localStorage.getItem('userId'),
       occasion,
-      boxSize: boxSize.id,
-      wrappingStyle: wrappingStyle.id,
+      boxSize,
+      wrappingStyle,
       ribbonColor,
       hasWaxSeal,
       recipientName,
       senderName,
       giftMessage,
-      cardTemplate: cardTemplate.id,
+      cardTemplate,
       deliveryAddress,
       deliveryDate,
       totalPrice: grandTotal,
-      items: Object.entries(selectedItems).map(([id, qty]) => ({
-        productId: parseInt(id),
-        quantity: qty
-      }))
-    };
+      selectedItems,
+    });
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/orders/custom-box`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify(orderPayload)
-      });
-
-      if (!res.ok) throw new Error('Failed to place order');
+      await placeCustomBoxOrder(orderPayload);
       
       localStorage.removeItem('giftora_customer_draft_box');
       setSubmitSuccess(true);
@@ -685,7 +645,7 @@ const BoxBuilderPage = () => {
                     ) : (
                       Object.entries(selectedItems).map(([id, qty]) => {
                         if (qty <= 0) return null;
-                        const prod = catalogProducts.find(p => String(getProdId(p)) === String(id));
+                        const prod = catalogProducts.find(p => String(getProductId(p)) === String(id));
 
                         return (
                           <div key={id} className="bb-selected-chip">
@@ -722,7 +682,7 @@ const BoxBuilderPage = () => {
               ) : (
                 <div className="bb-catalog-grid">
                   {availableItems.map(prod => {
-                    const prodId = getProdId(prod);
+                    const prodId = getProductId(prod);
                     const qty = selectedItems[prodId] || 0;
                     const isFull = totalItemsCount >= boxSize.limit && qty === 0;
 
@@ -1040,7 +1000,7 @@ const BoxBuilderPage = () => {
                 <p className="bb-empty-packed">Box is empty. Select items to add.</p>
               ) : (
                 Object.entries(selectedItems).map(([id, qty]) => {
-                  const prod = catalogProducts.find(p => String(getProdId(p)) === String(id));
+                  const prod = catalogProducts.find(p => String(getProductId(p)) === String(id));
                   if (!prod) return null;
                   return (
                     <div key={id} className="bb-packed-item-row">

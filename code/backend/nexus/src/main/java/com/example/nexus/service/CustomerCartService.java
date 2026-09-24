@@ -34,8 +34,13 @@ public class CustomerCartService {
             cart = cartRepository.save(newCart);
         }
 
-        // Add items to the cart
+        // A sync represents the customer's complete current cart. Replacing the
+        // previous rows prevents duplicated quantities after repeated saves.
+        dbCartItemRepository.deleteByCartId(cart.getCartId());
+        dbCartItemRepository.flush();
+
         for (DbCartItem item : items) {
+            item.setCartItemId(null);
             item.setCartId(cart.getCartId());
             dbCartItemRepository.save(item);
         }
@@ -48,5 +53,11 @@ public class CustomerCartService {
     
     public List<DbCartItem> getCartItems(Integer cartId) {
         return dbCartItemRepository.findByCartId(cartId);
+    }
+
+    public boolean cartBelongsToCustomer(Integer cartId, Integer customerId) {
+        return cartRepository.findById(cartId)
+                .map(cart -> customerId.equals(cart.getCustomerId()))
+                .orElse(false);
     }
 }

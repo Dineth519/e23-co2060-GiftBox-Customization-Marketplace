@@ -5,6 +5,11 @@ import {
   FaPhone, FaCalendarCheck, FaCheckCircle, FaTimesCircle,
   FaTasks, FaUsers
 } from 'react-icons/fa';
+import {
+  assemblerStats, buildAssemblerPayload, nextAssemblerStatus,
+  normalizeAssemblers, validateAssembler,
+} from '../../utils/adminStaffUtils';
+import { createAssembler, updateAssemblerStatus } from '../../utils/adminApi';
 import './StaffManagement.css';
 
 /**
@@ -36,13 +41,9 @@ const StaffManagement = () => {
         return res.json();
       })
       .then(data => {
-        const list = Array.isArray(data) ? data : data.assemblers || data.content || [];
+        const list = normalizeAssemblers(data);
         setAssemblers(list);
-        setStats({
-          total: list.length,
-          active: list.filter(a => a.status === 'ACTIVE').length,
-          inactive: list.filter(a => a.status === 'INACTIVE').length
-        });
+        setStats(assemblerStats(list));
         setLoading(false);
       })
       .catch(err => {
@@ -52,44 +53,37 @@ const StaffManagement = () => {
   }, []);
 
   // Toggle assembler active/inactive status
-  const toggleStatus = (id, currentStatus) => {
-    const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-    fetch(`${process.env.REACT_APP_API_URL}/api/assemblers/${id}/status?status=${newStatus}`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
-    })
-      .then(res => res.json())
-      .then(updated => {
-        setAssemblers(prev =>
-          prev.map(a => a.assemblerId === id ? { ...a, status: newStatus } : a)
-        );
-        setStats(prev => ({
-          ...prev,
-          active: newStatus === 'ACTIVE' ? prev.active + 1 : prev.active - 1,
-          inactive: newStatus === 'INACTIVE' ? prev.inactive + 1 : prev.inactive - 1
-        }));
-      })
-      .catch(err => console.error('Error updating status:', err));
+  const toggleStatus = async (id, currentStatus) => {
+    const newStatus = nextAssemblerStatus(currentStatus);
+    try {
+      await updateAssemblerStatus(id, newStatus);
+      setAssemblers(prev => prev.map(a => a.assemblerId === id ? { ...a, status: newStatus } : a));
+      setStats(prev => ({
+        ...prev,
+        active: newStatus === 'ACTIVE' ? prev.active + 1 : prev.active - 1,
+        inactive: newStatus === 'INACTIVE' ? prev.inactive + 1 : prev.inactive - 1,
+      }));
+    } catch (err) {
+      console.error('Error updating status:', err);
+    }
   };
 
   // Add new assembler account
-  const handleAddAssembler = () => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/assemblers`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-      },
-      body: JSON.stringify({ ...newAssembler, status: 'ACTIVE' })
-    })
-      .then(res => res.json())
-      .then(created => {
-        setAssemblers(prev => [...prev, created]);
-        setStats(prev => ({ ...prev, total: prev.total + 1, active: prev.active + 1 }));
-        setShowAddForm(false);
-        setNewAssembler({ fullName: '', email: '', phone: '', password: '' });
-      })
-      .catch(err => console.error('Error adding assembler:', err));
+  const handleAddAssembler = async () => {
+    const validationError = validateAssembler(newAssembler);
+    if (validationError) {
+      alert(validationError);
+      return;
+    }
+    try {
+      const created = await createAssembler(buildAssemblerPayload(newAssembler));
+      setAssemblers(prev => [...prev, created]);
+      setStats(prev => ({ ...prev, total: prev.total + 1, active: prev.active + 1 }));
+      setShowAddForm(false);
+      setNewAssembler({ fullName: '', email: '', phone: '', password: '' });
+    } catch (err) {
+      console.error('Error adding assembler:', err);
+    }
   };
 
   const toggleExpand = (id) => {
