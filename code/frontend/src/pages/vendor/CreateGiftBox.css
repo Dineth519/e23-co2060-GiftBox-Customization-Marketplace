@@ -1,0 +1,347 @@
+/* Container styling with theme beige background */
+.cgb-container {
+  padding: 30px;
+  background-color: #f6f1ea;
+  min-height: 100vh;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* Light Top Banner matching the new Add Item page */
+.cgb-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.cgb-top-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cgb-back-icon-btn {
+  background-color: #ffffff;
+  border: 1px solid #e0d8cc;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1a2340;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.cgb-back-icon-btn:hover {
+  background-color: #f0ebe1;
+}
+
+.cgb-title-wrap h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a2340;
+}
+
+.cgb-title-wrap p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #8c7f6b;
+}
+
+/* Top Action Buttons */
+.cgb-top-right {
+  display: flex;
+  gap: 12px;
+}
+
+.cgb-btn-cancel {
+  background-color: #ffffff;
+  border: 1px solid #e0d8cc;
+  color: #7a869a;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cgb-btn-cancel:hover {
+  background-color: #f4f0e6;
+  color: #1a2340;
+}
+
+.cgb-btn-save {
+  background-color: #c9a84c;
+  border: none;
+  color: #1a2340;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 6px rgba(201, 168, 76, 0.3);
+}
+
+.cgb-btn-save:hover {
+  background-color: #b5953e;
+}
+
+.cgb-btn-save:disabled {
+  background-color: #d8cba8;
+  cursor: not-allowed;
+}
+
+/* Form Layout Grid */
+.cgb-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 960px) {
+  .cgb-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cards */
+.cgb-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid #eee8df;
+}
+
+.cgb-section-title {
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a2340;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #f1ece4;
+  padding-bottom: 14px;
+}
+
+.cgb-section-icon {
+  color: #c9a84c;
+}
+
+/* Form Fields - Uppercase Labels */
+.cgb-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.cgb-row {
+  display: flex;
+  gap: 20px;
+}
+
+.cgb-field label, .cgb-sub-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #7a869a;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cgb-field input,
+.cgb-field select,
+.cgb-field textarea {
+  padding: 12px 14px;
+  border: 1px solid #e0d8cc;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  background-color: #ffffff;
+  color: #1a2340;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.cgb-field input:focus,
+.cgb-field select:focus,
+.cgb-field textarea:focus {
+  border-color: #c9a84c;
+  box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.1);
+}
+
+.cgb-hint {
+  font-size: 0.78rem;
+  color: #8c7f6b;
+  margin-top: 6px;
+}
+
+.cgb-preview-wrap {
+  margin-top: 12px;
+}
+
+.cgb-preview-img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #eedec4;
+}
+
+/* Selected Items Area */
+.cgb-empty-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border: 1px dashed #ded6ca;
+  border-radius: 8px;
+  color: #7a869a;
+  background-color: #fbf9f6;
+  margin-bottom: 16px;
+}
+
+.cgb-empty-box p {
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+
+.cgb-selected-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.cgb-selected-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: #fbf9f6;
+  border-radius: 8px;
+  border: 1px solid #ece4d7;
+}
+
+.cgb-subtext {
+  font-size: 0.8rem;
+  color: #7a869a;
+  margin: 4px 0 0 0;
+}
+
+.cgb-qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cgb-qty-controls input {
+  width: 50px;
+  padding: 6px;
+  border: 1px solid #ded6ca;
+  border-radius: 6px;
+  text-align: center;
+  background: #ffffff;
+  font-weight: 600;
+}
+
+.cgb-btn-delete {
+  background: #ffffff;
+  border: 1px solid #f09595;
+  color: #c0392b;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.cgb-btn-delete:hover {
+  background: #fcebeb;
+}
+
+/* Inventory List */
+.cgb-inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 20px;
+}
+
+.cgb-item-card {
+  padding: 14px;
+  border: 1px solid #e7ded0;
+  background: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.cgb-item-card.selected {
+  border-color: #c9a84c;
+  background: #fdfaf4;
+}
+
+.cgb-item-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1a2340;
+  margin: 0 0 6px 0;
+}
+
+.cgb-item-price {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #854f0b;
+}
+
+.cgb-btn-add {
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: #f0f2f5;
+  color: #1a2340;
+  border: 1px solid #e0e4e8;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.cgb-btn-add:hover {
+  background: #e4e7ec;
+}
+
+.cgb-item-card.selected .cgb-btn-add {
+  background: #1a2340;
+  color: #ffffff;
+  border-color: #1a2340;
+}
+
+.cgb-item-card.selected .cgb-btn-add:hover {
+  background: #c9a84c;
+  border-color: #c9a84c;
+  color: #1a2340;
+}

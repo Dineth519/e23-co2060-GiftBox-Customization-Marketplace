@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FaBoxes, FaThLarge, FaClipboardList, FaCog, FaGift, FaSignOutAlt } from 'react-icons/fa';
+import { FaBoxes, FaThLarge, FaClipboardList, FaCog, FaGift, FaPlusCircle, FaSignOutAlt } from 'react-icons/fa';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -40,8 +40,6 @@ const Sidebar = () => {
 
   return (
     <div className="sidebar-container">
-      
-
       {/* Navigation Menu */}
       <nav className="sidebar-nav">
         
@@ -52,6 +50,15 @@ const Sidebar = () => {
         >
           <FaThLarge size={18} /> 
           <span>Dashboard</span>
+        </NavLink>
+
+        {/* අලුතින් එකතු කළ Create Box Link එක */}
+        <NavLink 
+          to="/vendor/create-box" 
+          className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+        >
+          <FaPlusCircle size={18} /> 
+          <span>Create Box</span>
         </NavLink>
 
         <NavLink 
