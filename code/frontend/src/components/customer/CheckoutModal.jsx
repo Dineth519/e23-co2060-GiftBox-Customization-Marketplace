@@ -4,6 +4,8 @@ import { useCart } from '../../context/CartContext';
 import { X, MapPin, Phone, CreditCard, Banknote, ShieldCheck } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { getOrderErrorMessage } from '../../utils/customerOrderApi';
+import { checkoutFieldsFromProfile, loadCheckoutProfile } from '../../utils/customerProfileApi';
 import './CheckoutModal.css';
 
 const stripePromise = loadStripe('pk_test_51UIPGXBkZFvVdDzSFdXK26Pho1vSKVLgw9SM6oAyXsdSfkfLW9NdH8ZyVWdmwcSxWqPqQcQrXQcVsFVocUM3J3Wv00Sf8i2Zgx');
@@ -47,7 +49,9 @@ const StripeCheckoutForm = ({ orderPayload, onSuccess, onCancel }) => {
           body: JSON.stringify(orderPayload)
         });
 
-        if (!res.ok) throw new Error('Failed to save order to database.');
+        if (!res.ok) {
+          throw new Error(await getOrderErrorMessage(res, 'Failed to save order to database.'));
+        }
         await clearCart();
         onSuccess();
       } catch (err) {
@@ -93,7 +97,8 @@ const CheckoutModal = ({ isOpen, onClose }) => {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [clientSecret, setClientSecret] = useState(null);
 
-  const userId = localStorage.getItem('userId') ? parseInt(localStorage.getItem('userId')) : 5;
+  const userId = localStorage.getItem('userId');
+  const username = localStorage.getItem('username');
 
   useEffect(() => {
     if (isOpen) {
@@ -104,20 +109,12 @@ const CheckoutModal = ({ isOpen, onClose }) => {
       const fetchUserData = async () => {
         setLoadingData(true);
         try {
-          const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.name) setName(data.name);
-            
-            const addrParts = [data.addressLine1, data.addressLine2].filter(p => p && p.trim() !== '');
-            if (addrParts.length > 0) setDeliveryAddress(addrParts.join(', '));
-            
-            if (data.city) setCity(data.city);
-            if (data.postalCode) setZipCode(data.postalCode);
-            if (data.phoneNumber) setMobileNumber(data.phoneNumber);
-          }
+          const fields = checkoutFieldsFromProfile(await loadCheckoutProfile(userId, username));
+          if (fields.name) setName(fields.name);
+          if (fields.deliveryAddress) setDeliveryAddress(fields.deliveryAddress);
+          if (fields.city) setCity(fields.city);
+          if (fields.zipCode) setZipCode(fields.zipCode);
+          if (fields.mobileNumber) setMobileNumber(fields.mobileNumber);
         } catch (err) {
           console.error("Failed to fetch user profile", err);
         } finally {
@@ -126,7 +123,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
       };
       fetchUserData();
     }
-  }, [isOpen, userId]);
+  }, [isOpen, userId, username]);
 
   useEffect(() => {
     // Fetch PaymentIntent when method is card and secret doesn't exist
@@ -160,7 +157,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
   const getOrderPayload = () => {
     const finalAddress = `${name.trim()} | ${deliveryAddress.trim()}, ${city.trim()} ${zipCode.trim()} | Phone: ${mobileNumber.trim()} | Method: ${paymentMethod.toUpperCase()}`;
     return {
-      customerId: userId,
+      customerId: Number(userId),
       deliveryAddress: finalAddress,
       items: cartItems.map(item => ({
         productId: item.productId,
@@ -189,7 +186,9 @@ const CheckoutModal = ({ isOpen, onClose }) => {
         body: JSON.stringify(getOrderPayload())
       });
 
-      if (!res.ok) throw new Error('Failed to place order');
+      if (!res.ok) {
+        throw new Error(await getOrderErrorMessage(res, 'Failed to place order'));
+      }
       await clearCart();
       setSuccess(true);
     } catch (err) {

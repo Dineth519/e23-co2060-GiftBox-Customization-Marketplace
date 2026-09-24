@@ -1,4 +1,4 @@
-import { placeCustomBoxOrder, placeStandardOrder } from '../../../utils/customerOrderApi';
+import { getOrderErrorMessage, placeCustomBoxOrder, placeStandardOrder } from '../../../utils/customerOrderApi';
 
 beforeEach(() => {
   localStorage.clear();
@@ -28,4 +28,17 @@ test.each([
 test('reports the backend error when order placement fails', async () => {
   fetch.mockResolvedValue({ ok: false, text: async () => 'Product is out of stock' });
   await expect(placeStandardOrder({ items: [] })).rejects.toThrow('Product is out of stock');
+});
+
+test('uses a stable fallback when an error response has no readable body', async () => {
+  await expect(getOrderErrorMessage({ text: async () => { throw new Error('unreadable'); } }, 'Failed to place order'))
+    .resolves.toBe('Failed to place order');
+});
+
+test('extracts a readable message from a Spring JSON error response', async () => {
+  const response = {
+    text: async () => JSON.stringify({ status: 500, error: 'Internal Server Error', path: '/api/orders/standard' }),
+  };
+  await expect(getOrderErrorMessage(response, 'Failed to place order'))
+    .resolves.toBe('Internal Server Error');
 });

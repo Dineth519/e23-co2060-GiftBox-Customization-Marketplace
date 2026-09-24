@@ -222,7 +222,6 @@ public class OrderController {
 
     private ResponseEntity<?> processOrderCheckout(CreateOrderRequest request, String orderType,
             Authentication authentication) {
-        try {
             if (!isCustomer(authentication, request.getCustomerId())) {
                 return ResponseEntity.status(403).body("A customer may place orders only for their own account.");
             }
@@ -266,11 +265,18 @@ public class OrderController {
             java.util.Map<Integer, BigDecimal> vendorTotals = new java.util.HashMap<>();
 
             for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
+                if (itemReq == null || itemReq.getProductId() == null) {
+                    return ResponseEntity.badRequest().body("Validation Error: every item must include a productId.");
+                }
                 if (itemReq.getQuantity() == null || itemReq.getQuantity() <= 0) {
                     return ResponseEntity.badRequest().body("Validation Error: item quantities must be positive integers.");
                 }
-                Product product = productRepository.findById(itemReq.getProductId())
-                        .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemReq.getProductId()));
+                Product product = productRepository.findById(itemReq.getProductId()).orElse(null);
+                if (product == null) {
+                    return ResponseEntity.badRequest().body(
+                            "A product in your cart is no longer available (ID: " + itemReq.getProductId()
+                                    + "). Remove it from the cart and try again.");
+                }
                 
                 int stock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
                 if (stock < itemReq.getQuantity()) {
@@ -350,13 +356,7 @@ public class OrderController {
             orderDto.put("orderType", savedOrder.getOrderType());
             orderDto.put("totalAmount", savedOrder.getTotalAmount());
             orderDto.put("status", savedOrder.getStatus());
-            orderDto.put("createdAt", savedOrder.getCreatedAt());
-
             return ResponseEntity.ok(orderDto);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Unable to place order: " + e.getMessage());
-        }
     }
 
     private BigDecimal getBoxFee(String boxSize) {

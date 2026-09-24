@@ -1,12 +1,16 @@
 package com.example.nexus.controller;
 
 import com.example.nexus.model.User;
+import com.example.nexus.model.Customer;
 import com.example.nexus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,6 +21,35 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    // Checkout details for the currently authenticated customer. Using the JWT
+    // identity avoids stale or missing browser user IDs and keeps this lookup scoped
+    // to the signed-in account.
+    @GetMapping("/me/checkout-details")
+    public ResponseEntity<?> getCheckoutDetails(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(401).body("Authentication is required.");
+        }
+
+        return userRepository.findByUsername(authentication.getName()).map(user -> {
+            String addressLine1 = user.getAddressLine1();
+            if ((addressLine1 == null || addressLine1.isBlank())
+                    && user instanceof com.example.nexus.model.Customer customer) {
+                addressLine1 = customer.getAddress();
+            }
+
+            java.util.Map<String, Object> details = new java.util.LinkedHashMap<>();
+            details.put("name", user.getName());
+            details.put("addressLine1", addressLine1);
+            details.put("addressLine2", user.getAddressLine2());
+            details.put("city", user.getCity());
+            details.put("district", user.getDistrict());
+            details.put("province", user.getProvince());
+            details.put("postalCode", user.getPostalCode());
+            details.put("phoneNumber", user.getPhoneNumber());
+            return ResponseEntity.ok(details);
+        }).orElse(ResponseEntity.notFound().build());
+    }
 
     // Get single user by ID
     @GetMapping("/{id}")

@@ -1,3 +1,18 @@
+export async function getOrderErrorMessage(response, fallbackMessage) {
+  try {
+    const body = await response.text();
+    if (!body) return fallbackMessage;
+    try {
+      const error = JSON.parse(body);
+      return error.message || error.error || fallbackMessage;
+    } catch {
+      return body;
+    }
+  } catch {
+    return fallbackMessage;
+  }
+}
+
 async function placeOrder(path, payload, failureMessage) {
   const response = await fetch(`${process.env.REACT_APP_API_URL || ''}${path}`, {
     method: 'POST',
@@ -9,13 +24,7 @@ async function placeOrder(path, payload, failureMessage) {
   });
 
   if (!response.ok) {
-    let message = failureMessage;
-    try {
-      message = (await response.text()) || failureMessage;
-    } catch {
-      // Keep the stable user-facing message when the server has no readable body.
-    }
-    throw new Error(message);
+    throw new Error(await getOrderErrorMessage(response, failureMessage));
   }
   return response;
 }

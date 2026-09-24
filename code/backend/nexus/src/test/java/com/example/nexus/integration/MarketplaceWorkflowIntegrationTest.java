@@ -1,6 +1,7 @@
 package com.example.nexus.integration;
 
 import com.example.nexus.model.Assembler;
+import com.example.nexus.model.Customer;
 import com.example.nexus.model.Product;
 import com.example.nexus.model.Role;
 import com.example.nexus.model.User;
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -126,6 +128,31 @@ class MarketplaceWorkflowIntegrationTest {
         String assemblerToken = login("assembler", "AssemblerPass1");
         CustomerIdentity customer = registerVerifyAndLogin(
                 "customer-one", "customer1@giftora.test", "CustomerPass1");
+
+        Customer checkoutCustomer = (Customer) users.findById(customer.id()).orElseThrow();
+        checkoutCustomer.setAddress("12 Temple Road");
+        checkoutCustomer.setCity("Kandy");
+        checkoutCustomer.setPostalCode("20000");
+        checkoutCustomer.setPhoneNumber("0771234567");
+        users.saveAndFlush(checkoutCustomer);
+        mvc.perform(get("/api/users/me/checkout-details")
+                        .header("Authorization", bearer(customer.token())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Integration Customer"))
+                .andExpect(jsonPath("$.addressLine1").value("12 Temple Road"))
+                .andExpect(jsonPath("$.city").value("Kandy"))
+                .andExpect(jsonPath("$.postalCode").value("20000"))
+                .andExpect(jsonPath("$.phoneNumber").value("0771234567"));
+
+        mvc.perform(post("/api/orders/standard")
+                        .header("Authorization", bearer(customer.token()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"customerId":%d,"deliveryAddress":"12 Temple Road, Kandy",
+                                 "items":[{"productId":2147483647,"quantity":1}]}
+                """.formatted(customer.id())))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("no longer available")));
 
         Product product = new Product();
         product.setVendorId(vendor.getVendorId());

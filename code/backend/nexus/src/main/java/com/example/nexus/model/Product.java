@@ -60,7 +60,8 @@ public class Product {
     private BigDecimal rating;
 
     @Version
-    private Integer version;
+    @Column(nullable = false)
+    private Integer version = 0;
 
     public Product() {}
 

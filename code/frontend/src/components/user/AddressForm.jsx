@@ -27,7 +27,9 @@ const AddressForm = ({ onAddressSaved, compact = false }) => {
   useEffect(() => {
     const fetchAddress = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${username}/address`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${username}/address`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+        });
         const data = await res.json();
         if (data.success && data.address) {
           setFormData({
@@ -83,9 +85,12 @@ const AddressForm = ({ onAddressSaved, compact = false }) => {
     setSuccessMsg('');
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${username}/address`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${username}/address`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
         body: JSON.stringify(formData),
       });
 
