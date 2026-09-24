@@ -33,8 +33,8 @@ class AssemblyIntegrationTest {
         service = new AssemblyService(db);
         // Relevant pre-V22 columns follow V1, V9, V14 and V21; migrations under test are unchanged files.
         db.execute("CREATE TABLE vendors (vendor_id INT PRIMARY KEY, shop_name VARCHAR(100))");
-        db.execute("CREATE TABLE products (id INT PRIMARY KEY, vendor_id INT, name VARCHAR(150))");
-        db.execute("CREATE TABLE gift_boxes (id INT PRIMARY KEY, vendor_id INT, name VARCHAR(150))");
+        db.execute("CREATE TABLE products (id INT PRIMARY KEY, vendor_id INT, name VARCHAR(150), image_url VARCHAR(500))");
+        db.execute("CREATE TABLE gift_boxes (id INT PRIMARY KEY, vendor_id INT, name VARCHAR(150), image_url VARCHAR(500))");
         db.execute("CREATE TABLE orders (order_id INT PRIMARY KEY, assembler_id INT NULL, status ENUM('PENDING','CONFIRMED','RECEIVED','ASSEMBLING','READY','SHIPPED','DELIVERED','CANCELLED') DEFAULT 'PENDING', occasion VARCHAR(50), box_size VARCHAR(50), wrapping_style VARCHAR(50), recipient_name VARCHAR(100), gift_message TEXT, custom_box_details LONGTEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
         db.execute("CREATE TABLE order_items (id INT PRIMARY KEY, order_id INT, product_id INT, gift_box_id INT, quantity INT NOT NULL, FOREIGN KEY (order_id) REFERENCES orders(order_id))");
         var flyway = Flyway.configure().dataSource(source).locations("classpath:db/migration").baselineVersion("21").target("22").load();
@@ -45,8 +45,8 @@ class AssemblyIntegrationTest {
         assertEquals(0, assembly.migrate().migrationsExecuted);
         assertEquals("22", flyway.info().current().getVersion().toString());
         db.update("INSERT INTO vendors VALUES (1, 'Real vendor')");
-        db.update("INSERT INTO products VALUES (1, 1, 'Real candle')");
-        db.update("INSERT INTO gift_boxes VALUES (1, 1, 'Ready-made gift')");
+        db.update("INSERT INTO products VALUES (1, 1, 'Real candle', 'https://example.com/candle.jpg')");
+        db.update("INSERT INTO gift_boxes VALUES (1, 1, 'Ready-made gift', 'https://example.com/box.jpg')");
     }
     @BeforeEach void seed() {
         db.update("DELETE FROM order_items");
@@ -67,6 +67,7 @@ class AssemblyIntegrationTest {
         assertEquals(2, order.get("total"));
         assertEquals(0, order.get("received"));
         assertTrue(state(order).get("items").toString().contains("Real candle"));
+        assertTrue(state(order).get("items").toString().contains("imageUrl=https://example.com/candle.jpg"));
         assertTrue(order.get("customization").toString().contains("Gold"));
     }
     @Test void completeWorkflowPersistsAndLocksSubmission() {
@@ -131,6 +132,7 @@ class AssemblyIntegrationTest {
     @Test void supportsGiftBoxItemsWithoutProductId() {
         db.update("UPDATE order_items SET product_id=NULL, gift_box_id=1 WHERE id=10");
         assertTrue(state(service.get(1, 42)).get("items").toString().contains("Ready-made gift"));
+        assertTrue(state(service.get(1, 42)).get("items").toString().contains("imageUrl=https://example.com/box.jpg"));
         update(change(0, "confirm", 2, "good", NO, ""));
     }
     @Test void controllerRejectsOtherRolesAndUsesTokenIdentity() {

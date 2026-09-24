@@ -29,4 +29,15 @@ public class AssemblyWorkspaceController {
     public Map<String, Object> update(@PathVariable int id, @RequestBody AssemblyRules.Change change, Authentication auth) {
         return service.update(id, assemblerId(auth), change);
     }
+
+    @ExceptionHandler(Exception.class)
+    public org.springframework.http.ResponseEntity<Map<String, String>> handleException(Exception e) {
+        e.printStackTrace();
+        if (e instanceof ResponseStatusException rse) {
+            return org.springframework.http.ResponseEntity.status(rse.getStatusCode())
+                    .body(Map.of("message", rse.getReason() != null ? rse.getReason() : "No reason provided"));
+        }
+        return org.springframework.http.ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Backend Error: " + e.toString() + (e.getCause() != null ? " Caused by: " + e.getCause().toString() : "")));
+    }
 }

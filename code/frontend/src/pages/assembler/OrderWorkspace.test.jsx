@@ -81,3 +81,17 @@ test('submission is disabled until all checks are complete', async () => {
   for (const checkbox of container.querySelectorAll('input[type="checkbox"]')) await click(checkbox);
   expect(button('Submit for approval').disabled).toBe(false);
 });
+
+test('displays the ordered product image and falls back if it cannot load', async () => {
+  const actualOrder = order();
+  actualOrder.workspace.items[0].imageUrl = 'https://example.com/candle.jpg';
+  fetchAssemblyOrder.mockResolvedValue(actualOrder);
+  await render();
+  const image = container.querySelector('img.aw-product-image');
+  expect(image.getAttribute('src')).toBe('https://example.com/candle.jpg');
+  expect(image.alt).toBe('Real candle');
+  await act(async () => image.dispatchEvent(new Event('error')));
+  expect(container.querySelector('img.aw-product-image')).toBeNull();
+  expect(container.querySelector('[aria-label="Product image unavailable"]')).not.toBeNull();
+  expect(container.textContent).toContain('Real candle');
+});

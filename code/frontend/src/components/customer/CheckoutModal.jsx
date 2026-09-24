@@ -14,7 +14,6 @@ const StripeCheckoutForm = ({ orderPayload, onSuccess, onCancel }) => {
   const { clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [saveCard, setSaveCard] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +25,6 @@ const StripeCheckoutForm = ({ orderPayload, onSuccess, onCancel }) => {
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        setup_future_usage: saveCard ? 'off_session' : undefined,
       },
       redirect: 'if_required',
     });
@@ -62,18 +60,7 @@ const StripeCheckoutForm = ({ orderPayload, onSuccess, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} style={{ marginTop: '16px' }}>
       <PaymentElement options={{ wallets: { link: 'never' } }} />
-      
-      <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <input 
-          type="checkbox" 
-          id="saveCardOption" 
-          checked={saveCard} 
-          onChange={(e) => setSaveCard(e.target.checked)} 
-        />
-        <label htmlFor="saveCardOption" style={{ fontSize: '14px', cursor: 'pointer' }}>
-          Save this card for future faster checkouts
-        </label>
-      </div>
+
 
       {errorMessage && <div className="co-modal-error" style={{ marginTop: '16px' }}>{errorMessage}</div>}
       <div className="co-modal-footer" style={{ marginTop: '24px' }}>

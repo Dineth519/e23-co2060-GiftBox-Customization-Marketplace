@@ -6,6 +6,14 @@ import { CHECKS, receiptsReady, canSubmit } from './workspaceState';
 import { fetchAssemblyOrder, saveAssemblyOrder } from './assemblyApi';
 import './OrderWorkspace.css';
 
+function ItemImage({ item }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [item.imageUrl]);
+  return item.imageUrl && !failed
+    ? <img className="aw-product-image" src={item.imageUrl} alt={item.name} loading="lazy" onError={() => setFailed(true)} />
+    : <span className="aw-product-icon" aria-label="Product image unavailable">{item.name?.slice(0, 2).toUpperCase()}</span>;
+}
+
 export default function OrderWorkspace() {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
@@ -101,7 +109,7 @@ function Workspace({ order }) {
           {tab === 'receipt' && <>
             <div className="aw-section-heading"><div><h2>Item receipt</h2><p>Check each vendor delivery against the expected quantity.</p></div><strong>{received} / {order.total} received</strong></div>
             <p className="aw-small">Check the ordered products and quantities below. Editing receipts resets packing checks.</p>
-            {state.items.map(item => <article className="aw-item" key={item.id}><div className="aw-item-heading"><span className="aw-product-icon" aria-hidden="true">{item.name?.slice(0, 2).toUpperCase()}</span><div><h3>{item.name}</h3><p>{item.vendor}</p></div><span>Expected: {item.expected}</span></div>
+            {state.items.map(item => <article className="aw-item" key={item.id}><div className="aw-item-heading"><ItemImage item={item} /><div><h3>{item.name}</h3><p>{item.vendor}</p></div><span>Expected: {item.expected}</span></div>
               <div className="aw-item-fields"><label>Received quantity<select disabled={locked} value={item.received} onChange={event => updateItem(item.id, 'received', Number(event.target.value))}>{Array.from({ length: item.expected + 1 }, (_, i) => <option key={i} value={i}>{i}</option>)}</select></label><label>Item condition<select disabled={locked} value={item.condition} onChange={event => updateItem(item.id, 'condition', event.target.value)}><option value="unchecked">Not inspected</option><option value="good">Good condition</option><option value="damaged">Damaged</option><option value="incorrect">Incorrect item</option></select></label></div>
               <p className="aw-small">{item.received < item.expected ? (item.expected - item.received) + ' item(s) still missing.' : 'All expected items received.'}</p>
             </article>)}
@@ -121,7 +129,7 @@ function Workspace({ order }) {
           {tab === 'activity' && <><h2>Order activity</h2><p className="aw-small">Saved actions recorded for this order.</p><ol className="aw-timeline">{[...state.activity].reverse().map((event, index) => <li key={index}><span className="aw-timeline-dot" /><div><p>{event.text}</p><small>{event.time ? new Date(event.time).toLocaleString() : 'Time not recorded'}</small></div></li>)}</ol></>}
         </div>
       </div>
-      <aside className="aw-panel aw-customization" aria-label="Customer customization"><h2>Customer customization</h2><div className="aw-gift-preview"><Gift size={70} strokeWidth={1} aria-hidden="true" /><span>{order.box} gift box</span></div><dl>{[['Box', order.box], ['Wrap', order.wrap], ['Ribbon', order.ribbon], ['Card', order.card], ['Wax seal', order.waxSeal], ['To', order.recipient], ['From', order.sender]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl><h3>Gift message</h3><blockquote>{order.message}</blockquote><p className="aw-small">Illustrative preview. Use the listed customer choices when packing.</p></aside>
+      <aside className="aw-panel aw-customization" aria-label="Customer customization"><h2>Customer customization</h2><div className="aw-gift-preview"><img src={`/boxes/${(order.box || 'medium').toLowerCase()}.jpg`} alt={`${order.box} gift box`} style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} /><span>{order.box} gift box</span></div><dl>{[['Box', order.box], ['Wrap', order.wrap], ['Ribbon', order.ribbon], ['Card', order.card], ['Wax seal', order.waxSeal], ['To', order.recipient], ['From', order.sender]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl><h3>Gift message</h3><blockquote>{order.message}</blockquote><p className="aw-small">Illustrative preview. Use the listed customer choices when packing.</p></aside>
     </div>
     <footer className="aw-actions"><div><strong>Final delivery approval: Admin</strong><small>{saving ? 'Saving…' : dirty ? 'Unsaved changes' : 'All changes saved'}</small></div><button className="aw-danger" type="button" disabled={locked} onClick={() => { setIssueDraft(''); issueDialog.current.showModal(); }}>Report issue</button><button className="aw-secondary" type="button" disabled={!dirty || locked} onClick={() => persist('save')}>Save progress</button><button className="aw-primary" type="button" disabled={!canSubmit(state)} onClick={() => { if (canSubmit(state)) persist('submit'); }}>Submit for approval</button></footer>
     <dialog ref={issueDialog} className="aw-dialog" aria-labelledby="aw-issue-title"><form onSubmit={async event => { event.preventDefault(); if (issueDraft.trim() && await persist('report', { ...state, issue: issueDraft.trim() })) issueDialog.current.close(); }}><div className="aw-section-heading"><h2 id="aw-issue-title">Report an issue</h2><button type="button" className="aw-close" aria-label="Close issue form" onClick={() => issueDialog.current.close()}><X /></button></div><p className="aw-small">This saves the issue on the order and pauses assembly until it is resolved.</p><label>What needs attention?<textarea autoFocus required maxLength={500} rows={5} value={issueDraft} onChange={event => setIssueDraft(event.target.value)} placeholder="Describe the missing, damaged, or incorrect item..." /></label>{error && <p role="alert" className="aw-error">{error}</p>}<button className="aw-primary" type="submit" disabled={!issueDraft.trim()}>Report issue</button></form></dialog>

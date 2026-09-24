@@ -21,10 +21,17 @@ export function normalizeOrder(order) {
 async function request(path = '', options) {
   const response = await apiCall('/api/assembler/orders' + path, options);
   if (!response.ok) {
-    let message = 'Unable to load or save assembly data. Please try again.';
+    const explanations = {
+      401: 'Your login has expired. Sign in again before saving.',
+      403: 'The server denied access to this order. Check that you are signed in as its assembler.',
+      409: 'This order has changed or is no longer available for editing. Reload it before saving again.',
+    };
+    let message = explanations[response.status] || (response.status >= 500
+      ? 'The backend could not save or load the order. Check the backend error log.'
+      : 'The server rejected this request. Please check the order details.');
     try { const body = await response.json(); message = body.message || body.detail || message; }
     catch { /* Keep a readable message for non-JSON responses. */ }
-    throw new Error(message);
+    throw new Error(message + ` (HTTP ${response.status})`);
   }
   return response.json();
 }
