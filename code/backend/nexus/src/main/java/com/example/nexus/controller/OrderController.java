@@ -20,10 +20,13 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import tools.jackson.databind.json.JsonMapper;
 
 @RestController
 @RequestMapping("/api")
 public class OrderController {
+
+    private final JsonMapper json = JsonMapper.builder().build();
 
     @Autowired
     private OrderRepository orderRepository;
@@ -42,19 +45,42 @@ public class OrderController {
 
     // 1. Vendor-specific sub-orders retrieval
     @GetMapping("/vendors/{vendorId}/orders")
-    public List<SubOrder> getOrdersByVendor(@PathVariable Integer vendorId) {
-        return subOrderRepository.findByVendorId(vendorId);
+    public ResponseEntity<?> getOrdersByVendor(@PathVariable Integer vendorId, Authentication authentication) {
+        if (!isActor(authentication, "VENDOR", vendorId)) {
+            return ResponseEntity.status(403).body("Vendor access denied");
+        }
+        List<Map<String, Object>> response = subOrderRepository.findByVendorId(vendorId).stream().map(subOrder -> {
+            Order order = subOrder.getOrder();
+            Map<String, Object> item = new java.util.LinkedHashMap<>();
+            item.put("sub_order_id", subOrder.getSubOrderId());
+            item.put("order_id", order.getOrderId());
+            item.put("vendor_id", subOrder.getVendorId());
+            item.put("status", subOrder.getStatus());
+            item.put("vendor_total", subOrder.getVendorTotal());
+            item.put("total_amount", subOrder.getVendorTotal());
+            item.put("delivery_address", order.getDeliveryAddress());
+            item.put("special_notes", order.getSpecialNotes());
+            item.put("created_at", subOrder.getCreatedAt());
+            return item;
+        }).toList();
+        return ResponseEntity.ok(response);
     }
 
     // 1b. Customer-specific orders retrieval — each customer sees ONLY their own orders
     @GetMapping("/customers/{customerId}/orders")
-    public List<Order> getOrdersByCustomer(@PathVariable Integer customerId) {
-        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
+    public ResponseEntity<?> getOrdersByCustomer(@PathVariable Integer customerId, Authentication authentication) {
+        if (!isActor(authentication, "CUSTOMER", customerId)) {
+            return ResponseEntity.status(403).body("Customer access denied");
+        }
+        return ResponseEntity.ok(orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId));
     }
 
     // 1c. Customer-specific orders summary
     @GetMapping("/orders/customer/{customerId}/summary")
-    public ResponseEntity<?> getCustomerOrderSummary(@PathVariable Integer customerId) {
+    public ResponseEntity<?> getCustomerOrderSummary(@PathVariable Integer customerId, Authentication authentication) {
+        if (!isActor(authentication, "CUSTOMER", customerId)) {
+            return ResponseEntity.status(403).body("Customer access denied");
+        }
         List<Order> orders = orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
         
         int totalOrders = orders.size();
@@ -83,7 +109,7 @@ public class OrderController {
         return ResponseEntity.ok(summary);
     }
 
-    // 2. Order status update (Vendor or Customer)
+    // 2. Parent-order status update (assigned assembler or owning customer)
     @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Integer orderId,
             @RequestBody Map<String, String> request, Authentication authentication) {
@@ -94,12 +120,10 @@ public class OrderController {
         String next = request.get("status");
         String current = order.getStatus();
         Integer actorId = authentication != null && authentication.getDetails() instanceof Integer id ? id : null;
-        boolean vendor = hasRole(authentication, "VENDOR") && actorId != null && actorId.equals(order.getVendorId());
         boolean assembler = hasRole(authentication, "ASSEMBLER") && actorId != null && actorId.equals(order.getAssemblerId());
         boolean customer = hasRole(authentication, "CUSTOMER") && actorId != null && actorId.equals(order.getCustomerId());
 
-        boolean allowed = vendor && "PENDING".equals(current) && Set.of("CONFIRMED", "CANCELLED").contains(next)
-                || assembler && "READY".equals(current) && "SHIPPED".equals(next)
+        boolean allowed = assembler && "READY".equals(current) && "SHIPPED".equals(next)
                 || assembler && "SHIPPED".equals(current) && "DELIVERED".equals(next)
                 || customer && "DELIVERED".equals(current) && "RECEIVED".equals(next);
 
@@ -107,10 +131,16 @@ public class OrderController {
         order.setStatus(next);
         orderRepository.save(order);
         return ResponseEntity.ok().body("Order " + next);
+    }
+
     // 2. Sub-Order status update (Vendor updating their part)
     @PutMapping("/sub-orders/{subOrderId}/status")
-    public ResponseEntity<?> updateSubOrderStatus(@PathVariable Integer subOrderId, @RequestBody Map<String, String> request) {
+    public ResponseEntity<?> updateSubOrderStatus(@PathVariable Integer subOrderId,
+            @RequestBody Map<String, String> request, Authentication authentication) {
         return subOrderRepository.findById(subOrderId).map(subOrder -> {
+            if (!isActor(authentication, "VENDOR", subOrder.getVendorId())) {
+                return ResponseEntity.status(403).body("Vendor access denied");
+            }
             String newStatus = request.get("status");
             String currentStatus = subOrder.getStatus();
 
@@ -137,22 +167,23 @@ public class OrderController {
     // Internal helper to update parent order status
     private void checkParentOrderStatus(Order order) {
         List<SubOrder> subs = subOrderRepository.findByOrder_OrderId(order.getOrderId());
-        boolean allSentToAssembly = true;
-        for (SubOrder sub : subs) {
-            if (!"SENT_TO_ASSEMBLY".equals(sub.getStatus()) && !"REJECTED".equals(sub.getStatus())) {
-                allSentToAssembly = false;
-                break;
-            }
-        }
-        if (allSentToAssembly && !"ASSEMBLING".equals(order.getStatus())) {
-            order.setStatus("ASSEMBLING");
+        boolean allResolved = !subs.isEmpty() && subs.stream().allMatch(sub ->
+                Set.of("SENT_TO_ASSEMBLY", "REJECTED").contains(sub.getStatus()));
+        boolean anySent = subs.stream().anyMatch(sub -> "SENT_TO_ASSEMBLY".equals(sub.getStatus()));
+        if (allResolved) {
+            order.setStatus(anySent ? "ASSEMBLING" : "CANCELLED");
             orderRepository.save(order);
         }
     }
 
     // 2b. Get items for an order
     @GetMapping("/orders/{orderId}/items")
-    public ResponseEntity<?> getOrderItems(@PathVariable Integer orderId) {
+    public ResponseEntity<?> getOrderItems(@PathVariable Integer orderId, Authentication authentication) {
+        var order = orderRepository.findById(orderId);
+        if (order.isEmpty()) return ResponseEntity.notFound().build();
+        if (!canAccessOrder(authentication, order.get())) {
+            return ResponseEntity.status(403).body("Order access denied");
+        }
         List<OrderItem> items = orderItemRepository.findByOrderId(orderId);
         List<Map<String, Object>> response = new java.util.ArrayList<>();
         
@@ -176,18 +207,21 @@ public class OrderController {
     // 3. Place custom box order
     @PostMapping("/orders/custom-box")
     @Transactional
-    public ResponseEntity<?> placeCustomBoxOrder(@RequestBody CreateOrderRequest request) {
-        return processOrderCheckout(request, "CUSTOM_BOX");
+    public ResponseEntity<?> placeCustomBoxOrder(@RequestBody CreateOrderRequest request,
+            Authentication authentication) {
+        return processOrderCheckout(request, "CUSTOM_BOX", authentication);
     }
 
     // 4. Place standard cart order (multi-vendor split)
     @PostMapping("/orders/standard")
     @Transactional
-    public ResponseEntity<?> placeStandardOrder(@RequestBody CreateOrderRequest request) {
-        return processOrderCheckout(request, "STANDARD");
+    public ResponseEntity<?> placeStandardOrder(@RequestBody CreateOrderRequest request,
+            Authentication authentication) {
+        return processOrderCheckout(request, "STANDARD", authentication);
     }
 
-    private ResponseEntity<?> processOrderCheckout(CreateOrderRequest request, String orderType) {
+    private ResponseEntity<?> processOrderCheckout(CreateOrderRequest request, String orderType,
+            Authentication authentication) {
         try {
             if (!isCustomer(authentication, request.getCustomerId())) {
                 return ResponseEntity.status(403).body("A customer may place orders only for their own account.");
@@ -230,9 +264,11 @@ public class OrderController {
 
             // Group items by vendorId for SubOrders
             java.util.Map<Integer, BigDecimal> vendorTotals = new java.util.HashMap<>();
-            java.util.Map<Integer, java.util.List<CreateOrderRequest.OrderItemRequest>> itemsByVendor = new java.util.HashMap<>();
 
             for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
+                if (itemReq.getQuantity() == null || itemReq.getQuantity() <= 0) {
+                    return ResponseEntity.badRequest().body("Validation Error: item quantities must be positive integers.");
+                }
                 Product product = productRepository.findById(itemReq.getProductId())
                         .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemReq.getProductId()));
                 
@@ -245,7 +281,6 @@ public class OrderController {
                 totalAmount = totalAmount.add(itemSubtotal);
                 
                 vendorTotals.put(product.getVendorId(), vendorTotals.getOrDefault(product.getVendorId(), BigDecimal.ZERO).add(itemSubtotal));
-                itemsByVendor.computeIfAbsent(product.getVendorId(), k -> new java.util.ArrayList<>()).add(itemReq);
                 
                 // Item revenue split
                 adminRevenue = adminRevenue.add(itemSubtotal.multiply(commissionRate));
@@ -259,8 +294,8 @@ public class OrderController {
             order.setDeliveryAddress(request.getDeliveryAddress());
             order.setOrderType(orderType);
             
+            order.setStatus("PENDING");
             if ("CUSTOM_BOX".equals(orderType)) {
-                order.setStatus("CONFIRMED"); // Ensure custom boxes start as CONFIRMED for assembler
                 order.setOccasion(request.getOccasion());
                 order.setBoxSize(request.getBoxSize());
                 order.setGiftMessage(request.getGiftMessage());
@@ -273,11 +308,8 @@ public class OrderController {
                 customization.put("hasWaxSeal", request.getHasWaxSeal());
                 customization.put("deliveryDate", request.getDeliveryDate() == null ? null : request.getDeliveryDate().toString());
                 
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                order.setCustomBoxDetails(mapper.writeValueAsString(customization));
+                order.setCustomBoxDetails(json.writeValueAsString(customization));
                 order.setDueDate(request.getDeliveryDate() == null ? null : request.getDeliveryDate().atStartOfDay());
-            } else {
-                order.setStatus("PENDING");
             }
 
             order.setTotalAmount(totalAmount);
@@ -322,9 +354,8 @@ public class OrderController {
 
             return ResponseEntity.ok(orderDto);
         } catch (Exception e) {
-            java.io.StringWriter sw = new java.io.StringWriter();
-            e.printStackTrace(new java.io.PrintWriter(sw));
-            return ResponseEntity.status(500).body("Error: " + e.getMessage() + "\n" + sw.toString());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Unable to place order: " + e.getMessage());
         }
     }
 
@@ -340,8 +371,23 @@ public class OrderController {
     }
 
     private boolean isCustomer(Authentication authentication, Integer customerId) {
-        return customerId != null && hasRole(authentication, "CUSTOMER")
-                && authentication.getDetails() instanceof Integer id && customerId.equals(id);
+        return isActor(authentication, "CUSTOMER", customerId);
+    }
+
+    private boolean isActor(Authentication authentication, String role, Integer expectedId) {
+        return expectedId != null && hasRole(authentication, role)
+                && authentication.getDetails() instanceof Integer id && expectedId.equals(id);
+    }
+
+    private boolean canAccessOrder(Authentication authentication, Order order) {
+        if (hasRole(authentication, "ADMIN")) return true;
+        Integer actorId = authentication != null && authentication.getDetails() instanceof Integer id ? id : null;
+        if (actorId == null) return false;
+        if (hasRole(authentication, "CUSTOMER") && actorId.equals(order.getCustomerId())) return true;
+        if (hasRole(authentication, "ASSEMBLER")
+                && (order.getAssemblerId() == null || actorId.equals(order.getAssemblerId()))) return true;
+        return hasRole(authentication, "VENDOR") && subOrderRepository.findByOrder_OrderId(order.getOrderId()).stream()
+                .anyMatch(subOrder -> actorId.equals(subOrder.getVendorId()));
     }
 
     private boolean hasRole(Authentication authentication, String role) {

@@ -31,11 +31,9 @@ class AssemblyRulesTest {
 
     @Test
     void validWorkflowActionsMoveToTheirExpectedStatuses() {
-        assertEquals("ready", AssemblyRules.nextStatus(
-                "awaiting", false, true, change("confirm", NO, "", "")));
         assertEquals("assembling", AssemblyRules.nextStatus(
-                "ready", true, true, change("start", NO, "", "")));
-        assertEquals("review", AssemblyRules.nextStatus(
+                "awaiting", false, true, change("confirm", NO, "", "")));
+        assertEquals("completed", AssemblyRules.nextStatus(
                 "assembling", true, true, change("submit", YES, "", "")));
         assertEquals("hold", AssemblyRules.nextStatus(
                 "assembling", true, false, change("report", NO, "", "Damaged item")));
@@ -73,8 +71,8 @@ class AssemblyRulesTest {
     @Test
     void submittedOrdersCannotBeChanged() {
         assertBadRequest(() -> AssemblyRules.nextStatus(
-                "review", true, true, change("save", YES, "", "")),
-                "Submitted orders are locked for admin review.");
+                "completed", true, true, change("save", YES, "", "")),
+                "Completed orders are locked.");
     }
 
     @Test

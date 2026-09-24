@@ -8,6 +8,7 @@ import com.example.nexus.model.Vendor;
 import com.example.nexus.repository.OrderItemRepository;
 import com.example.nexus.repository.OrderRepository;
 import com.example.nexus.repository.ProductRepository;
+import com.example.nexus.repository.SubOrderRepository;
 import com.example.nexus.repository.UserRepository;
 import com.example.nexus.repository.VendorRepository;
 import com.example.nexus.service.EmailService;
@@ -54,6 +55,7 @@ class MarketplaceWorkflowIntegrationTest {
     @Autowired ProductRepository products;
     @Autowired OrderRepository orders;
     @Autowired OrderItemRepository orderItems;
+    @Autowired SubOrderRepository subOrders;
     @Autowired PasswordEncoder passwords;
     private final JsonMapper json = JsonMapper.builder().build();
 
@@ -85,7 +87,7 @@ class MarketplaceWorkflowIntegrationTest {
     @BeforeEach
     void cleanDatabase() {
         db.execute("SET REFERENTIAL_INTEGRITY FALSE");
-        for (String table : List.of("order_items", "orders", "products", "cart_items", "carts",
+        for (String table : List.of("order_items", "sub_orders", "orders", "products", "cart_items", "carts",
                 "custom_box_cart", "admins", "assemblers", "customers", "vendors", "users", "categories", "gift_boxes")) {
             db.execute("TRUNCATE TABLE " + table + " RESTART IDENTITY");
         }
@@ -141,20 +143,24 @@ class MarketplaceWorkflowIntegrationTest {
                         .content("""
                                 {"customerId":%d,"deliveryAddress":"12 Temple Road, Kandy",
                                  "items":[{"productId":%d,"quantity":2}]}
-                                """.formatted(customer.id(), product.getId())))
+                """.formatted(customer.id(), product.getId())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].status").value("PENDING"))
+                .andExpect(jsonPath("$.status").value("PENDING"))
                 .andReturn().getResponse().getContentAsString();
 
-        int orderId = ((Number) ((List<?>) json.readValue(orderResponse, List.class)).stream()
-                .map(Map.class::cast).findFirst().orElseThrow().get("orderId")).intValue();
+        int orderId = ((Number) json.readValue(orderResponse, Map.class).get("orderId")).intValue();
         assertEquals(8, products.findById(product.getId()).orElseThrow().getStockQuantity());
 
-        mvc.perform(put("/api/orders/{id}/status", orderId)
+        int subOrderId = subOrders.findByVendorId(vendor.getVendorId()).get(0).getSubOrderId();
+        mvc.perform(put("/api/sub-orders/{id}/status", subOrderId)
                         .header("Authorization", bearer(vendorToken))
-                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"CONFIRMED\"}"))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"ACCEPTED_BY_VENDOR\"}"))
                 .andExpect(status().isOk());
-        assertEquals("CONFIRMED", orders.findById(orderId).orElseThrow().getStatus());
+        mvc.perform(put("/api/sub-orders/{id}/status", subOrderId)
+                        .header("Authorization", bearer(vendorToken))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"SENT_TO_ASSEMBLY\"}"))
+                .andExpect(status().isOk());
+        assertEquals("ASSEMBLING", orders.findById(orderId).orElseThrow().getStatus());
 
         int orderItemId = orderItems.findByOrderId(orderId).get(0).getId();
         mvc.perform(put("/api/assembler/orders/{id}", orderId)
@@ -167,16 +173,9 @@ class MarketplaceWorkflowIntegrationTest {
         mvc.perform(put("/api/assembler/orders/{id}", orderId)
                         .header("Authorization", bearer(assemblerToken))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(assemblyChange(1, "start", orderItemId, false)))
+                        .content(assemblyChange(1, "submit", orderItemId, true)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("assembling"));
-
-        mvc.perform(put("/api/assembler/orders/{id}", orderId)
-                        .header("Authorization", bearer(assemblerToken))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(assemblyChange(2, "submit", orderItemId, true)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("review"));
+                .andExpect(jsonPath("$.status").value("completed"));
         assertEquals("READY", orders.findById(orderId).orElseThrow().getStatus());
 
         changeStatus(orderId, "SHIPPED", assemblerToken);
