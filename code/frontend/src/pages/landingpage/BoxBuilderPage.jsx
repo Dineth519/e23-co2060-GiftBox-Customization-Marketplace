@@ -132,6 +132,18 @@ const BoxBuilderPage = () => {
     setIsLoadingCatalog(false);
   }, [cartItems]);
 
+  // Scroll to top of wizard on step change
+  useEffect(() => {
+    if (heroRef.current) {
+      window.scrollTo({
+        top: heroRef.current.offsetTop - 80,
+        behavior: 'smooth'
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeStep]);
+
   // Sync Item Trim Constraints when Box Size Decreases
   useEffect(() => {
     if (!boxSize) return;

@@ -17,21 +17,17 @@ public final class AssemblyRules {
         require(change.checks() != null && change.checks().size() == 6 && !change.checks().contains(null),
                 "Exactly six quality checks are required.");
         require(change.notes() != null && change.notes().length() <= 1000, "Packing notes must be at most 1000 characters.");
-        require(!"review".equals(current), "Submitted orders are locked for admin review.");
+        require(!"completed".equals(current), "Completed orders are locked.");
         return switch (change.action()) {
             case "save" -> current;
             case "confirm" -> {
                 require(ready && !"hold".equals(current), "Receive and inspect every item and resolve holds first.");
-                yield "ready";
-            }
-            case "start" -> {
-                require(confirmed && ready && "ready".equals(current), "Confirm receipt before starting assembly.");
                 yield "assembling";
             }
             case "submit" -> {
                 require(confirmed && ready && "assembling".equals(current) && change.checks().stream().allMatch(Boolean.TRUE::equals),
                         "Complete receipts, assembly and all six quality checks before submission.");
-                yield "review";
+                yield "completed";
             }
             case "report" -> {
                 require(change.issue() != null && !change.issue().isBlank() && change.issue().length() <= 500,

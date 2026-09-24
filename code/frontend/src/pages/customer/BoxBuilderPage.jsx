@@ -193,7 +193,7 @@ const BoxBuilderPage = () => {
       const userId = localStorage.getItem('userId');
       if (!userId) return;
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/users/${userId}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         if (res.ok) {
@@ -217,6 +217,18 @@ const BoxBuilderPage = () => {
     setCatalogProducts(cartItems || []);
     setIsLoadingCatalog(false);
   }, [cartItems]);
+
+  // Scroll to top of wizard on step change
+  useEffect(() => {
+    if (heroRef.current) {
+      window.scrollTo({
+        top: heroRef.current.offsetTop - 80,
+        behavior: 'smooth'
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeStep]);
 
   // Restore Draft on mount
   useEffect(() => {
@@ -411,7 +423,8 @@ const BoxBuilderPage = () => {
     setSubmitting(true);
     
     const orderPayload = {
-      customerId: parseInt(localStorage.getItem('userId')), // Use actual logged-in user ID
+      customerId: parseInt(localStorage.getItem('userId')), 
+
       occasion,
       boxSize: boxSize.id,
       wrappingStyle: wrappingStyle.id,
@@ -431,7 +444,7 @@ const BoxBuilderPage = () => {
     };
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/orders/custom-box`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/orders/custom-box`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

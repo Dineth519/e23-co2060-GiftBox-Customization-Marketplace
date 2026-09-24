@@ -74,6 +74,7 @@ const sampleOrders = [
 const statusConfig = {
   'Pending':          { color: '#EF9F27', bg: 'rgba(239,159,39,0.1)',  emoji: '🕐' },
   'Processing':       { color: '#378ADD', bg: 'rgba(55,138,221,0.1)',  emoji: '⚙️' },
+  'Assembling':       { color: '#378ADD', bg: 'rgba(55,138,221,0.1)',  emoji: '🎁' },
   'Out for Delivery': { color: '#7F77DD', bg: 'rgba(127,119,221,0.1)', emoji: '🚚' },
   'Delivered':        { color: '#1D9E75', bg: 'rgba(29,158,117,0.1)',  emoji: '📦' },
   'Received':         { color: '#1D9E75', bg: 'rgba(29,158,117,0.1)',  emoji: '✅' },
@@ -152,8 +153,8 @@ export default function Orders() {
         'PENDING':    'Pending',
         'CONFIRMED':  'Processing',
         'RECEIVED':   'Received',
-        'ASSEMBLING': 'Processing',
-        'READY':      'Processing',
+        'ASSEMBLING': 'Assembling',
+        'READY':      'Assembling',
         'SHIPPED':    'Out for Delivery',
         'DELIVERED':  'Delivered',
         'CANCELLED':  'Cancelled',
@@ -262,7 +263,7 @@ export default function Orders() {
       {/* ── Filter Tabs ── */}
       {/* These tabs let customer filter by order status */}
       <div className="orders-tabs">
-        {['All', 'Pending', 'Processing', 'Out for Delivery', 'Delivered', 'Received', 'Cancelled'].map((tab) => (
+        {['All', 'Pending', 'Processing', 'Assembling', 'Out for Delivery', 'Delivered', 'Received', 'Cancelled'].map((tab) => (
           <button
             key={tab}
             className={`orders-tab ${filter === tab ? 'active' : ''}`}

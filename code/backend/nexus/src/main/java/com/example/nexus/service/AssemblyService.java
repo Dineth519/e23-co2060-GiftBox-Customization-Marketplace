@@ -16,16 +16,39 @@ import tools.jackson.databind.json.JsonMapper;
 public class AssemblyService {
     private final JdbcTemplate db;
     private final JsonMapper json = JsonMapper.builder().build();
-    private static final Set<String> ACTIVE = Set.of("CONFIRMED", "ASSEMBLING", "READY");
+    private static final Set<String> ACTIVE = Set.of("CONFIRMED", "ASSEMBLING", "READY", "DELIVERED");
     private static final List<Boolean> EMPTY_CHECKS = Collections.nCopies(6, false);
 
     public AssemblyService(JdbcTemplate db) { this.db = db; }
 
     public List<Map<String, Object>> list(int assemblerId) {
-        // Unassigned confirmed orders form the shared queue. First save claims an order atomically.
-        return db.queryForList("SELECT * FROM orders WHERE (assembler_id = ? OR assembler_id IS NULL) " +
-                "AND status IN ('CONFIRMED','ASSEMBLING','READY') ORDER BY due_date IS NULL, due_date, created_at", assemblerId)
-                .stream().map(this::view).toList();
+        List<Map<String, Object>> orders = db.queryForList("SELECT * FROM orders WHERE (assembler_id = ? OR assembler_id IS NULL) " +
+                "AND status IN ('CONFIRMED','ASSEMBLING','READY','DELIVERED') ORDER BY due_date IS NULL, due_date, created_at", assemblerId);
+        if (orders.isEmpty()) return List.of();
+        
+        List<Integer> orderIds = orders.stream().map(o -> ((Number) o.get("order_id")).intValue()).toList();
+        String placeholders = String.join(",", Collections.nCopies(orderIds.size(), "?"));
+        
+        List<Map<String, Object>> allItems = db.queryForList("SELECT oi.order_id, oi.id, oi.quantity AS expected, oi.received_quantity AS received, " +
+                "oi.received_condition AS `condition`, COALESCE(p.name, gb.name, 'Unavailable product') AS name, " +
+                "COALESCE(p.image_url, gb.image_url) AS imageUrl, " +
+                "COALESCE(v.shop_name, 'Vendor not recorded') AS vendor " +
+                "FROM order_items oi LEFT JOIN products p ON p.id = oi.product_id " +
+                "LEFT JOIN gift_boxes gb ON gb.id = oi.gift_box_id " +
+                "LEFT JOIN vendors v ON v.vendor_id = COALESCE(p.vendor_id, gb.vendor_id) " +
+                "WHERE oi.order_id IN (" + placeholders + ") ORDER BY oi.id", orderIds.toArray());
+        
+        Map<Integer, List<Map<String, Object>>> itemsByOrder = new java.util.HashMap<>();
+        for (Map<String, Object> item : allItems) {
+            int orderId = ((Number) item.get("order_id")).intValue();
+            item.remove("order_id");
+            itemsByOrder.computeIfAbsent(orderId, k -> new java.util.ArrayList<>()).add(item);
+        }
+        
+        return orders.stream().map(order -> {
+            int id = ((Number) order.get("order_id")).intValue();
+            return view(order, itemsByOrder.getOrDefault(id, List.of()));
+        }).toList();
     }
 
     public Map<String, Object> get(int id, int assemblerId) {
@@ -63,7 +86,7 @@ public class AssemblyService {
         if (revision != change.revision()) throw new ResponseStatusException(HttpStatus.CONFLICT,
                 "This order changed in another session. Reload it before saving again.");
         String previous = str(order.get("assembly_status"));
-        AssemblyRules.require(!"review".equals(previous), "Submitted orders are locked for admin review.");
+        AssemblyRules.require(!"completed".equals(previous), "Completed orders are locked for admin review.");
         List<Map<String, Object>> existingItems = items(id);
         AssemblyRules.require(change.items() != null && !existingItems.isEmpty() && change.items().size() == existingItems.size(),
                 "The receipt must include every order item.");
@@ -94,11 +117,10 @@ public class AssemblyService {
         if ("confirm".equals(change.action())) confirmed = true;
         if (Set.of("report", "resolve").contains(change.action())) confirmed = false;
         String message = switch (change.action()) {
-            case "confirm" -> "All items received and inspected.";
-            case "start" -> "Assembly started.";
+            case "confirm" -> "All items received; assembly started.";
             case "report" -> "Issue reported: " + issue;
             case "resolve" -> "Issue resolved; confirm receipt to continue.";
-            case "submit" -> "Packing and quality checks completed; submitted for admin approval.";
+            case "submit" -> "Assembly and quality checks completed; order is ready for delivery.";
             default -> "Progress saved.";
         };
         List<Object> activity = new ArrayList<>(readList(order.get("assembly_activity")));
@@ -113,13 +135,17 @@ public class AssemblyService {
                         "assembler_notes = ?, issue = ?, assembly_activity = ?, assembly_revision = assembly_revision + 1, " +
                         "assembly_submitted_at = ?, status = ? WHERE order_id = ?",
                 assemblerId, next, confirmed, json.writeValueAsString(checks), change.notes(), issue,
-                json.writeValueAsString(activity), "review".equals(next) ? Timestamp.valueOf(LocalDateTime.now()) : null, lifecycle, id);
+                json.writeValueAsString(activity), "completed".equals(next) ? Timestamp.valueOf(LocalDateTime.now()) : null, lifecycle, id);
         return get(id, assemblerId);
     }
 
     private Map<String, Object> view(Map<String, Object> order) {
         int id = ((Number) order.get("order_id")).intValue();
-        List<Map<String, Object>> items = items(id);
+        return view(order, items(id));
+    }
+
+    private Map<String, Object> view(Map<String, Object> order, List<Map<String, Object>> items) {
+        int id = ((Number) order.get("order_id")).intValue();
         Map<String, Object> workspace = new LinkedHashMap<>();
         workspace.put("revision", order.get("assembly_revision"));
         workspace.put("items", items);
