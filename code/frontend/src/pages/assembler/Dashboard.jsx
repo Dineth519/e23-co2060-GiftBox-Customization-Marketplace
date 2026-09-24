@@ -69,24 +69,70 @@ export default function AssemblerDashboard({ queueMode = false }) {
       </div>}
 
       {!queueMode && <div className="ao-summary-grid">
-        <section className="ao-summary-panel" aria-labelledby="ao-attention-title">
-          <div className="ao-summary-heading"><div><span className="ao-eyebrow">Priorities</span><h2 id="ao-attention-title">Needs attention</h2></div><span className="ao-attention-count">{attention.length}</span></div>
-          <p className="ao-summary-intro">Resolve these blockers before packing.</p>
-          {attention.length ? attention.map(order => <article className="ao-attention-item" key={order.id}>
-            <TriangleAlert size={20} aria-hidden="true" />
-            <div><h3>{order.issue ? 'Issue reported' : order.status === 'hold' ? 'Order on hold' : 'Items missing for today'}</h3><span>#{order.id} · {order.occasion}</span><p>{order.issue || (order.status === 'hold' ? 'Review this order before resuming assembly.' : `${order.total - order.received} items still awaiting receipt. This box is due today.`)}</p><button type="button" onClick={() => openWorkspace(order)} aria-label={'Review attention needed for ' + order.id}>Review order <ArrowRight size={14} aria-hidden="true" /></button></div>
-          </article>) : <p className="ao-summary-empty">No orders need attention right now.</p>}
+        <section className="ao-summary-panel" aria-labelledby="ao-summary-title" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="ao-summary-heading"><div><span className="ao-eyebrow">Overview</span><h2 id="ao-summary-title">Current orders</h2></div></div>
+          <p className="ao-summary-intro">Breakdown of all active work.</p>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '40px', padding: '16px' }}>
+            <div style={{ width: '150px', height: '150px', position: 'relative', flexShrink: 0 }}>
+              <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#f0f0f0" strokeWidth="4" />
+                {(() => {
+                  const TONE_COLORS = { amber: '#f59e0b', teal: '#10b981', blue: '#3b82f6', red: '#ef4444' };
+                  const counts = { awaiting: liveOrders.filter(o => o.status === 'awaiting').length, ready: liveOrders.filter(o => o.status === 'ready').length, assembling: liveOrders.filter(o => o.status === 'assembling').length, completed: liveOrders.filter(o => o.status === 'completed').length, hold: liveOrders.filter(o => o.status === 'hold').length };
+                  const data = Object.keys(counts).filter(k => counts[k] > 0).map(key => ({ label: STATUS[key].label, value: counts[key], color: TONE_COLORS[STATUS[key].tone] || '#ccc' }));
+                  const total = data.reduce((sum, d) => sum + d.value, 0);
+                  let cumulative = 0;
+                  return total > 0 && data.map(d => {
+                    const percentage = (d.value / total) * 100;
+                    const dashArray = `${percentage} ${100 - percentage}`;
+                    const dashOffset = 100 - cumulative;
+                    cumulative += percentage;
+                    return <circle key={d.label} cx="18" cy="18" r="15.915" fill="transparent" stroke={d.color} strokeWidth="4" strokeDasharray={dashArray} strokeDashoffset={dashOffset} style={{ transition: 'all 0.5s ease' }}><title>{d.label}: {d.value}</title></circle>;
+                  });
+                })()}
+              </svg>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '30px', fontWeight: 'bold', lineHeight: 1, color: '#111' }}>{liveOrders.length}</span>
+                <span style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '6px' }}>Total</span>
+              </div>
+            </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {(() => {
+                const TONE_COLORS = { amber: '#f59e0b', teal: '#10b981', blue: '#3b82f6', red: '#ef4444' };
+                const counts = { awaiting: liveOrders.filter(o => o.status === 'awaiting').length, ready: liveOrders.filter(o => o.status === 'ready').length, assembling: liveOrders.filter(o => o.status === 'assembling').length, completed: liveOrders.filter(o => o.status === 'completed').length, hold: liveOrders.filter(o => o.status === 'hold').length };
+                const data = Object.keys(counts).filter(k => counts[k] > 0).map(key => ({ label: STATUS[key].label, value: counts[key], color: TONE_COLORS[STATUS[key].tone] || '#ccc' }));
+                return data.length > 0 ? data.map(d => (
+                  <div key={d.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: d.color }}></span><span style={{ color: '#4b5563' }}>{d.label}</span></div>
+                    <strong style={{ color: '#111827', fontSize: '14px' }}>{d.value}</strong>
+                  </div>
+                )) : <span style={{ fontSize: '14px', color: '#6b7280' }}>No active orders</span>;
+              })()}
+            </div>
+          </div>
         </section>
-        <section className="ao-summary-panel" aria-labelledby="ao-continue-title">
-          <div className="ao-summary-heading"><div><span className="ao-eyebrow">Your workbench</span><h2 id="ao-continue-title">Continue working</h2></div><Settings size={22} aria-hidden="true" /></div>
-          <p className="ao-summary-intro">Up to three gift boxes already in assembly.</p>
-          {inProgress.length ? inProgress.map(order => <article className="ao-work-card" key={order.id}>
-            <div className="ao-work-title"><span className="ao-work-icon"><Box size={25} aria-hidden="true" /></span><div><h3>#{order.id}</h3><p>{order.occasion} · {order.box} box</p></div><span className="ao-work-due">Due {order.due.toLowerCase()}</span></div>
-            <StatusBadge status={order.status} /><p className="ao-work-receipt"><CircleCheck size={16} aria-hidden="true" />{order.received} of {order.total} items received</p>
-            <div className="ao-work-custom"><span>Wrap<strong>{order.wrap}</strong></span><span>Ribbon<strong>{order.ribbon}</strong></span></div>
-            <button type="button" className="ao-order-button" onClick={() => openWorkspace(order)} aria-label={'Continue order ' + order.id}>Continue <ArrowRight size={16} aria-hidden="true" /></button>
-          </article>) : <div className="ao-summary-empty"><Box size={28} aria-hidden="true" /><p>No boxes are currently in assembly.</p><Link to="/assembler/queue?status=ready">Find a box ready to assemble</Link></div>}
-          <p className="ao-summary-note">Continue opens the packing workspace. Save progress to keep your changes.</p>
+        <section className="ao-summary-panel" aria-labelledby="ao-graph-title" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="ao-summary-heading"><div><span className="ao-eyebrow">Performance</span><h2 id="ao-graph-title">Monthly Output</h2></div><span style={{ fontSize: '13px', color: '#10b981', fontWeight: 'bold', background: '#ecfdf5', padding: '4px 8px', borderRadius: '12px' }}>+31%</span></div>
+          <p className="ao-summary-intro">Boxes fully assembled and delivered.</p>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', padding: '32px 16px 8px', gap: '12px' }}>
+            {[
+              { month: 'Apr', val: 142 }, { month: 'May', val: 185 }, { month: 'Jun', val: 160 },
+              { month: 'Jul', val: 210 }, { month: 'Aug', val: 265 }, { month: 'Sep', val: 348 }
+            ].map((d, i, arr) => {
+              const max = Math.max(...arr.map(x => x.val));
+              const height = (d.val / max) * 100;
+              return (
+                <div key={d.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '100%', height: '140px', display: 'flex', alignItems: 'flex-end', position: 'relative' }}>
+                    <div style={{ width: '100%', maxWidth: '36px', margin: '0 auto', height: `${height}%`, backgroundColor: i === arr.length - 1 ? '#10b981' : '#d1fae5', borderRadius: '6px 6px 0 0', position: 'relative' }}>
+                       <span style={{ position: 'absolute', top: '-24px', left: '50%', transform: 'translateX(-50%)', fontSize: '12px', color: i === arr.length - 1 ? '#047857' : '#9ca3af', fontWeight: 'bold' }}>{d.val}</span>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '13px', color: i === arr.length - 1 ? '#111827' : '#6b7280', fontWeight: i === arr.length - 1 ? 'bold' : 'normal' }}>{d.month}</span>
+                </div>
+              );
+            })}
+          </div>
         </section>
         <section className="ao-quick-links" aria-label="Quick links"><Link to="/assembler/queue"><span><strong>Open Order Queue</strong><small>Search and manage the complete work list</small></span><ArrowRight size={20} aria-hidden="true" /></Link><Link to="/assembler/packing-guide"><span><strong>Packing Guide</strong><small>Preparation standards and quality checks</small></span><BookOpen size={20} aria-hidden="true" /></Link></section>
       </div>}
