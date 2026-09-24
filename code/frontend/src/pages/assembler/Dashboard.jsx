@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Package, Box, Settings, CircleCheck, Clock, TriangleAlert, Search, ArrowUpRight, ArrowRight, Inbox, BookOpen } from 'lucide-react';
-import { STATUS, selectQueueOrders } from './overviewData';
+import { STATUS, selectQueueOrders, hasAssemblyIssue } from './overviewData';
 import './Dashboard.css';
 import { useAssemblyOrders, AssemblyLoadState } from './assemblyApi';
 import { getMonthlyOutput } from './monthlyOutput';
 
 const metrics = [
   { status: 'awaiting', icon: Package, hint: 'Waiting for vendor deliveries' },
-  { status: 'ready', icon: Box, hint: 'All items received' },
+  { status: 'issues', icon: TriangleAlert, hint: 'Orders needing attention' },
   { status: 'assembling', icon: Settings, hint: 'Preparation in progress' },
   { status: 'completed', icon: CircleCheck, hint: 'Assembly completed' },
 ];
@@ -62,9 +62,9 @@ export default function AssemblerDashboard({ queueMode = false }) {
       {!loading && !error && liveOrders.length === 0 && <p role="status">No confirmed orders are available. Orders appear here after vendor confirmation.</p>}
       {!queueMode && <div className="ao-metrics" aria-label="Assembly summary">
         {metrics.map(({ status: key, icon: Icon, hint }) => (
-          <Link key={key} className="ao-metric" to={'/assembler/queue?status=' + key}>
-            <span className={'ao-metric-icon ao-tone-' + STATUS[key].tone}><Icon size={24} aria-hidden="true" /></span>
-            <span><span className="ao-metric-label">{STATUS[key].label}</span><strong>{String(liveOrders.filter(order => order.status === key).length).padStart(2, '0')}</strong><span className="ao-metric-hint">{hint}</span></span>
+          <Link key={key} className="ao-metric" to={key === 'issues' ? '/assembler/issues' : '/assembler/queue?status=' + key}>
+            <span className={'ao-metric-icon ao-tone-' + (key === 'issues' ? 'red' : STATUS[key].tone)}><Icon size={24} aria-hidden="true" /></span>
+            <span><span className="ao-metric-label">{key === 'issues' ? 'Issues' : STATUS[key].label}</span><strong>{loading || error ? '—' : String(liveOrders.filter(order => key === 'issues' ? hasAssemblyIssue(order) : order.status === key).length).padStart(2, '0')}</strong><span className="ao-metric-hint">{hint}</span></span>
             <ArrowUpRight className="ao-metric-arrow" size={16} aria-hidden="true" />
           </Link>
         ))}
