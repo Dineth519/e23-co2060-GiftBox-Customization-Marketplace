@@ -44,6 +44,14 @@ public class Order {
     @JsonProperty("total_amount")
     private BigDecimal totalAmount;
 
+    @Column(name = "admin_revenue")
+    @JsonProperty("admin_revenue")
+    private BigDecimal adminRevenue;
+
+    @Column(name = "vendor_revenue")
+    @JsonProperty("vendor_revenue")
+    private BigDecimal vendorRevenue;
+
     @Column(name = "occasion")
     private String occasion;
 
@@ -70,6 +78,24 @@ public class Order {
     @Column(name = "custom_box_details", columnDefinition = "LONGTEXT")
     private String customBoxDetails;
 
+    @Column(name = "issue", columnDefinition = "TEXT")
+    private String issue;
+
+    @Column(name = "assembler_notes", columnDefinition = "TEXT")
+    @JsonProperty("assembler_notes")
+    private String assemblerNotes;
+
+    @Column(name = "receipt_confirmed")
+    @JsonProperty("receipt_confirmed")
+    private Boolean receiptConfirmed;
+
+    @Column(name = "checks")
+    private String checks;
+
+    @Column(name = "due_date")
+    @JsonProperty("due_date")
+    private LocalDateTime dueDate;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
@@ -77,4 +103,8 @@ public class Order {
     @Column(name = "updated_at", insertable = false, updatable = false)
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonProperty("sub_orders")
+    private java.util.List<SubOrder> subOrders = new java.util.ArrayList<>();
 }

@@ -47,7 +47,7 @@ export default function PackingGuide() {
     </div>
     <div className="pg-problem"><span className="pg-problem-icon"><AlertTriangle size={22} aria-hidden="true" /></span><div><h2>Something isn’t quite right?</h2><p>Pause packing. Record the missing, damaged, or incorrect item and use <strong>Report issue</strong> inside the order workspace.</p><details><summary>How to resume after an issue</summary><p>Coordinate with the administrator. After the problem is resolved, update quantities and item condition, clear the hold, confirm receipt again, and repeat the packing checks.</p></details></div></div>
     <footer className="pg-footer"><div><h2>Ready to make someone’s day?</h2><p>Choose an order and put the guide into practice.</p></div><Link to="/assembler/queue">Open Order Queue<ArrowRight size={18} aria-hidden="true" /></Link></footer>
-    <p className="pg-demo-note">Suggested team reference. Demo progress is stored on this browser only; issues and submissions do not notify the admin.</p>
+    <p className="pg-demo-note">Save receipts, issues, and packing checks in the order workspace. Submissions are recorded for admin review.</p>
   </section>;
 }
 

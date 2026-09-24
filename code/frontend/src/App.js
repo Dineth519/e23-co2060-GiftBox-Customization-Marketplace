@@ -1,6 +1,6 @@
 // Core libraries and routing
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 
 // Public and user pages
 import LandingPage from './pages/landingpage/LandingPage.jsx';
@@ -94,10 +94,10 @@ const LayoutWrapper = ({ children }) => {
 
 // Main application component that sets up routing for admin, user, and seller sections
 
-function App() {
+function AppRoutes() {
   return (
     <CartProvider>                                      
-      <Router>
+      <>
         <ScrollToTop />
         <Routes>
           {/* Public and user routes */}
@@ -176,9 +176,10 @@ function App() {
           <Route path="*" element={<Navigate to="/" />} />
 
         </Routes>
-      </Router>
+      </>
     </CartProvider>                                     
   );
 }
 
-export default App;
+const router = createBrowserRouter([{ path: '*', element: <AppRoutes /> }]);
+export default function App() { return <RouterProvider router={router} />; }

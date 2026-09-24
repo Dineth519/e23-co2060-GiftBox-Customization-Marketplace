@@ -16,6 +16,7 @@ export default function AssemblerSidebar() {
     const username = localStorage.getItem('username')?.trim() || 'Assembler';
     const handleLogout = () => {
         if (!window.confirm('Are you sure you want to log out?')) return;
+        if (!window.dispatchEvent(new Event('assembly:logout', { cancelable: true }))) return;
         ['accessToken', 'refreshToken', 'role', 'userRole', 'userId', 'username'].forEach(key => localStorage.removeItem(key));
         navigate('/login', { replace: true });
     };

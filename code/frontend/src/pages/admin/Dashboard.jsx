@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaUsers, FaBoxOpen, FaShoppingCart, FaDollarSign, FaTruck, FaStar } from 'react-icons/fa';
-import { PieChart, Pie, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { FaUsers, FaBoxOpen, FaShoppingCart, FaDollarSign, FaTruck, FaStar, FaStore, FaWallet } from 'react-icons/fa';
+import { PieChart, Pie, BarChart, Bar, AreaChart, Area, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './Dashboard.css';
 
 /**
@@ -15,10 +15,12 @@ const Dashboard = () => {
     giftBoxesCreated: 0,
     totalOrders: 0,
     totalRevenue: 0.0,
+    totalVendors: 0,
     recentOrders: [],
     topVendors: [],
     orderStatusDistribution: [],
-    monthlyRevenue: []
+    monthlyRevenue: [],
+    weeklyRevenue: []
   });
 
   const adminUsername = localStorage.getItem('username') || 'Administrator';
@@ -38,10 +40,12 @@ const Dashboard = () => {
           giftBoxesCreated: data.giftBoxesCreated ?? 0,
           totalOrders: data.totalOrders ?? 0,
           totalRevenue: data.totalRevenue ?? 0.0,
+          totalVendors: data.totalVendors ?? 0,
           recentOrders: data.recentOrders ?? [],
           topVendors: data.topVendors ?? [],
           orderStatusDistribution: data.orderStatusDistribution ?? [],
-          monthlyRevenue: data.monthlyRevenue ?? []
+          monthlyRevenue: data.monthlyRevenue ?? [],
+          weeklyRevenue: data.weeklyRevenue ?? []
         });
         setLoading(false);
       })
@@ -54,9 +58,9 @@ const Dashboard = () => {
   // Statistics cards data structure mapping live DB stats
   const statsData = [
     { icon: <FaUsers />, title: 'Total Customers', value: stats.totalCustomers.toLocaleString() },
-    { icon: <FaBoxOpen />, title: 'Gift Boxes Created', value: stats.giftBoxesCreated.toLocaleString() },
+    { icon: <FaStore />, title: 'Total Vendors', value: stats.totalVendors.toLocaleString() },
     { icon: <FaShoppingCart />, title: 'Orders Today', value: stats.totalOrders.toLocaleString() },
-    { icon: <FaDollarSign />, title: 'Revenue (LKR)', value: stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }) },
+    { icon: <FaWallet />, title: 'Admin Revenue (LKR)', value: stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }) },
   ];
 
   return (
@@ -66,7 +70,13 @@ const Dashboard = () => {
       <div className="dashboard-header">
         <div className="header-content">
           <h1 className="dashboard-title">Welcome back, {adminUsername}! 👋</h1>
-          <p className="dashboard-subtitle">Here's what's happening with your gift marketplace today.</p>
+          <p className="dashboard-subtitle">
+            Here's what's happening with your gift marketplace today.
+          </p>
+        </div>
+        <div className="header-date">
+          <span className="date-icon">📅</span>
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </div>
       </div>
 
@@ -121,9 +131,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Monthly Revenue Bar Chart */}
+        {/* Monthly Orders Bar Chart */}
         <div className="chart-card">
-          <h2 className="card-title">Monthly Revenue (LKR)</h2>
+          <h2 className="card-title">Monthly Orders</h2>
           <div className="chart-container">
             {loading ? (
               <div className="loading-placeholder">Loading chart...</div>
@@ -134,10 +144,66 @@ const Dashboard = () => {
                 <BarChart data={stats.monthlyRevenue}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `LKR ${val/1000}k`} />
-                  <Tooltip cursor={{ fill: '#f5f5f5' }} />
-                  <Bar dataKey="revenue" fill="#1A2340" radius={[4, 4, 0, 0]} />
+                  <YAxis axisLine={false} tickLine={false} />
+                  <Tooltip cursor={{ fill: '#f5f5f5' }} formatter={(value) => `${value} Orders`} />
+                  <Bar dataKey="orderCount" fill="#1A2340" radius={[4, 4, 0, 0]} />
                 </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        {/* Weekly Revenue Area Chart */}
+        <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
+          <h2 className="card-title">Weekly Admin Revenue (Last 7 Days)</h2>
+          <div className="chart-container">
+            {loading ? (
+              <div className="loading-placeholder">Loading chart...</div>
+            ) : stats.weeklyRevenue.length === 0 ? (
+              <div className="empty-placeholder">No data available.</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={stats.weeklyRevenue}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#C9A961" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#C9A961" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} />
+                  <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `LKR ${val/1000}k`} />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="revenue" stroke="#C9A961" fillOpacity={1} fill="url(#colorRevenue)" strokeWidth={3} activeDot={{ r: 6 }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        {/* Monthly Revenue Area Chart */}
+        <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
+          <h2 className="card-title">Monthly Admin Revenue (Last 6 Months)</h2>
+          <div className="chart-container">
+            {loading ? (
+              <div className="loading-placeholder">Loading chart...</div>
+            ) : stats.monthlyRevenue.length === 0 ? (
+              <div className="empty-placeholder">No data available.</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={stats.monthlyRevenue}>
+                  <defs>
+                    <linearGradient id="colorMonthly" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#1A2340" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#1A2340" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                  <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `LKR ${val/1000}k`} />
+                  <Tooltip formatter={(value) => `LKR ${value.toLocaleString()}`} />
+                  <Area type="monotone" dataKey="revenue" stroke="#1A2340" fillOpacity={1} fill="url(#colorMonthly)" strokeWidth={3} activeDot={{ r: 6 }} />
+                </AreaChart>
               </ResponsiveContainer>
             )}
           </div>
@@ -150,7 +216,6 @@ const Dashboard = () => {
         <div className="activity-card">
           <div className="card-header">
             <h2 className="card-title">Recent Orders</h2>
-            <button className="view-all-btn">View All</button>
           </div>
           <div className="card-content">
             {loading ? (
@@ -184,7 +249,6 @@ const Dashboard = () => {
         <div className="activity-card">
           <div className="card-header">
             <h2 className="card-title">Top Vendors</h2>
-            <button className="view-all-btn">View All</button>
           </div>
           <div className="card-content">
             {loading ? (

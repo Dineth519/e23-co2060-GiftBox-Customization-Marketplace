@@ -59,6 +59,9 @@ public class Product {
 
     private BigDecimal rating;
 
+    @Version
+    private Integer version;
+
     public Product() {}
 
     // ─── Getters and Setters  ───
@@ -100,4 +103,7 @@ public class Product {
 
     public String getSubCategory() { return subCategory; }
     public void setSubCategory(String subCategory) { this.subCategory = subCategory; }
+
+    public Integer getVersion() { return version; }
+    public void setVersion(Integer version) { this.version = version; }
 }

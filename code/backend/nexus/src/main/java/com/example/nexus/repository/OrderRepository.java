@@ -36,4 +36,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     // Dashboard — order status distribution
     @Query(value = "SELECT o.status, COUNT(DISTINCT o.order_id) as count FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.id WHERE p.vendor_id = :vendorId GROUP BY o.status", nativeQuery = true)
     List<Object[]> getOrderStatusDistribution(@Param("vendorId") Integer vendorId);
+
+    // Assembler — assigned or unassigned orders
+    @Query("SELECT o FROM Order o WHERE (o.assemblerId = :assemblerId OR o.assemblerId IS NULL) ORDER BY o.createdAt DESC")
+    List<Order> findForAssembler(@Param("assemblerId") Integer assemblerId);
 }

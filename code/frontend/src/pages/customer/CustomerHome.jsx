@@ -156,7 +156,6 @@ const CustomerHome = () => {
 
   return (
     <div className="customer-home">
-      <Header />
 
       {/* ── SECTION 1: HERO ── */}
       <section className="hero-section" ref={ref}>
