@@ -11,7 +11,6 @@ const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [saveCard, setSaveCard] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = async (e) => {
@@ -23,8 +22,7 @@ const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/orders`,
-          setup_future_usage: saveCard ? 'off_session' : undefined
+          return_url: `${window.location.origin}/orders`
         },
         redirect: 'if_required'
       });
@@ -34,7 +32,8 @@ const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
         onPaymentSuccess();
       }
     } catch (err) {
-      setErrorMsg('Payment failed.');
+      console.error("Stripe confirm error:", err);
+      setErrorMsg('Payment failed: ' + (err.message || 'An unexpected error occurred.'));
     } finally {
       setIsProcessing(false);
     }
@@ -43,17 +42,7 @@ const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
   return (
     <form id="bb-checkout-form" onSubmit={handleSubmit} style={{ marginTop: '24px' }}>
       <PaymentElement options={{ wallets: { link: 'never' } }} />
-      <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <input 
-          type="checkbox" 
-          id="bbSaveCardOption" 
-          checked={saveCard} 
-          onChange={(e) => setSaveCard(e.target.checked)} 
-        />
-        <label htmlFor="bbSaveCardOption" style={{ fontSize: '14px', color: 'var(--text-primary)' }}>
-          Save card details securely for future purchases
-        </label>
-      </div>
+
       {errorMsg && <div style={{ color: 'red', marginTop: '12px' }}>{errorMsg}</div>}
       <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
         <button type="button" className="bb-btn-back" onClick={onBack} disabled={isProcessing || submitting}>
@@ -204,7 +193,7 @@ const BoxBuilderPage = () => {
       const userId = localStorage.getItem('userId');
       if (!userId) return;
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/users/${userId}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         if (res.ok) {
@@ -228,6 +217,18 @@ const BoxBuilderPage = () => {
     setCatalogProducts(cartItems || []);
     setIsLoadingCatalog(false);
   }, [cartItems]);
+
+  // Scroll to top of wizard on step change
+  useEffect(() => {
+    if (heroRef.current) {
+      window.scrollTo({
+        top: heroRef.current.offsetTop - 80,
+        behavior: 'smooth'
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeStep]);
 
   // Restore Draft on mount
   useEffect(() => {
@@ -422,7 +423,8 @@ const BoxBuilderPage = () => {
     setSubmitting(true);
     
     const orderPayload = {
-      customerId: 5, // Maintains customer login context
+      customerId: parseInt(localStorage.getItem('userId')), 
+
       occasion,
       boxSize: boxSize.id,
       wrappingStyle: wrappingStyle.id,
@@ -442,9 +444,12 @@ const BoxBuilderPage = () => {
     };
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/orders/custom-box`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/orders/custom-box`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
         body: JSON.stringify(orderPayload)
       });
 

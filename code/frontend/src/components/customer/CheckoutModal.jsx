@@ -14,7 +14,6 @@ const StripeCheckoutForm = ({ orderPayload, onSuccess, onCancel }) => {
   const { clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [saveCard, setSaveCard] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +25,6 @@ const StripeCheckoutForm = ({ orderPayload, onSuccess, onCancel }) => {
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        setup_future_usage: saveCard ? 'off_session' : undefined,
       },
       redirect: 'if_required',
     });
@@ -40,7 +38,7 @@ const StripeCheckoutForm = ({ orderPayload, onSuccess, onCancel }) => {
     if (paymentIntent && paymentIntent.status === 'succeeded') {
       // 2. Process Backend Order
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/orders/standard`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/orders/standard`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -62,18 +60,7 @@ const StripeCheckoutForm = ({ orderPayload, onSuccess, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} style={{ marginTop: '16px' }}>
       <PaymentElement options={{ wallets: { link: 'never' } }} />
-      
-      <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <input 
-          type="checkbox" 
-          id="saveCardOption" 
-          checked={saveCard} 
-          onChange={(e) => setSaveCard(e.target.checked)} 
-        />
-        <label htmlFor="saveCardOption" style={{ fontSize: '14px', cursor: 'pointer' }}>
-          Save this card for future faster checkouts
-        </label>
-      </div>
+
 
       {errorMessage && <div className="co-modal-error" style={{ marginTop: '16px' }}>{errorMessage}</div>}
       <div className="co-modal-footer" style={{ marginTop: '24px' }}>
@@ -117,7 +104,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
       const fetchUserData = async () => {
         setLoadingData(true);
         try {
-          const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/users/${userId}`, {
+          const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
           });
           if (res.ok) {
@@ -146,7 +133,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     if (isOpen && paymentMethod === 'card' && cartTotal > 0 && !clientSecret) {
       const fetchIntent = async () => {
         try {
-          const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/payments/create-intent`, {
+          const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/payments/create-intent`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -193,7 +180,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/orders/standard`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/orders/standard`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -246,7 +233,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
             {loadingData ? (
               <div className="co-modal-loading">Loading your details...</div>
             ) : (
-              <form onSubmit={paymentMethod === 'cash' ? handlePlaceCODOrder : (e) => e.preventDefault()} className="co-modal-form-split">
+              <div className="co-modal-form-split">
                 
                 <div className="co-modal-left">
                   <div className="co-form-section">
@@ -358,13 +345,13 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                     <button type="button" className="co-modal-btn-cancel" onClick={onClose}>
                       Cancel
                     </button>
-                    <button type="submit" className="co-modal-btn co-modal-btn--gold" disabled={submitting}>
+                    <button type="button" className="co-modal-btn co-modal-btn--gold" onClick={handlePlaceCODOrder} disabled={submitting}>
                       {submitting ? 'Processing...' : 'Confirm COD Order'}
                     </button>
                   </div>
                 )}
                 </div>
-              </form>
+              </div>
             )}
           </div>
         )}

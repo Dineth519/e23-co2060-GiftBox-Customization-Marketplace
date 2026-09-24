@@ -248,7 +248,7 @@ public class OrderController {
                 order.setCustomBoxDetails(mapper.writeValueAsString(customization));
                 order.setDueDate(request.getDeliveryDate() == null ? null : request.getDeliveryDate().atStartOfDay());
             } else {
-                order.setStatus("PROCESSING");
+                order.setStatus("PENDING");
             }
 
             order.setTotalAmount(totalAmount);

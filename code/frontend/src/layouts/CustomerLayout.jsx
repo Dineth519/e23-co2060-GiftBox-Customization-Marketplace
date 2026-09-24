@@ -51,7 +51,7 @@ export default function CustomerLayout() {
           <div className="workspace-heading__inner">
             <div className="workspace-heading__row">
               <div><p className="workspace-eyebrow">{page.label}</p><h1>{page.title}</h1><p className="workspace-description">{page.description}</p></div>
-              <div className="workspace-emblem" aria-hidden="true">✧</div>
+
             </div>
           </div>
         </section>}
