@@ -11,7 +11,6 @@ const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [saveCard, setSaveCard] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = async (e) => {
@@ -23,8 +22,7 @@ const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/orders`,
-          setup_future_usage: saveCard ? 'off_session' : undefined
+          return_url: `${window.location.origin}/orders`
         },
         redirect: 'if_required'
       });
@@ -34,7 +32,8 @@ const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
         onPaymentSuccess();
       }
     } catch (err) {
-      setErrorMsg('Payment failed.');
+      console.error("Stripe confirm error:", err);
+      setErrorMsg('Payment failed: ' + (err.message || 'An unexpected error occurred.'));
     } finally {
       setIsProcessing(false);
     }
@@ -43,17 +42,7 @@ const CheckoutForm = ({ grandTotal, onPaymentSuccess, onBack, submitting }) => {
   return (
     <form id="bb-checkout-form" onSubmit={handleSubmit} style={{ marginTop: '24px' }}>
       <PaymentElement options={{ wallets: { link: 'never' } }} />
-      <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <input 
-          type="checkbox" 
-          id="bbSaveCardOption" 
-          checked={saveCard} 
-          onChange={(e) => setSaveCard(e.target.checked)} 
-        />
-        <label htmlFor="bbSaveCardOption" style={{ fontSize: '14px', color: 'var(--text-primary)' }}>
-          Save card details securely for future purchases
-        </label>
-      </div>
+
       {errorMsg && <div style={{ color: 'red', marginTop: '12px' }}>{errorMsg}</div>}
       <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
         <button type="button" className="bb-btn-back" onClick={onBack} disabled={isProcessing || submitting}>
