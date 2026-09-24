@@ -1,4 +1,9 @@
-import { canVendorSetOrderStatus, filterVendorOrders, vendorOrderStats } from '../../../utils/vendorOrderUtils';
+import {
+  canVendorSetOrderStatus,
+  filterVendorOrders,
+  resolveVendorOrderImageUrl,
+  vendorOrderStats,
+} from '../../../utils/vendorOrderUtils';
 
 const orders = [
   { order_id: 101, status: 'PENDING_VENDOR_ACCEPTANCE', delivery_address: 'Kandy', total_amount: 1000 },
@@ -23,4 +28,14 @@ test.each([
   ['ACCEPTED_BY_VENDOR', 'REJECTED', false],
 ])('validates vendor order status transitions', (current, next, expected) => {
   expect(canVendorSetOrderStatus(current, next)).toBe(expected);
+});
+
+test('keeps remote product image URLs unchanged', () => {
+  const cloudinaryUrl = 'https://res.cloudinary.com/demo/image/upload/product.jpg';
+  expect(resolveVendorOrderImageUrl(cloudinaryUrl, 'http://localhost:8080')).toBe(cloudinaryUrl);
+});
+
+test('resolves relative product image paths against the backend URL', () => {
+  expect(resolveVendorOrderImageUrl('/uploads/product.jpg', 'http://localhost:8080/'))
+    .toBe('http://localhost:8080/uploads/product.jpg');
 });

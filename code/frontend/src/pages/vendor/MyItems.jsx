@@ -4,7 +4,7 @@ import { FaThLarge, FaList, FaSearch, FaEdit, FaTrash, FaPlus, FaSave, FaTimes }
 import { buildProductEdit, filterVendorProducts, vendorProductStats } from '../../utils/vendorProductUtils';
 import { updateVendorProduct } from '../../utils/vendorApi';
 import './MyItems.css'; // Uses the existing MyItems CSS file
-
+import './CreateGiftBox.css'; // Import CreateGiftBox CSS for the common header layout
 const getBadgeClass = (status) => ({
   'Active':        'badge-active',
   'Low Stock':     'badge-low-stock',
@@ -270,14 +270,18 @@ const MyItems = () => {
 
   return (
     <div className="my-items-page">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">My Items</h1>
-          <p className="page-subtitle">Manage your product listings</p>
+      <div className="cgb-top-bar" style={{ marginBottom: '24px' }}>
+        <div className="cgb-top-left">
+          <div className="cgb-title-wrap">
+            <h2>My Items</h2>
+            <p>Manage your product listings</p>
+          </div>
         </div>
-        <button className="btn-add" onClick={() => navigate('/vendor/add-items')}>
-          <FaPlus size={12} /> Add New Item
-        </button>
+        <div className="cgb-top-right">
+          <button type="button" className="cgb-btn-save" onClick={() => navigate('/vendor/add-items')}>
+            <FaPlus size={12} style={{marginRight: '6px'}} /> Add New Item
+          </button>
+        </div>
       </div>
 
       <div className="stats-grid">

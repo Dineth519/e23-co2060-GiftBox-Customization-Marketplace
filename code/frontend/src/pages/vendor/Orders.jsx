@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { filterVendorOrders, vendorOrderStats } from '../../utils/vendorOrderUtils';
+import { FaBoxOpen, FaCoins, FaRegStickyNote, FaUser } from 'react-icons/fa';
+import {
+  filterVendorOrders,
+  resolveVendorOrderImageUrl,
+  vendorOrderStats,
+} from '../../utils/vendorOrderUtils';
 import { updateVendorOrderStatus } from '../../utils/vendorApi';
 import './Orders.css';
-
+import './CreateGiftBox.css'; // Import CreateGiftBox CSS for the common header layout
 // ─── Constants ────────────────────────────────────────────────────────────────
 const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
 
@@ -30,7 +35,12 @@ function StatCard({ label, value, badge, badgeType }) {
 }
 
 function StatusPill({ status }) {
-  return <span className={`orders-status-pill status-${status?.toLowerCase()}`}>{status}</span>;
+  const label = (status || 'Pending')
+    .toLowerCase()
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+  return <span className={`orders-status-pill status-${status?.toLowerCase()}`}>{label}</span>;
 }
 
 function Avatar({ name, index }) {
@@ -40,6 +50,21 @@ function Avatar({ name, index }) {
     <div className="orders-avatar" style={{ background: AVATAR_BG[i], color: '#fff' }}>
       {initials(name)}
     </div>
+  );
+}
+
+function OrderItemImage({ item }) {
+  const [failed, setFailed] = useState(false);
+  if (!item.imageUrl || failed) {
+    return <div className="orders-modal-item-img-placeholder"><FaBoxOpen /></div>;
+  }
+  return (
+    <img
+      src={resolveVendorOrderImageUrl(item.imageUrl)}
+      alt={item.name || 'Order item'}
+      className="orders-modal-item-img"
+      onError={() => setFailed(true)}
+    />
   );
 }
 
@@ -56,7 +81,10 @@ function OrderModal({ order, onClose, onStatusChange }) {
       <div className="orders-modal">
         <div className="orders-modal-head">
           <div className="orders-modal-head-left">
-            <span className="orders-modal-id">#{order.order_id}</span>
+            <div className="orders-modal-heading">
+              <span className="orders-modal-eyebrow">Order details</span>
+              <span className="orders-modal-id">Order #{order.order_id}</span>
+            </div>
             <StatusPill status={order.status} />
           </div>
           <button className="orders-modal-close" onClick={onClose}>✕</button>
@@ -65,21 +93,47 @@ function OrderModal({ order, onClose, onStatusChange }) {
         <div className="orders-modal-body">
           <div className="orders-modal-section">
             <div className="orders-modal-section-title">Order Info</div>
-            <div className="orders-modal-info-grid">
-              <div className="orders-modal-info-row">
-                <span className="orders-modal-info-label">Address</span>
-                <span className="orders-modal-info-val">{order.delivery_address}</span>
+            <div className="orders-modal-summary-grid">
+              <div className="orders-modal-summary-card">
+                <span className="orders-modal-summary-icon"><FaUser /></span>
+                <span className="orders-modal-summary-copy">
+                  <span className="orders-modal-info-label">Customer</span>
+                  <strong className="orders-modal-info-val">{order.customer_name || 'Customer'}</strong>
+                </span>
               </div>
-              <div className="orders-modal-info-row">
-                <span className="orders-modal-info-label">Total Amount</span>
-                <span className="orders-modal-info-val">LKR {fmtLKR(order.total_amount)}</span>
+              <div className="orders-modal-summary-card">
+                <span className="orders-modal-summary-icon"><FaCoins /></span>
+                <span className="orders-modal-summary-copy">
+                  <span className="orders-modal-info-label">Vendor total</span>
+                  <strong className="orders-modal-info-val">LKR {fmtLKR(order.total_amount)}</strong>
+                </span>
               </div>
-              <div className="orders-modal-info-row">
-                <span className="orders-modal-info-label">Special Notes</span>
-                <span className="orders-modal-info-val">{order.special_notes || 'No notes'}</span>
+              <div className="orders-modal-summary-card orders-modal-summary-card--wide">
+                <span className="orders-modal-summary-icon"><FaRegStickyNote /></span>
+                <span className="orders-modal-summary-copy">
+                  <span className="orders-modal-info-label">Special notes</span>
+                  <strong className="orders-modal-info-val">{order.special_notes || 'No special notes provided'}</strong>
+                </span>
               </div>
             </div>
           </div>
+
+          {order.items && order.items.length > 0 && (
+            <div className="orders-modal-section">
+              <div className="orders-modal-section-title">Order Items</div>
+              <div className="orders-modal-items-list">
+                {order.items.map((item, idx) => (
+                  <div key={idx} className="orders-modal-item">
+                    <OrderItemImage item={item} />
+                    <div className="orders-modal-item-details">
+                      <span className="orders-modal-item-name">{item.name}</span>
+                      <span className="orders-modal-item-qty">Quantity · {item.quantity}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="orders-modal-section">
             <div className="orders-modal-section-title">Order Timeline</div>
@@ -88,8 +142,10 @@ function OrderModal({ order, onClose, onStatusChange }) {
             ) : (
               <div className="orders-timeline">
                 {timelineSteps.map((s, j) => (
-                  <div className="orders-tl-step" key={j}>
-                    <div className={`orders-tl-dot ${j <= step ? 'done' : 'todo'}`} />
+                  <div className={`orders-tl-step ${j < step ? 'done-line' : ''}`} key={j}>
+                    <div className={`orders-tl-dot ${j < step ? 'done' : j === step ? 'current' : 'todo'}`}>
+                      {j <= step ? '✓' : ''}
+                    </div>
                     <div className="orders-tl-label">{s}</div>
                   </div>
                 ))}
@@ -193,13 +249,14 @@ const Orders = () => {
   const stats = useMemo(() => vendorOrderStats(orders), [orders]);
 
   return (
-    <div className="orders-page">
-      <div className="orders-page-header">
-        <div>
-          <h1 className="orders-page-title">Order Management</h1>
-          <p className="orders-page-sub">Track, filter and update all your customer orders</p>
+    <div className="vendor-orders-page">
+      <div className="cgb-top-bar" style={{ marginBottom: '24px' }}>
+        <div className="cgb-top-left">
+          <div className="cgb-title-wrap">
+            <h2>Order Management</h2>
+            <p>Track, filter and update all your customer orders</p>
+          </div>
         </div>
-        <button className="orders-export-btn">Export CSV</button>
       </div>
 
       {/* Stats Row */}
@@ -215,14 +272,20 @@ const Orders = () => {
         <input
           className="orders-search-input"
           type="text"
-          placeholder="Search by order ID or address…"
+          placeholder="Search by order ID or customer name…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="orders-filter-tabs">
-          {['All', 'PENDING_VENDOR_ACCEPTANCE', 'ACCEPTED_BY_VENDOR', 'SENT_TO_ASSEMBLY', 'REJECTED'].map(f => (
-            <button key={f} className={`orders-filter-tab ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
-              {f}
+          {[
+            { id: 'All', label: 'All' },
+            { id: 'PENDING_VENDOR_ACCEPTANCE', label: 'Pending Acceptance' },
+            { id: 'ACCEPTED_BY_VENDOR', label: 'Accepted' },
+            { id: 'SENT_TO_ASSEMBLY', label: 'Sent to Assembly' },
+            { id: 'REJECTED', label: 'Rejected' }
+          ].map(f => (
+            <button key={f.id} className={`orders-filter-tab ${filter === f.id ? 'active' : ''}`} onClick={() => setFilter(f.id)}>
+              {f.label}
             </button>
           ))}
         </div>
@@ -239,7 +302,7 @@ const Orders = () => {
             <thead>
               <tr>
                 <th>Order ID</th>
-                <th>Address</th>
+                <th>Customer Name</th>
                 <th>Date</th>
                 <th>Total (LKR)</th>
                 <th>Status</th>
@@ -250,7 +313,7 @@ const Orders = () => {
               {pageSlice.map((order, i) => (
                 <tr key={order.sub_order_id} className={`orders-table-row ${order.status === 'PENDING_VENDOR_ACCEPTANCE' ? 'orders-row-pending-special' : ''}`}>
                   <td className="orders-order-id">#{order.order_id}</td>
-                  <td>{order.delivery_address}</td>
+                  <td>{order.customer_name}</td>
                   <td>{new Date(order.created_at).toLocaleDateString()}</td>
                   <td className="orders-total-cell">{fmtLKR(order.total_amount)}</td>
                   <td><StatusPill status={order.status} /></td>

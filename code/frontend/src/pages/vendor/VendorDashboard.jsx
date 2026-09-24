@@ -8,7 +8,7 @@ import {
   FaShoppingCart, FaDollarSign, FaBoxOpen, FaStar, FaClock
 } from 'react-icons/fa';
 import './VendorDashboard.css';
-
+import './CreateGiftBox.css'; // Import CreateGiftBox CSS for the common header layout
 // ── Config ────────────────────────────────────────────────────
 const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
 const getSellerId = () => {
@@ -24,6 +24,10 @@ const STATUS_COLOR_MAP = {
   SHIPPED:    { bg: '#E6F1FB', color: '#185FA5', border: '#85B7EB' },
   CANCELLED:  { bg: '#FCEBEB', color: '#A32D2D', border: '#F09595' },
   READY:      { bg: '#EAF3DE', color: '#2E7D52', border: '#A8D87A' },
+  PENDING_VENDOR_ACCEPTANCE: { bg: '#FFF4D6', color: '#8A5A00', border: '#E8C96A' },
+  ACCEPTED_BY_VENDOR: { bg: '#E8F0FE', color: '#1A5BBF', border: '#85B7EB' },
+  SENT_TO_ASSEMBLY: { bg: '#F0E6FB', color: '#6A1FAB', border: '#C49AEB' },
+  REJECTED: { bg: '#FCE8E8', color: '#A32D2D', border: '#F09595' },
 };
 
 const PIE_COLORS = {
@@ -85,9 +89,11 @@ const ChartCard = ({ children, style }) => (
 
 const StatusPill = ({ status }) => {
   const s = STATUS_COLOR_MAP[status] || STATUS_COLOR_MAP.PENDING;
+  const label = (status || 'PENDING').toLowerCase().split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   return (
     <span className="sd-status-pill" style={{ background: s.bg, color: s.color, borderColor: s.border }}>
-      {status}
+      {label}
     </span>
   );
 };
@@ -135,7 +141,7 @@ const VendorDashboard = () => {
           if (dash.statusDistribution) {
             const total = Object.values(dash.statusDistribution).reduce((a, b) => a + Number(b), 0);
             setPieData(Object.entries(dash.statusDistribution).map(([name, val]) => ({
-              name,
+              name: name.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' '),
               value: total > 0 ? Math.round((Number(val) / total) * 100) : 0,
               color: PIE_COLORS[name] ?? '#AAA',
             })));
@@ -176,18 +182,11 @@ const VendorDashboard = () => {
     <div className="sd-page">
 
       {/* ── Welcome Banner ── */}
-      <div className="sd-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1>Welcome back! 👋</h1>
-          <p>Here's what's happening with your shop today.</p>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div className="sd-banner-date">
-            <p className="date-label">Today</p>
-            <p className="date-value">
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-            </p>
+      <div className="cgb-top-bar" style={{ marginBottom: '24px' }}>
+        <div className="cgb-top-left">
+          <div className="cgb-title-wrap">
+            <h2>Vendor Dashboard</h2>
+            <p>Track your shop performance, orders and inventory.</p>
           </div>
         </div>
       </div>
@@ -265,7 +264,7 @@ const VendorDashboard = () => {
                 <thead>
                   <tr>
                     <th>Order ID</th>
-                    <th>Destination</th>
+                    <th>Customer</th>
                     <th>Date</th>
                     <th>Status</th>
                     <th style={{ textAlign: 'right' }}>Total</th>
@@ -275,7 +274,7 @@ const VendorDashboard = () => {
                   {recent.map((o) => (
                     <tr key={o.order_id} className={o.status === 'PENDING' ? 'sd-tr-pending-special' : ''}>
                       <td className="sd-td-id">#{o.order_id}</td>
-                      <td>{o.delivery_address}</td>
+                      <td>{o.customer_name}</td>
                       <td className="sd-td-time">{timeAgo(o.created_at)}</td>
                       <td><StatusPill status={o.status} /></td>
                       <td style={{ textAlign: 'right', fontWeight: 600 }}>LKR {fmtLKR(o.total_amount)}</td>

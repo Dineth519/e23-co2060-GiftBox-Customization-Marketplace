@@ -5,7 +5,7 @@ import { FaArrowLeft, FaPlus, FaUpload, FaBoxOpen, FaDollarSign, FaImage, FaChec
 import { buildVendorProductPayload, validateVendorProduct } from '../../utils/vendorProductUtils';
 import { apiCall } from '../../utils/api'; // අපේ API utility එක මෙතනට import කර ඇත
 import './AddItems.css';
-
+import './CreateGiftBox.css'; // Import CreateGiftBox CSS for the common header layout
 // ── Reusable field components ──────────────────────────────────
 const Label = ({ children, required }) => (
   <label className="ai-label">
@@ -181,20 +181,20 @@ const AddItems = () => {
     <div className="ai-page">
 
       {/* ── Page Header ── */}
-      <div className="ai-header">
-        <div className="ai-header-left">
-          <button className="ai-back-btn" onClick={() => navigate('/vendor/my-items')}>
+      <div className="cgb-top-bar" style={{ marginBottom: '24px' }}>
+        <div className="cgb-top-left">
+          <button type="button" className="cgb-back-icon-btn" onClick={() => navigate('/vendor/my-items')}>
             <FaArrowLeft />
           </button>
-          <div>
-            <h1>Add New Item</h1>
+          <div className="cgb-title-wrap">
+            <h2>Add New Item</h2>
             <p>Fill in the details to list a new product</p>
           </div>
         </div>
-        <div className="ai-header-actions">
-          <button className="btn-cancel" onClick={() => navigate('/vendor/my-items')}>Cancel</button>
-          <button className={`btn-save${submitted ? ' saved' : ''}`} disabled={submitted} onClick={handleSubmit}>
-            <FaPlus size={12} /> {submitted ? 'Saving…' : 'Save Item'}
+        <div className="cgb-top-right">
+          <button type="button" className="cgb-btn-cancel" onClick={() => navigate('/vendor/my-items')}>Cancel</button>
+          <button type="button" className={`cgb-btn-save${submitted ? ' saved' : ''}`} disabled={submitted} onClick={handleSubmit}>
+            {submitted ? 'Saving…' : '+ Save Item'}
           </button>
         </div>
       </div>

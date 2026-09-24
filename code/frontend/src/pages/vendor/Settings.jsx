@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import './CreateGiftBox.css'; // Import CreateGiftBox CSS for the common header layout
 const gold = "#C9A84C";
 const goldLight = "#E8C96A";
 const navy = "#1A2340";
@@ -8,14 +8,14 @@ const cream = "#F5F0E8";
 
 const styles = {
   page: {
-    padding: "32px 36px",
+    padding: "30px",
     minHeight: "100vh",
-    background: cream,
+    background: "#F6F1EA",
     fontFamily: "'Inter', sans-serif",
   },
-  pageHeader: { marginBottom: 28 },
+  pageHeader: { marginBottom: 24 },
   pageTitle: { fontSize: 24, fontWeight: 700, color: navy, margin: 0 },
-  pageSub: { color: "#7A869A", fontSize: 14, marginTop: 6 },
+  pageSub: { color: "#8C7F6B", fontSize: 14, marginTop: 4 },
   grid: {
     display: "grid",
     gridTemplateColumns: "280px 1fr",
@@ -353,11 +353,21 @@ const Settings = () => {
   return (
     <div style={styles.page}>
       {/* Page Header */}
-      <div style={styles.pageHeader}>
-        <h1 style={styles.pageTitle}>Edit Profile</h1>
-        <p style={styles.pageSub}>
-          Manage your personal details, shop settings and payment information
-        </p>
+      <div className="cgb-top-bar" style={{ marginBottom: '24px' }}>
+        <div className="cgb-top-left">
+          <div className="cgb-title-wrap">
+            <h2>Edit Profile</h2>
+            <p>Manage your personal details, shop settings and payment information</p>
+          </div>
+        </div>
+        <div className="cgb-top-right">
+          <button type="button" className="cgb-btn-cancel">
+            Cancel
+          </button>
+          <button type="button" className="cgb-btn-save" onClick={handleSave}>
+            Save Changes
+          </button>
+        </div>
       </div>
 
       <div style={styles.grid}>

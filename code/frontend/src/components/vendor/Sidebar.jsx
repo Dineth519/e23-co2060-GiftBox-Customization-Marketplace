@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FaBoxes, FaThLarge, FaClipboardList, FaCog, FaGift, FaPlusCircle, FaSignOutAlt } from 'react-icons/fa';
+import { FaBoxes, FaThLarge, FaClipboardList, FaCog, FaPlusCircle, FaSignOutAlt } from 'react-icons/fa';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -77,14 +77,6 @@ const Sidebar = () => {
           <span>My items</span>
         </NavLink>
       
-        <NavLink 
-          to="/vendor/add-items" 
-          className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-        >
-          <FaGift size={18} /> 
-          <span>Gift Sets</span>
-        </NavLink>
-
         <NavLink 
           to="/vendor/settings" 
           className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
