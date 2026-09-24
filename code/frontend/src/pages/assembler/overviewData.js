@@ -3,7 +3,7 @@ export const STATUS = {
   awaiting: { label: 'Awaiting items', tone: 'amber' },
   ready: { label: 'Ready to assemble', tone: 'teal' },
   assembling: { label: 'In assembly', tone: 'blue' },
-  review: { label: 'Ready for review', tone: 'teal' },
+  completed: { label: 'Completed', tone: 'teal' },
   hold: { label: 'On hold', tone: 'red' },
 };
 export function filterOrders(orders, status, query) {

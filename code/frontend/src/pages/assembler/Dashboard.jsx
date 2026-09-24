@@ -9,9 +9,9 @@ const metrics = [
   { status: 'awaiting', icon: Package, hint: 'Waiting for vendor deliveries' },
   { status: 'ready', icon: Box, hint: 'All items received' },
   { status: 'assembling', icon: Settings, hint: 'Preparation in progress' },
-  { status: 'review', icon: CircleCheck, hint: 'Awaiting final approval' },
+  { status: 'completed', icon: CircleCheck, hint: 'Assembly completed' },
 ];
-const statusIcons = { awaiting: Clock, ready: Box, assembling: Settings, review: CircleCheck, hold: TriangleAlert };
+const statusIcons = { awaiting: Clock, ready: Box, assembling: Settings, completed: CircleCheck, hold: TriangleAlert };
 
 function StatusBadge({ status }) {
   const Icon = statusIcons[status];
@@ -34,7 +34,8 @@ export default function AssemblerDashboard({ queueMode = false }) {
   const [due, setDue] = useState('all');
   const [sort, setSort] = useState('due');
   const navigate = useNavigate();
-  const { orders: liveOrders, loading, error, reload } = useAssemblyOrders();
+  const { orders: allOrders, loading, error, reload } = useAssemblyOrders();
+  const liveOrders = allOrders;
   const orders = selectQueueOrders(liveOrders, { status, query, box, due, sort });
   const onHold = liveOrders.filter(order => order.status === 'hold').length;
   const attention = liveOrders.filter(order => order.issue || order.status === 'hold' || (order.status === 'awaiting' && ['Today', 'Overdue'].includes(order.due)));
@@ -50,10 +51,9 @@ export default function AssemblerDashboard({ queueMode = false }) {
       {queueMode && <nav className="aq-breadcrumb" aria-label="Breadcrumb"><Link to="/assembler">Overview</Link><span aria-hidden="true">/</span><span aria-current="page">Order Queue</span></nav>}
       <header className="ao-header">
         <div>
-          <div className="ao-title-row"><h1 id="ao-title">{queueMode ? 'Order Queue' : 'Assembly overview'}</h1><button type="button" className="ao-sample" onClick={reload} disabled={loading}>Refresh</button></div>
+          <div className="ao-title-row"><h1 id="ao-title">{queueMode ? 'Order Queue' : 'Assembly overview'}</h1></div>
           <p>{queueMode ? 'Find a gift box, check item arrivals, and plan your next assembly.' : 'Receive items. Prepare gifts. Keep every detail right.'}</p>
         </div>
-        <div className="ao-date"><span>Today</span><time dateTime={new Date().toLocaleDateString('en-CA')}>{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</time></div>
       </header>
 
       <AssemblyLoadState loading={loading} error={error} reload={reload} />
@@ -123,7 +123,7 @@ export default function AssemblerDashboard({ queueMode = false }) {
         {onHold > 0 && <button type="button" className="ao-alert" onClick={() => { setSearchParams({ status: 'hold' }, { replace: true }); setBox('all'); setDue('all'); }}><TriangleAlert size={19} aria-hidden="true" /><span><strong>{onHold} {onHold === 1 ? 'order needs' : 'orders need'} attention</strong> — review held orders</span><ArrowRight size={18} aria-hidden="true" /></button>}
       </section>}
 
-      <footer className="ao-bottom"><p>Confirmed orders available to you. Saving an unassigned order assigns it to you.</p><Link to="/assembler/packing-guide"><BookOpen size={17} aria-hidden="true" />Packing guide<ArrowRight size={15} aria-hidden="true" /></Link></footer>
+      <footer className="ao-bottom"><p>Confirmed orders available to you. Saving an unassigned order assigns it to you.</p></footer>
 
 
     </section>

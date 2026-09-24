@@ -103,4 +103,8 @@ public class Order {
     @Column(name = "updated_at", insertable = false, updatable = false)
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonProperty("sub_orders")
+    private java.util.List<SubOrder> subOrders = new java.util.ArrayList<>();
 }

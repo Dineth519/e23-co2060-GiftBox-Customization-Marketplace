@@ -38,7 +38,7 @@ const StripeCheckoutForm = ({ orderPayload, onSuccess, onCancel }) => {
     if (paymentIntent && paymentIntent.status === 'succeeded') {
       // 2. Process Backend Order
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/orders/standard`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/orders/standard`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
       const fetchUserData = async () => {
         setLoadingData(true);
         try {
-          const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/users/${userId}`, {
+          const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
           });
           if (res.ok) {
@@ -133,7 +133,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     if (isOpen && paymentMethod === 'card' && cartTotal > 0 && !clientSecret) {
       const fetchIntent = async () => {
         try {
-          const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/payments/create-intent`, {
+          const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/payments/create-intent`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/orders/standard`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/orders/standard`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -233,7 +233,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
             {loadingData ? (
               <div className="co-modal-loading">Loading your details...</div>
             ) : (
-              <form onSubmit={paymentMethod === 'cash' ? handlePlaceCODOrder : (e) => e.preventDefault()} className="co-modal-form-split">
+              <div className="co-modal-form-split">
                 
                 <div className="co-modal-left">
                   <div className="co-form-section">
@@ -345,13 +345,13 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                     <button type="button" className="co-modal-btn-cancel" onClick={onClose}>
                       Cancel
                     </button>
-                    <button type="submit" className="co-modal-btn co-modal-btn--gold" disabled={submitting}>
+                    <button type="button" className="co-modal-btn co-modal-btn--gold" onClick={handlePlaceCODOrder} disabled={submitting}>
                       {submitting ? 'Processing...' : 'Confirm COD Order'}
                     </button>
                   </div>
                 )}
                 </div>
-              </form>
+              </div>
             )}
           </div>
         )}

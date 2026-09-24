@@ -202,7 +202,7 @@ const BoxBuilderPage = () => {
       const userId = localStorage.getItem('userId');
       if (!userId) return;
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/users/${userId}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/users/${userId}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         if (res.ok) {
@@ -226,6 +226,18 @@ const BoxBuilderPage = () => {
     setCatalogProducts(cartItems || []);
     setIsLoadingCatalog(false);
   }, [cartItems]);
+
+  // Scroll to top of wizard on step change
+  useEffect(() => {
+    if (heroRef.current) {
+      window.scrollTo({
+        top: heroRef.current.offsetTop - 80,
+        behavior: 'smooth'
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeStep]);
 
   // Restore Draft on mount
   useEffect(() => {

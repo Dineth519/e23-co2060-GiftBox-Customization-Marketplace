@@ -8,7 +8,7 @@ import './Issues.css';
 
 export default function AssemblerCompleted() {
   const { orders: allOrders, loading, error, reload } = useAssemblyOrders();
-  const orders = allOrders.filter(order => order.status === 'review').sort((a, b) => (Date.parse(b.submittedAt) || 0) - (Date.parse(a.submittedAt) || 0));
+  const orders = allOrders.filter(order => order.status === 'completed').sort((a, b) => (Date.parse(b.submittedAt) || 0) - (Date.parse(a.submittedAt) || 0));
   const [query, setQuery] = useState('');
   const visible = filterOrders(orders, 'all', query);
   return <section className="asm-issues" aria-labelledby="ac-title">

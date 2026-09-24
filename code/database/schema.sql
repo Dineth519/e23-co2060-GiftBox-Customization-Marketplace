@@ -131,33 +131,46 @@ CREATE TABLE gift_box_items (
 );
 
 -- ============================================================
--- 7. ORDERS
---    Customer places an order (no payment — COD only for now)
---    Status flow: PENDING → CONFIRMED → RECEIVED → ASSEMBLING
---                 → READY → SHIPPED → DELIVERED | CANCELLED
+-- 7. PARENT ORDERS & SUB-ORDERS
+--    Customer places an order mapped to a parent_order.
+--    Vendors get sub-orders mapped to the orders table.
 -- ============================================================
+CREATE TABLE parent_orders (
+    parent_order_id  INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id      INT NOT NULL,
+    total_amount     DECIMAL(10,2) NOT NULL,
+    status           ENUM(
+                        'PENDING_PAYMENT',
+                        'PROCESSING',
+                        'ASSEMBLING',
+                        'READY_TO_SHIP',
+                        'SHIPPED',
+                        'DELIVERED',
+                        'CANCELLED'
+                     ) DEFAULT 'PROCESSING',
+    delivery_address VARCHAR(255) NOT NULL,
+    special_notes    TEXT         NULL,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
 CREATE TABLE orders (
     order_id         INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id      INT          NOT NULL,
+    parent_order_id  INT          NOT NULL,
     partner_id       INT          NOT NULL,    -- Which vendor's shop this order is from
-    assembler_id     INT          NULL,        -- Assigned assembler (nullable until assigned)
+    assembler_id     INT          NULL,        -- Assigned assembler
     status           ENUM(
-                        'PENDING',       -- Customer placed order
-                        'CONFIRMED',     -- Vendor confirmed
-                        'RECEIVED',      -- Assembler received items
-                        'ASSEMBLING',    -- Assembler is building gift box
-                        'READY',         -- Assembly complete, ready to ship
-                        'SHIPPED',       -- On the way
-                        'DELIVERED',     -- Customer received
-                        'CANCELLED'      -- Cancelled by vendor or customer
-                     ) DEFAULT 'PENDING',
-    delivery_address VARCHAR(255) NOT NULL,
-    special_notes    TEXT         NULL,        -- Customer's special instructions
-    total_amount     DECIMAL(10,2) NOT NULL,
+                        'PENDING_VENDOR_ACCEPTANCE',
+                        'ACCEPTED_BY_VENDOR',
+                        'SENT_TO_ASSEMBLY',
+                        'REJECTED'
+                     ) DEFAULT 'PENDING_VENDOR_ACCEPTANCE',
+    vendor_total     DECIMAL(10,2) NOT NULL,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (customer_id)  REFERENCES customers(customer_id),
+    FOREIGN KEY (parent_order_id) REFERENCES parent_orders(parent_order_id) ON DELETE CASCADE,
     FOREIGN KEY (partner_id)   REFERENCES partners(partner_id),
     FOREIGN KEY (assembler_id) REFERENCES assemblers(assembler_id)
 );
@@ -197,9 +210,9 @@ SELECT
     o.partner_id,
     DATE(o.created_at)      AS order_date,
     COUNT(o.order_id)       AS total_orders,
-    SUM(o.total_amount)     AS daily_revenue
+    SUM(o.vendor_total)     AS daily_revenue
 FROM orders o
-WHERE o.status NOT IN ('CANCELLED')
+WHERE o.status NOT IN ('REJECTED')
 GROUP BY o.partner_id, DATE(o.created_at);
 
 -- Vendor weekly revenue view
@@ -209,9 +222,9 @@ SELECT
     YEAR(o.created_at)      AS yr,
     WEEK(o.created_at)      AS wk,
     COUNT(o.order_id)       AS total_orders,
-    SUM(o.total_amount)     AS weekly_revenue
+    SUM(o.vendor_total)     AS weekly_revenue
 FROM orders o
-WHERE o.status NOT IN ('CANCELLED')
+WHERE o.status NOT IN ('REJECTED')
 GROUP BY o.partner_id, YEAR(o.created_at), WEEK(o.created_at);
 
 -- Best-selling products (by total quantity ordered)
@@ -224,7 +237,7 @@ SELECT
 FROM order_items oi
 JOIN products p ON oi.product_id = p.id
 JOIN orders   o ON oi.order_id   = o.order_id
-WHERE o.status NOT IN ('CANCELLED')
+WHERE o.status NOT IN ('REJECTED')
 GROUP BY p.id, p.name, p.partner_id
 ORDER BY total_sold DESC;
 
@@ -232,14 +245,18 @@ ORDER BY total_sold DESC;
 CREATE VIEW admin_order_overview AS
 SELECT
     o.order_id,
+    po.parent_order_id,
     u_c.name        AS customer_name,
     u_p.name        AS vendor_name,
     pt.shop_name,
-    o.status,
-    o.total_amount,
+    o.status        AS sub_order_status,
+    po.status       AS parent_order_status,
+    o.vendor_total,
+    po.total_amount AS parent_total_amount,
     o.created_at
 FROM orders o
-JOIN customers c  ON o.customer_id = c.customer_id
+JOIN parent_orders po ON o.parent_order_id = po.parent_order_id
+JOIN customers c  ON po.customer_id = c.customer_id
 JOIN users u_c    ON c.customer_id = u_c.user_id
 JOIN partners pt  ON o.partner_id  = pt.partner_id
 JOIN users u_p    ON pt.partner_id = u_p.user_id;
