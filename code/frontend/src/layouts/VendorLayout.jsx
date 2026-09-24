@@ -1,6 +1,6 @@
 // Core library
 import React, { useEffect, useRef } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 
 // Vendor components
 import Sidebar from '../components/vendor/Sidebar';
@@ -9,8 +9,7 @@ import TopBar from '../components/vendor/TopBar';
 // Stylesheet
 import './AdminLayout.css';
 
-// Vendor layout wrapper component providing sidebar and top navigation
-const VendorLayout = ({ children }) => {
+const VendorLayout = () => {
   const userRole = localStorage.getItem('role');
   const userId = localStorage.getItem('userId');
   const location = useLocation();
@@ -38,11 +37,10 @@ const VendorLayout = ({ children }) => {
 
         {/* Main content area */}
         <main className="main-content" ref={mainContentRef}>
-          {children}
+          {/* Child Route Components will be rendered here */}
+          <Outlet />
         </main>
-
       </div>
-      
     </div>
   );
 };
