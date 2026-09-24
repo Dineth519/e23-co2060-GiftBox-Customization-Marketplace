@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/landingpage/Header';
 import Footer from '../../components/landingpage/Footer';
+import { useCart } from '../../context/CartContext';
 import './BoxBuilderPage.css';
 
 // Safe helper to extract product ID regardless of backend field naming (_id, id, productId)
@@ -84,6 +85,7 @@ const FALLBACK_PRODUCTS = [
 const BoxBuilderPage = () => {
   const navigate = useNavigate();
   const heroRef = useRef(null);
+  const { cartItems } = useCart();
   
   const [activeStep, setActiveStep] = useState(1);
   const [catalogProducts, setCatalogProducts] = useState([]);
@@ -123,12 +125,12 @@ const BoxBuilderPage = () => {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  // Load catalog products
+  // Load catalog products from cart items
   useEffect(() => {
     setIsLoadingCatalog(true);
-    setCatalogProducts(FALLBACK_PRODUCTS);
+    setCatalogProducts(cartItems || []);
     setIsLoadingCatalog(false);
-  }, []);
+  }, [cartItems]);
 
   // Sync Item Trim Constraints when Box Size Decreases
   useEffect(() => {
@@ -206,7 +208,7 @@ const BoxBuilderPage = () => {
 
   // Submit Order Process
   const canPlaceOrder = () => !isLoadingCatalog && totalItemsCount > 0 &&
-    totalItemsCount <= boxSize.limit && recipientName.trim() && deliveryAddress.trim() && zipCode.trim();
+    totalItemsCount <= boxSize.limit && recipientName.trim();
 
   const handleSignInToBuy = () => {
     if (!canPlaceOrder() || submitting) return;
@@ -284,7 +286,6 @@ const BoxBuilderPage = () => {
           { step: 2, label: ' Wrap & Styling' },
           { step: 3, label: ' Select Inventory' },
           { step: 4, label: ' Personalization' },
-          { step: 5, label: ' Checkout' }
         ].map((item) => (
           <button
             key={item.step}
@@ -631,84 +632,16 @@ const BoxBuilderPage = () => {
                   Save Draft
                 </button>
                 <button
-                  className="bb-btn-forward"
-                  disabled={!recipientName.trim()}
-                  onClick={() => setActiveStep(5)}
-                >
-                  Next: Checkout & Dispatch →
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 5: CHECKOUT & DISPATCH */}
-          {activeStep === 5 && (
-            <div className="bb-step-view">
-              <div className="bb-step-header">
-                <h3>Checkout & Dispatch</h3>
-                <p>Provide consignment address and secure payment details.</p>
-              </div>
-
-              <div className="bb-form-layout">
-                <div className="bb-field">
-                  <label>Delivery Destination Address *</label>
-                  <input
-                    type="text"
-                    placeholder="Street, City"
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                  />
-                </div>
-
-                <div className="bb-field-row">
-                  <div className="bb-field">
-                    <label>Zip / Postal Code *</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 10400"
-                      value={zipCode}
-                      onChange={(e) => setZipCode(e.target.value)}
-                    />
-                  </div>
-                  <div className="bb-field">
-                    <label>Preferred Delivery Date</label>
-                    <input
-                      type="date"
-                      min={new Date().toISOString().split('T')[0]}
-                      value={deliveryDate}
-                      onChange={(e) => setDeliveryDate(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bb-step-header" style={{ marginTop: '32px' }}>
-                <h3>Secure Payment</h3>
-              </div>
-
-              <div style={{ padding: '20px', background: '#f5f5f0', borderRadius: '8px', textAlign: 'center', marginTop: '16px' }}>
-                <p>Please sign in to proceed with secure checkout and payment.</p>
-              </div>
-
-              <div className="bb-step-nav-row" style={{ marginTop: '32px' }}>
-                <button className="bb-btn-secondary" onClick={() => setActiveStep(4)}>← Back</button>
-                <button
-                  className="bb-btn-secondary"
-                  onClick={handleSaveDraft}
-                  style={{ marginRight: '16px' }}
-                >
-                  Save Draft
-                </button>
-                <button
                   className="bb-btn-submit"
-                  onClick={handleSignInToBuy}
-                  disabled={!canPlaceOrder() || submitting}
+                  onClick={() => { handleSaveDraft(); navigate('/login'); }}
                 >
-                  {submitting ? 'Processing Submission...' : `Sign in to buy • LKR ${grandTotal.toLocaleString()}`}
+                  Sign In to Buy • LKR {grandTotal.toLocaleString()}
                 </button>
               </div>
             </div>
           )}
+
+
 
         </div>
 

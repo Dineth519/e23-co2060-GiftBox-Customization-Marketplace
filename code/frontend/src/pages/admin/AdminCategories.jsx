@@ -81,9 +81,9 @@ const AdminCategories = () => {
   return (
     <div className="categories-container">
       <div className="categories-header">
-        <div>
-          <h1 className="categories-title">Categories</h1>
-          <p className="categories-subtitle">Manage product categories</p>
+        <div className="header-text">
+          <h1 className="page-title">Categories</h1>
+          <p className="page-subtitle">Manage product categories</p>
         </div>
       </div>
 
@@ -102,7 +102,10 @@ const AdminCategories = () => {
       </form>
 
       {loading ? (
-        <p>Loading categories...</p>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">Loading categories...</p>
+        </div>
       ) : (
         <div className="categories-grid">
           {categories.map(cat => (
@@ -114,11 +117,13 @@ const AdminCategories = () => {
               >
                 <FaTrash size={14} />
               </button>
-              <FaFolder size={20} style={{ color: '#c9a961', marginBottom: '10px' }} />
-              <div>{cat.name}</div>
+              <div className="category-icon-wrapper">
+                <FaFolder size={24} />
+              </div>
+              <div className="category-name">{cat.name}</div>
             </div>
           ))}
-          {categories.length === 0 && <p>No categories found.</p>}
+          {categories.length === 0 && <p className="empty-text">No categories found.</p>}
         </div>
       )}
     </div>

@@ -16,6 +16,22 @@
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(201, 169, 97, 0.1);
   border: 1px solid rgba(201, 169, 97, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-date {
+  background: linear-gradient(135deg, rgba(201, 169, 97, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
+  padding: 12px 20px;
+  border-radius: 12px;
+  color: #C9A961;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(201, 169, 97, 0.2);
 }
 
 .header-content {
@@ -212,15 +228,20 @@
 /* Card content wrapper */
 .card-content {
   padding: 16px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 /* Activity list item styling */
 .activity-item {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 16px;
   padding: 16px 0;
   border-bottom: 1px solid rgba(201, 169, 97, 0.08);
+  width: 100%;
 }
 
 .activity-item:last-child {
