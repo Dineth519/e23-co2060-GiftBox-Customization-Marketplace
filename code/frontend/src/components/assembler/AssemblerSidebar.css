@@ -19,6 +19,9 @@
 .assembler-sidebar .asm-profile { display: flex; align-items: center; gap: 12px; border-top: 1px solid #ffffff24; padding: 20px 8px 8px; }
 .assembler-sidebar .asm-avatar { width: 34px; height: 34px; flex: 0 0 34px; border-radius: 50%; background: #e9e7e1; color: #24334d; display: grid; place-items: center; font-weight: 700; }
 .assembler-sidebar .asm-profile-details { min-width: 0; }
+.assembler-sidebar .asm-profile { color: inherit; text-decoration: none; border-radius: 7px; width: 100%; background: transparent; border-inline: 0; border-bottom: 0; text-align: left; font-family: inherit; cursor: pointer; }
+.assembler-sidebar .asm-profile:hover, .assembler-sidebar .asm-profile.is-active { background: #263851; }
+.assembler-sidebar .asm-profile:focus-visible { outline: 2px solid #e6c985; outline-offset: 3px; }
 .assembler-sidebar .asm-profile-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
 .assembler-sidebar .asm-profile-role { display: block; color: #b5bfd0; font-size: 12px; margin-top: 3px; }
 .assembler-sidebar .asm-logout { width: 100%; background: transparent; border: 0; cursor: pointer; font-family: inherit; text-align: left; }

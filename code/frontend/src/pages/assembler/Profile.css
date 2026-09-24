@@ -1,0 +1,19 @@
+.asm-account { max-width: 800px; color: #1a2942; }
+.asm-profile-modal { position: fixed; inset: 0; margin: auto; width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); overflow-y: auto; background: #fff; border: 1px solid #e4e1db; border-radius: 16px; padding: 28px; box-shadow: 0 24px 80px #0004; font-family: 'DM Sans', 'Segoe UI', sans-serif; }
+.asm-profile-modal::backdrop { background: rgba(10, 20, 35, 0.55); }
+.asm-profile-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: #f4f3f0; color: #1a2942; cursor: pointer; }
+.asm-account-back { display: inline-block; margin-bottom: 24px; color: #526580; text-decoration: none; }
+.asm-account-back:hover { text-decoration: underline; }
+.asm-account h1 { font-size: 30px; margin: 0 0 8px; }
+.asm-account-intro { color: #64748b; margin-bottom: 28px; }
+.asm-account-card { background: #fff; border: 1px solid #e4e1db; border-radius: 12px; padding: 28px; }
+.asm-account-heading { display: flex; gap: 16px; align-items: center; padding-bottom: 24px; border-bottom: 1px solid #e4e1db; }
+.asm-account-heading h2 { font-size: 22px; margin: 0 0 4px; overflow-wrap: anywhere; }
+.asm-account-heading p { margin: 0; color: #64748b; }
+.asm-account-avatar { display: grid; place-items: center; flex: 0 0 60px; height: 60px; border-radius: 50%; background: #f3eddf; font-size: 24px; font-weight: 600; }
+.asm-account dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 24px 0 0; }
+.asm-account dt { color: #64748b; font-size: 13px; margin-bottom: 6px; }
+.asm-account dd { margin: 0; overflow-wrap: anywhere; }
+.asm-account-retry { background: #1a2942; color: #fff; padding: 10px 20px; border-radius: 6px; }
+.asm-account a:focus-visible, .asm-account button:focus-visible { outline: 2px solid #967337; outline-offset: 4px; }
+@media (max-width: 600px) { .asm-account dl { grid-template-columns: 1fr; } .asm-account-card { padding: 20px; } }
