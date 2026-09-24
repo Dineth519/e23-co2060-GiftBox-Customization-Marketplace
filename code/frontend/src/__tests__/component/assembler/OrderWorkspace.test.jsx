@@ -1,10 +1,10 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createMemoryRouter, RouterProvider, Link } from 'react-router-dom';
-import OrderWorkspace from './OrderWorkspace';
-import { fetchAssemblyOrder, saveAssemblyOrder } from './assemblyApi';
+import OrderWorkspace from '../../../pages/assembler/OrderWorkspace';
+import { fetchAssemblyOrder, saveAssemblyOrder } from '../../../pages/assembler/assemblyApi';
 
-jest.mock('./assemblyApi', () => ({ fetchAssemblyOrder: jest.fn(), saveAssemblyOrder: jest.fn() }));
+jest.mock('../../../pages/assembler/assemblyApi', () => ({ fetchAssemblyOrder: jest.fn(), saveAssemblyOrder: jest.fn() }));
 global.IS_REACT_ACT_ENVIRONMENT = true;
 
 const order = () => ({
@@ -32,22 +32,22 @@ beforeEach(() => {
 });
 afterEach(async () => { await act(async () => root.unmount()); router?.dispose(); container.remove(); });
 
-test('loads real order and saves QA progress through the backend', async () => {
-  const updated = order(); updated.workspace.revision = 1; updated.workspace.checks[0] = true;
-  updated.workspace.activity = [{ text: 'Progress saved.', time: '2026-09-22T10:00:00Z' }];
+test('loads a real order and submits completed QA through the backend', async () => {
+  const initial = order(); initial.workspace.checks = [true, true, true, true, true, false];
+  fetchAssemblyOrder.mockResolvedValue(initial);
+  const updated = order(); updated.workspace.revision = 1; updated.workspace.status = 'completed'; updated.workspace.checks = Array(6).fill(true);
+  updated.workspace.activity = [{ text: 'Assembly and quality checks completed; order is ready for delivery.', time: '2026-09-22T10:00:00Z' }];
   saveAssemblyOrder.mockResolvedValue(updated);
   await render();
   expect(container.textContent).toContain('Real candle');
-  await click(button('Packing & QA'));
-  await click(container.querySelector('input[type="checkbox"]'));
-  expect(container.textContent).toContain('Unsaved changes');
-  await click(button('Save progress'));
-  expect(saveAssemblyOrder).toHaveBeenCalledWith('1', 'save', expect.objectContaining({ revision: 0, checks: [true, false, false, false, false, false] }));
-  expect(container.textContent).toContain('All changes saved');
+  await click([...container.querySelectorAll('input[type="checkbox"]')].at(-1));
+  await click(button('Mark as Delivered'));
+  expect(saveAssemblyOrder).toHaveBeenCalledWith('1', 'submit', expect.objectContaining({ revision: 0, checks: Array(6).fill(true) }));
+  expect(container.textContent).toContain('Assembly completed');
 });
 
 test('sidebar navigation warns and preserves edits when leaving is cancelled', async () => {
-  await render(); await click(button('Packing & QA')); await click(container.querySelector('input[type="checkbox"]'));
+  await render(); await click(container.querySelector('input[type="checkbox"]'));
   await click(container.querySelector('a'));
   expect(window.confirm).toHaveBeenCalledWith('Leave without saving your changes?');
   expect(router.state.location.pathname).toBe('/assembler/orders/1');
@@ -58,11 +58,14 @@ test('sidebar navigation warns and preserves edits when leaving is cancelled', a
 });
 
 test('failed save retains changes and shows the server error', async () => {
+  const initial = order(); initial.workspace.checks = [true, true, true, true, true, false];
+  fetchAssemblyOrder.mockResolvedValue(initial);
   saveAssemblyOrder.mockRejectedValue(new Error('This order changed in another session. Reload it before saving again.'));
-  await render(); await click(button('Packing & QA')); await click(container.querySelector('input[type="checkbox"]')); await click(button('Save progress'));
+  await render();
+  await click([...container.querySelectorAll('input[type="checkbox"]')].at(-1));
+  await click(button('Mark as Delivered'));
   expect(container.querySelector('[role="alert"]').textContent).toContain('changed in another session');
-  expect(container.querySelector('input[type="checkbox"]').checked).toBe(true);
-  expect(container.textContent).toContain('Unsaved changes');
+  expect([...container.querySelectorAll('input[type="checkbox"]')].at(-1).checked).toBe(true);
 });
 
 test('load failure offers retry instead of substituting sample orders', async () => {
@@ -76,14 +79,15 @@ test('load failure offers retry instead of substituting sample orders', async ()
 
 test('submission is disabled until all checks are complete', async () => {
   await render();
-  expect(button('Submit for approval').disabled).toBe(true);
-  await click(button('Packing & QA'));
+  expect(button('Mark as Delivered').disabled).toBe(true);
   for (const checkbox of container.querySelectorAll('input[type="checkbox"]')) await click(checkbox);
-  expect(button('Submit for approval').disabled).toBe(false);
+  expect(button('Mark as Delivered').disabled).toBe(false);
 });
 
 test('displays the ordered product image and falls back if it cannot load', async () => {
   const actualOrder = order();
+  actualOrder.workspace.receiptConfirmed = false;
+  actualOrder.workspace.status = 'awaiting';
   actualOrder.workspace.items[0].imageUrl = 'https://example.com/candle.jpg';
   fetchAssemblyOrder.mockResolvedValue(actualOrder);
   await render();

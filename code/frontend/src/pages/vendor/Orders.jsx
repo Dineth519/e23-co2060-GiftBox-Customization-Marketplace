@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { filterVendorOrders, vendorOrderStats } from '../../utils/vendorOrderUtils';
+import { updateVendorOrderStatus } from '../../utils/vendorApi';
 import './Orders.css';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
 
 // Status progression order as defined in the database
-const STATUS_ORDER = ['PENDING', 'CONFIRMED', 'RECEIVED', 'ASSEMBLING', 'READY', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+const STATUS_ORDER = ['PENDING_VENDOR_ACCEPTANCE', 'ACCEPTED_BY_VENDOR', 'SENT_TO_ASSEMBLY'];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function initials(name) {
@@ -47,7 +49,7 @@ function OrderModal({ order, onClose, onStatusChange }) {
 
   // Get the current step index to highlight the timeline correctly
   const step = STATUS_ORDER.indexOf(order.status);
-  const timelineSteps = ['Order Placed', 'Confirmed', 'Ready', 'Shipped', 'Delivered'];
+  const timelineSteps = ['Order received', 'Accepted', 'Sent to assembly'];
 
   return (
     <div className="orders-modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -95,16 +97,25 @@ function OrderModal({ order, onClose, onStatusChange }) {
             )}
           </div>
 
-          {/* Vendor Actions: only shown for PENDING orders */}
-          {order.status === 'PENDING' && (
+          {order.status === 'PENDING_VENDOR_ACCEPTANCE' && (
             <div className="orders-modal-section">
               <div className="orders-modal-section-title">Update Status</div>
               <div className="orders-status-btns">
-                <button className="orders-status-update-btn" onClick={() => onStatusChange(order.order_id, 'CONFIRMED')}>
+                <button className="orders-status-update-btn" onClick={() => onStatusChange(order.sub_order_id, 'ACCEPTED_BY_VENDOR')}>
                   Confirm Order
                 </button>
-                <button className="orders-status-update-btn cancel-btn" onClick={() => onStatusChange(order.order_id, 'CANCELLED')}>
-                  Cancel Order
+                <button className="orders-status-update-btn cancel-btn" onClick={() => onStatusChange(order.sub_order_id, 'REJECTED')}>
+                  Reject Order
+                </button>
+              </div>
+            </div>
+          )}
+          {order.status === 'ACCEPTED_BY_VENDOR' && (
+            <div className="orders-modal-section">
+              <div className="orders-modal-section-title">Send items</div>
+              <div className="orders-status-btns">
+                <button className="orders-status-update-btn" onClick={() => onStatusChange(order.sub_order_id, 'SENT_TO_ASSEMBLY')}>
+                  Mark Sent to Assembly
                 </button>
               </div>
             </div>
@@ -160,17 +171,9 @@ const Orders = () => {
   // 2. Handle Status Change (Accept/Cancel)
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const res = await fetch(`${API_BASE}/orders/${id}/status`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-      if (!res.ok) throw new Error("Update failed");
+      await updateVendorOrderStatus(id, newStatus);
 
-      setOrders(prev => prev.map(o => o.order_id === id ? { ...o, status: newStatus } : o));
+      setOrders(prev => prev.map(o => o.sub_order_id === id ? { ...o, status: newStatus } : o));
       setSelected(null);
       setToast(`Order #${id} marked as ${newStatus}`);
       setTimeout(() => setToast(null), 3000);
@@ -181,23 +184,13 @@ const Orders = () => {
 
   // ── Filtered + paginated data ──
   const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return orders.filter(o => {
-      const matchStatus = filter === 'All' || o.status === filter;
-      const matchSearch = !q || o.order_id.toString().includes(q) || (o.delivery_address && o.delivery_address.toLowerCase().includes(q));
-      return matchStatus && matchSearch;
-    });
+    return filterVendorOrders(orders, filter, search);
   }, [orders, filter, search]);
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const pageSlice = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  const stats = useMemo(() => ({
-    total: orders.length,
-    pending: orders.filter(o => o.status === 'PENDING').length,
-    delivered: orders.filter(o => o.status === 'DELIVERED').length,
-    revenue: orders.filter(o => o.status !== 'CANCELLED').reduce((s, o) => s + Number(o.total_amount), 0),
-  }), [orders]);
+  const stats = useMemo(() => vendorOrderStats(orders), [orders]);
 
   return (
     <div className="orders-page">
@@ -227,7 +220,7 @@ const Orders = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="orders-filter-tabs">
-          {['All', 'PENDING', 'CONFIRMED', 'DELIVERED', 'CANCELLED'].map(f => (
+          {['All', 'PENDING_VENDOR_ACCEPTANCE', 'ACCEPTED_BY_VENDOR', 'SENT_TO_ASSEMBLY', 'REJECTED'].map(f => (
             <button key={f} className={`orders-filter-tab ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
               {f}
             </button>
@@ -255,7 +248,7 @@ const Orders = () => {
             </thead>
             <tbody>
               {pageSlice.map((order, i) => (
-                <tr key={order.order_id} className={`orders-table-row ${order.status === 'PENDING' ? 'orders-row-pending-special' : ''}`}>
+                <tr key={order.sub_order_id} className={`orders-table-row ${order.status === 'PENDING_VENDOR_ACCEPTANCE' ? 'orders-row-pending-special' : ''}`}>
                   <td className="orders-order-id">#{order.order_id}</td>
                   <td>{order.delivery_address}</td>
                   <td>{new Date(order.created_at).toLocaleDateString()}</td>

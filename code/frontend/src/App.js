@@ -8,13 +8,16 @@ import AboutUsPage from './pages/landingpage/AboutUsPage.jsx';
 import CustomerHome from './pages/customer/CustomerHome.jsx';
 import Verify from './pages/customer/Verify.jsx';
 import VendorLanding from './pages/landingpage/VendorLanding.jsx';
+import ProductsPage from './pages/landingpage/ProductsPage.jsx';
+import CartPage from './pages/landingpage/CartPage.jsx';
+import AddressForm from './components/user/AddressForm.jsx';
 
-//Customer
+// Customer
 import CustomerOrders from './pages/customer/Orders.jsx';
 import OrderDetail from './pages/customer/OrderDetail.jsx';
 import CustomerLayout from './layouts/CustomerLayout.jsx';  
 import CustomerCart from './pages/customer/CustomerCart.jsx';
-import CustomerProfile from './pages/customer/Profile.jsx'
+import CustomerProfile from './pages/customer/Profile.jsx';
 import AboutUs from './pages/customer/AboutUsPage.jsx';
 import CustomerBoxBuilderPage from './pages/customer/BoxBuilderPage.jsx';
 import Checkout from './pages/customer/Checkout.jsx';
@@ -42,12 +45,10 @@ import MyItems from './pages/vendor/MyItems.jsx';
 import AddItems from './pages/vendor/AddItems.jsx';
 import Orders from './pages/vendor/Orders.jsx';
 import VendorSettings from './pages/vendor/Settings.jsx';
+import CreateGiftBox from './pages/vendor/CreateGiftBox.jsx';
 
-// Landingpage
-import ProductsPage from './pages/landingpage/ProductsPage.jsx';
-import AddressForm from './components/user/AddressForm.jsx';
+// Context
 import { CartProvider } from './context/CartContext.jsx';
-import CartPage from './pages/landingpage/CartPage.jsx';
 
 // Box Builder
 import PublicBoxBuilderPage from './pages/landingpage/BoxBuilderPage.jsx';
@@ -75,15 +76,8 @@ const LayoutWrapper = ({ children }) => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
 
-  // Log current path and admin status for debugging
-  useEffect(() => {
-    console.log("Current Path:", location.pathname);
-    console.log("Is Admin View:", isAdminPath);
-  }, [location]);
-
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Display sidebar on admin paths */}
       {isAdminPath && <Sidebar />} 
       <div style={{ flex: 1, background: isAdminPath ? '#deebf7' : '#ffffff' }}>
         {children}
@@ -93,7 +87,6 @@ const LayoutWrapper = ({ children }) => {
 };
 
 // Main application component that sets up routing for admin, user, and seller sections
-
 function AppRoutes() {
   return (
     <CartProvider>                                      
@@ -103,13 +96,12 @@ function AppRoutes() {
           {/* Public and user routes */}
           <Route path="/" element={<LayoutWrapper><LandingPage /></LayoutWrapper>} />
           <Route path="/products" element={<ProductsPage />} />
-
           <Route path="/about-us" element={<LayoutWrapper><AboutUsPage /></LayoutWrapper>} />
           <Route path="/home" element={<LayoutWrapper><CustomerHome /></LayoutWrapper>} />
           <Route path="/login" element={<LayoutWrapper><Login /></LayoutWrapper>} />
           <Route path="/vendor-landing" element={<VendorLanding />} />
           <Route path="/vendor-register" element={<VendorRegistration />} />
-          <Route path='/verify' element={<LayoutWrapper><Verify /></LayoutWrapper>} />
+          <Route path="/verify" element={<LayoutWrapper><Verify /></LayoutWrapper>} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/build-box" element={<PublicBoxBuilderPage />} />
           <Route path="/test-address" element={<LayoutWrapper><AddressForm /></LayoutWrapper>} />
@@ -127,21 +119,17 @@ function AppRoutes() {
             <Route path="about-us" element={<AboutUs />} />
             <Route path="build-box" element={<CustomerBoxBuilderPage />} />
             <Route path="settings" element={<CustomerSettings />} />
-
           </Route>
 
           {/* Vendor routes */}
-          <Route path="/vendor/*" element={
-            <VendorLayout>
-              <Routes>
-                <Route path="/" element={<VendorDashboard />} />
-                <Route path="my-items" element={<MyItems />} />
-                <Route path="add-items" element={<AddItems />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="settings" element={<VendorSettings />} />
-              </Routes>
-            </VendorLayout>
-          } />
+          <Route path="/vendor" element={<VendorLayout />}>
+            <Route index element={<VendorDashboard />} />
+            <Route path="create-box" element={<CreateGiftBox />} />
+            <Route path="my-items" element={<MyItems />} />
+            <Route path="add-items" element={<AddItems />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="settings" element={<VendorSettings />} />
+          </Route>
 
           {/* Admin routes using AdminLayout for sidebar and styling */}
           <Route path="/admin/*" element={
@@ -171,9 +159,9 @@ function AppRoutes() {
                   </Routes>
               </AssemblerLayout>
           } />
-          
+
           {/* Catch-all route that redirects to home page */}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
       </>

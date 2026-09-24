@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { FaTruck, FaLock, FaSpinner, FaShoppingBag } from 'react-icons/fa';
+import { buildStandardOrderPayload } from '../../utils/customerOrderUtils';
+import { placeStandardOrder } from '../../utils/customerOrderApi';
 import './Checkout.css';
 
 const Checkout = () => {
@@ -37,29 +39,10 @@ const Checkout = () => {
     const customerId = localStorage.getItem('userId') ? parseInt(localStorage.getItem('userId')) : 5;
 
     // Prepare standard order request matching CreateOrderRequest DTO
-    const orderPayload = {
-      customerId: customerId,
-      deliveryAddress: deliveryAddress.trim(),
-      items: cartItems.map(item => ({
-        productId: item.productId,
-        quantity: item.quantity
-      }))
-    };
+    const orderPayload = buildStandardOrderPayload(customerId, deliveryAddress, cartItems);
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/standard`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify(orderPayload)
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || 'Failed to place order');
-      }
+      await placeStandardOrder(orderPayload);
 
       await clearCart();
       setSuccess(true);

@@ -6,12 +6,16 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 // Create React Context for cart state management
 const CartContext = createContext(null);
 
+export const cartStorageKey = (userId) => `giftora_cart_${userId || 'guest'}`;
+
 // ── Provider ─────────────────────────────────────────────────
 export const CartProvider = ({ children }) => {
 
+  const [storageKey, setStorageKey] = useState(() => cartStorageKey(localStorage.getItem('userId')));
+
   const [cartItems,  setCartItems]  = useState(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem('giftora_cart'));
+      const saved = JSON.parse(localStorage.getItem(cartStorageKey(localStorage.getItem('userId'))));
       return Array.isArray(saved) ? saved : [];
     } catch { return []; }
   });   // Restore before the persistence effect runs
@@ -32,21 +36,21 @@ export const CartProvider = ({ children }) => {
 
   // ── Sync to localStorage ──────────────────────────────────────
   useEffect(() => {
-    localStorage.setItem('giftora_cart', JSON.stringify(cartItems));
+    localStorage.setItem(storageKey, JSON.stringify(cartItems));
     recalculate(cartItems);
-  }, [cartItems]);
+  }, [cartItems, storageKey]);
 
   // ── Load cart on mount ───────────────────────────────────────
   const loadCart = useCallback(async () => {
     try {
-      const saved = localStorage.getItem('giftora_cart');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setCartItems(parsed);
-        recalculate(parsed);
-      }
+      const nextStorageKey = cartStorageKey(localStorage.getItem('userId'));
+      const saved = localStorage.getItem(nextStorageKey);
+      const parsed = saved ? JSON.parse(saved) : [];
+      setStorageKey(nextStorageKey);
+      setCartItems(Array.isArray(parsed) ? parsed : []);
     } catch (err) {
       console.error('Failed to parse cart from local storage:', err);
+      setCartItems([]);
     }
   }, []);
 
