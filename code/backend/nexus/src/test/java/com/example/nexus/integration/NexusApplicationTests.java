@@ -1,11 +1,11 @@
-package com.example.nexus;
+package com.example.nexus.integration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles("arch")
+@ActiveProfiles("integration")
 class NexusApplicationTests {
 
 	@Test
@@ -13,6 +13,5 @@ class NexusApplicationTests {
 	}
 
 }
-
 
 

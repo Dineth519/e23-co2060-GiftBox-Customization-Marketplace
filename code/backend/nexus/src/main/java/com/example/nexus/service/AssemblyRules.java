@@ -1,6 +1,7 @@
 package com.example.nexus.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,7 +15,8 @@ public final class AssemblyRules {
 
     public static String nextStatus(String current, boolean confirmed, boolean ready, Change change) {
         require(change != null && change.action() != null, "Choose an assembly action.");
-        require(change.checks() != null && change.checks().size() == 6 && !change.checks().contains(null),
+        require(change.checks() != null && change.checks().size() == 6
+                        && change.checks().stream().noneMatch(Objects::isNull),
                 "Exactly six quality checks are required.");
         require(change.notes() != null && change.notes().length() <= 1000, "Packing notes must be at most 1000 characters.");
         require(!"completed".equals(current), "Completed orders are locked.");

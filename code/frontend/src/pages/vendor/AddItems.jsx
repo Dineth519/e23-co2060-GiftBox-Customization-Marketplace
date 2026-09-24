@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaArrowLeft, FaPlus, FaUpload, FaBoxOpen, FaDollarSign, FaImage, FaCheck } from 'react-icons/fa';
+import { buildVendorProductPayload, validateVendorProduct } from '../../utils/vendorProductUtils';
 import './AddItems.css';
 
 // Category icons mapping removed as requested
@@ -119,16 +120,9 @@ const AddItems = () => {
   // ── Submit ──
   const handleSubmit = async () => {
     if (submitted) return;
-    if (!form.name.trim() || !form.category || !form.description.trim() || !form.subCategory.trim() || !images.length) {
-      alert('Add a name, description, category, product type, and product photo.');
-      return;
-    }
-    if (!form.price || !Number.isFinite(Number(form.price)) || Number(form.price) <= 0 || form.stock === '' || !Number.isInteger(Number(form.stock)) || Number(form.stock) < 0) {
-      alert('Enter a positive price and a whole-number stock quantity of zero or more.');
-      return;
-    }
-    if (form.discountPrice !== '' && (!Number.isFinite(Number(form.discountPrice)) || Number(form.discountPrice) <= 0 || Number(form.discountPrice) >= Number(form.price))) {
-      alert('Discount price must be positive and lower than the regular price.');
+    const validationError = validateVendorProduct(form, images.length > 0);
+    if (validationError) {
+      alert(validationError);
       return;
     }
 
@@ -150,18 +144,7 @@ const AddItems = () => {
         uploadedImageUrl = cloudinaryRes.data.secure_url;
       }
 
-      const payload = {
-        name: form.name,
-        description: form.description,
-        price: Number(form.price),
-        discountPrice: form.discountPrice ? Number(form.discountPrice) : null,
-        stockQuantity: parseInt(form.stock, 10),
-        sku: form.sku ? form.sku : null,
-        isActive: form.is_active ? 1 : 0,
-        imageUrl: uploadedImageUrl || 'https://via.placeholder.com/220x150?text=No+Image',
-        categoryId: Number(form.category),
-        subCategory: form.subCategory
-      };
+      const payload = buildVendorProductPayload(form, uploadedImageUrl);
 
       const SELLER_ID = localStorage.getItem('userId');
       await axios.post(`${process.env.REACT_APP_API_URL}/api/vendors/${SELLER_ID}/products`, payload, {

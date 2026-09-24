@@ -138,6 +138,11 @@ public class AuthService {
             return new AuthResponse(false, "Please verify your email before logging in");
         }
 
+        // Vendors may sign in only after an administrator approves the application.
+        if (user instanceof Vendor vendor && !"ACTIVE".equals(vendor.getStatus())) {
+            return new AuthResponse(false, "Vendor application is pending admin approval");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return new AuthResponse(false, "Incorrect password");
         }

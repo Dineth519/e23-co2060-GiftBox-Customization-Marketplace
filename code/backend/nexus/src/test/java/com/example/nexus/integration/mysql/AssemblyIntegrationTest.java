@@ -1,4 +1,4 @@
-package com.example.nexus;
+package com.example.nexus.integration.mysql;
 
 import com.example.nexus.controller.AssemblyWorkspaceController;
 import com.example.nexus.config.AssemblyMigrationConfig;
