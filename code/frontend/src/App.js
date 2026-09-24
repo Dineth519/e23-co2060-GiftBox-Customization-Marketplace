@@ -11,10 +11,8 @@ import VendorLanding from './pages/landingpage/VendorLanding.jsx';
 import ProductsPage from './pages/landingpage/ProductsPage.jsx';
 import CartPage from './pages/landingpage/CartPage.jsx';
 import AddressForm from './components/user/AddressForm.jsx';
-import BoxBuilderPage from './pages/box_build/BoxBuilderPage.jsx';
 
 // Customer
-import GiftCustomizer from './pages/customer/GiftCustomizer.jsx';
 import CustomerOrders from './pages/customer/Orders.jsx';
 import OrderDetail from './pages/customer/OrderDetail.jsx';
 import CustomerLayout from './layouts/CustomerLayout.jsx';  
