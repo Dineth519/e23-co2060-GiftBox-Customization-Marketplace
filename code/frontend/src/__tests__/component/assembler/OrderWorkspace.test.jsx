@@ -1,10 +1,10 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createMemoryRouter, RouterProvider, Link } from 'react-router-dom';
-import OrderWorkspace from './OrderWorkspace';
-import { fetchAssemblyOrder, saveAssemblyOrder } from './assemblyApi';
+import OrderWorkspace from '../../../pages/assembler/OrderWorkspace';
+import { fetchAssemblyOrder, saveAssemblyOrder } from '../../../pages/assembler/assemblyApi';
 
-jest.mock('./assemblyApi', () => ({ fetchAssemblyOrder: jest.fn(), saveAssemblyOrder: jest.fn() }));
+jest.mock('../../../pages/assembler/assemblyApi', () => ({ fetchAssemblyOrder: jest.fn(), saveAssemblyOrder: jest.fn() }));
 global.IS_REACT_ACT_ENVIRONMENT = true;
 
 const order = () => ({

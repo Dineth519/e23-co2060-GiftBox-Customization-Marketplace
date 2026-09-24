@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaFolder, FaTrash } from 'react-icons/fa';
+import { createCategory, deleteCategory } from '../../utils/adminApi';
 import './AdminCategories.css';
 
 const AdminCategories = () => {
@@ -31,22 +32,9 @@ const AdminCategories = () => {
 
     setAdding(true);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/categories`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify({ name: newCategoryName.trim() })
-      });
-
-      if (res.ok) {
-        setNewCategoryName('');
-        fetchCategories(); // Refresh list
-      } else {
-        const errData = await res.json();
-        alert(`Failed to create category: ${errData.error || 'Unknown error'}`);
-      }
+      await createCategory(newCategoryName);
+      setNewCategoryName('');
+      fetchCategories(); // Refresh list
     } catch (err) {
       console.error("Error adding category:", err);
       alert('Network error while adding category.');
@@ -59,19 +47,8 @@ const AdminCategories = () => {
     if (!window.confirm(`Are you sure you want to delete the category "${name}"?`)) return;
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/categories/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
-
-      if (res.ok) {
-        fetchCategories(); // Refresh list
-      } else {
-        const errData = await res.json();
-        alert(`Failed to delete category: ${errData.error || 'Unknown error'}`);
-      }
+      await deleteCategory(id);
+      fetchCategories(); // Refresh list
     } catch (err) {
       console.error("Error deleting category:", err);
       alert('Network error while deleting category.');

@@ -4,6 +4,8 @@ import {
   FaArrowLeft, FaCheck, FaTimes, FaMapMarkerAlt, 
   FaUser, FaPhone, FaStore, FaClock, FaEnvelope
 } from 'react-icons/fa';
+import { pendingVendorApplications, removeProcessedVendor } from '../../utils/adminVendorUtils';
+import { updateVendorApplicationStatus } from '../../utils/adminApi';
 import './PendingVendors.css';
 
 /**
@@ -24,18 +26,7 @@ const PendingVendors = () => {
       .then(res => res.json())
       .then(data => {
         // Filter for pending vendors and map to local state structure
-        const pending = data
-          .filter(p => p.status === 'PENDING')
-          .map(p => ({
-            id: p.vendorId,        
-            shop: p.shopName,       
-            name: p.fullName,       
-            address: p.shopAddress, 
-            phone: p.phoneNumber,   
-            br_no: p.brNo,
-            email: p.email || 'No Email',
-            categories: p.categories || 'premium-gifts'
-          }));
+        const pending = pendingVendorApplications(data);
         setPendingSellers(pending);
         setLoading(false);
       })
@@ -52,23 +43,15 @@ const PendingVendors = () => {
    * @param {number} id - Vendor ID
    * @param {string} newStatus - New status (ACTIVE or REJECTED)
    */
-  const handleStatusUpdate = (id, newStatus) => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/vendors/${id}/status?status=${newStatus}`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
-    })
-    .then(response => {
-      if (response.ok) {
-        setPendingSellers(pendingSellers.filter(seller => seller.id !== id));
-        console.log("Database updated successfully!");
-      } else {
-        alert("Failed to update status.");
-      }
-    })
-    .catch(error => {
+  const handleStatusUpdate = async (id, newStatus) => {
+    try {
+      await updateVendorApplicationStatus(id, newStatus);
+      setPendingSellers(current => removeProcessedVendor(current, id));
+      console.log("Database updated successfully!");
+    } catch (error) {
       console.error("Error connecting to backend:", error);
-      alert("Error connecting to server.");
-    });
+      alert("Failed to update vendor status.");
+    }
   };
 
   return (

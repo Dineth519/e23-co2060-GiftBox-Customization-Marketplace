@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaThLarge, FaList, FaSearch, FaEdit, FaTrash, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
+import { buildProductEdit, filterVendorProducts, vendorProductStats } from '../../utils/vendorProductUtils';
+import { updateVendorProduct } from '../../utils/vendorApi';
 import './MyItems.css'; // Uses the existing MyItems CSS file
 
 const getBadgeClass = (status) => ({
@@ -230,39 +232,8 @@ const MyItems = () => {
 // ── Save Edit to Backend ──
   const handleSaveEdit = async (id) => {
     try {
-      // Step 1: Parse the new stock value as an integer
-      const newStock = parseInt(editForm.stock, 10);
-      const isActiveSelected = editForm.status === 'Active';
-
-      // Step 2: Automatically determine the correct status based on stock quantity (mirrors backend logic)
-      let newCalculatedStatus = 'Active';
-      
-      if (!isActiveSelected || newStock <= 0) {
-        newCalculatedStatus = 'Out of Stock'; // Mark as Out of Stock if inactive or stock is 0
-      } else if (newStock <= 10) {
-        newCalculatedStatus = 'Low Stock';    // Mark as Low Stock if stock is 10 or fewer
-      }
-
-      // Backend payload
-      const payload = {
-        name: editForm.name,
-        description: editForm.description,
-        subCategory: editForm.subCategory,
-        price: parseFloat(editForm.price),
-        stockQuantity: newStock,
-        isActive: isActiveSelected ? 1 : 0
-      };
-
-      const res = await fetch(`${API_BASE}/products/${id}`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Update failed');
+      const { stock: newStock, status: newCalculatedStatus, payload } = buildProductEdit(editForm);
+      await updateVendorProduct(id, payload);
       
       // Step 3: Immediately update local React state with the new status (optimistic UI update)
       setProducts(prev => prev.map(p => 
@@ -283,18 +254,18 @@ const MyItems = () => {
     }
   };
 
-  const stats = useMemo(() => [
-    { key: 'All',           label: 'Total Products', icon: '📦', value: products.length },
-    { key: 'Active',        label: 'Active',         icon: '✅', value: products.filter(p => p.status === 'Active').length },
-    { key: 'Low Stock',     label: 'Low Stock',      icon: '⚠️', value: products.filter(p => p.status === 'Low Stock').length },
-    { key: 'Out of Stock',  label: 'Out of Stock',   icon: '❌', value: products.filter(p => p.status === 'Out of Stock').length },
-  ], [products]);
+  const stats = useMemo(() => {
+    const values = vendorProductStats(products);
+    return [
+      { key: 'All', label: 'Total Products', icon: '📦', value: values.total },
+      { key: 'Active', label: 'Active', icon: '✅', value: values.active },
+      { key: 'Low Stock', label: 'Low Stock', icon: '⚠️', value: values.lowStock },
+      { key: 'Out of Stock', label: 'Out of Stock', icon: '❌', value: values.outOfStock },
+    ];
+  }, [products]);
 
-  const filtered = useMemo(() => products.filter(p => {
-    const matchCategory = category === 'All' || p.category === category;
-    const matchStatus   = statusFilter === 'All' || p.status === statusFilter;
-    const matchSearch   = p.name.toLowerCase().includes(search.toLowerCase());
-    return matchCategory && matchStatus && matchSearch;
+  const filtered = useMemo(() => filterVendorProducts(products, {
+    search, category, status: statusFilter,
   }), [products, search, category, statusFilter]);
 
   return (

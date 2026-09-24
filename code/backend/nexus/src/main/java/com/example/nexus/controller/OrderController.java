@@ -13,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 import com.example.nexus.repository.UserRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -81,6 +83,30 @@ public class OrderController {
         return ResponseEntity.ok(summary);
     }
 
+    // 2. Order status update (Vendor or Customer)
+    @PutMapping("/orders/{orderId}/status")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Integer orderId,
+            @RequestBody Map<String, String> request, Authentication authentication) {
+        var found = orderRepository.findById(orderId);
+        if (found.isEmpty()) return ResponseEntity.notFound().build();
+
+        Order order = found.get();
+        String next = request.get("status");
+        String current = order.getStatus();
+        Integer actorId = authentication != null && authentication.getDetails() instanceof Integer id ? id : null;
+        boolean vendor = hasRole(authentication, "VENDOR") && actorId != null && actorId.equals(order.getVendorId());
+        boolean assembler = hasRole(authentication, "ASSEMBLER") && actorId != null && actorId.equals(order.getAssemblerId());
+        boolean customer = hasRole(authentication, "CUSTOMER") && actorId != null && actorId.equals(order.getCustomerId());
+
+        boolean allowed = vendor && "PENDING".equals(current) && Set.of("CONFIRMED", "CANCELLED").contains(next)
+                || assembler && "READY".equals(current) && "SHIPPED".equals(next)
+                || assembler && "SHIPPED".equals(current) && "DELIVERED".equals(next)
+                || customer && "DELIVERED".equals(current) && "RECEIVED".equals(next);
+
+        if (!allowed) return ResponseEntity.badRequest().body("Action not allowed for this user or current status");
+        order.setStatus(next);
+        orderRepository.save(order);
+        return ResponseEntity.ok().body("Order " + next);
     // 2. Sub-Order status update (Vendor updating their part)
     @PutMapping("/sub-orders/{subOrderId}/status")
     public ResponseEntity<?> updateSubOrderStatus(@PathVariable Integer subOrderId, @RequestBody Map<String, String> request) {
@@ -163,6 +189,9 @@ public class OrderController {
 
     private ResponseEntity<?> processOrderCheckout(CreateOrderRequest request, String orderType) {
         try {
+            if (!isCustomer(authentication, request.getCustomerId())) {
+                return ResponseEntity.status(403).body("A customer may place orders only for their own account.");
+            }
             // Validate request
             if (request.getCustomerId() == null) {
                 return ResponseEntity.badRequest().body("Validation Error: customerId is required.");
@@ -308,5 +337,15 @@ public class OrderController {
             return new BigDecimal("1200");
         }
         return BigDecimal.ZERO;
+    }
+
+    private boolean isCustomer(Authentication authentication, Integer customerId) {
+        return customerId != null && hasRole(authentication, "CUSTOMER")
+                && authentication.getDetails() instanceof Integer id && customerId.equals(id);
+    }
+
+    private boolean hasRole(Authentication authentication, String role) {
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_" + role));
     }
 }
