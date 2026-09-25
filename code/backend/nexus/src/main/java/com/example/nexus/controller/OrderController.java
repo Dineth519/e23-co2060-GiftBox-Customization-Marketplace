@@ -65,22 +65,22 @@ public class OrderController {
             }
 
             List<Map<String, Object>> itemsList = orderItemRepository.findByOrderId(order.getOrderId()).stream()
-                .filter(oi -> {
-                    Product p = productRepository.findById(oi.getProductId()).orElse(null);
-                    return p != null && p.getVendorId().equals(subOrder.getVendorId());
-                }).map(oi -> {
-                    Product p = productRepository.findById(oi.getProductId()).orElse(null);
+                .map(oi -> new java.util.AbstractMap.SimpleEntry<>(oi, productRepository.findById(oi.getProductId()).orElse(null)))
+                .filter(entry -> entry.getValue() != null && entry.getValue().getVendorId().equals(subOrder.getVendorId()))
+                .map(entry -> {
+                    OrderItem oi = entry.getKey();
+                    Product p = entry.getValue();
                     Map<String, Object> i = new java.util.HashMap<>();
                     i.put("quantity", oi.getQuantity());
-                    i.put("name", p != null ? p.getName() : "Unknown");
-                    i.put("imageUrl", p != null ? p.getImageUrl() : null);
+                    i.put("name", p.getName());
+                    i.put("imageUrl", p.getImageUrl());
                     return i;
                 }).toList();
 
             item.put("customer_name", customerName);
             item.put("items", itemsList);
             item.put("special_notes", order.getSpecialNotes());
-            item.put("created_at", subOrder.getCreatedAt());
+            item.put("created_at", order.getCreatedAt());
             return item;
         }).toList();
         return ResponseEntity.ok(response);
