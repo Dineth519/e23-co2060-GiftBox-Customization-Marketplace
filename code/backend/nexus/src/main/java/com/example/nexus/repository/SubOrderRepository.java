@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface SubOrderRepository extends JpaRepository<SubOrder, Integer> {
+    List<SubOrder> findByVendorIdOrderBySubOrderIdDesc(Integer vendorId);
     List<SubOrder> findByVendorId(Integer vendorId);
     List<SubOrder> findByOrder_OrderId(Integer orderId);
 }

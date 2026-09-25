@@ -23,7 +23,7 @@ public class AssemblyService {
 
     public List<Map<String, Object>> list(int assemblerId) {
         List<Map<String, Object>> orders = db.queryForList("SELECT * FROM orders WHERE (assembler_id = ? OR assembler_id IS NULL) " +
-                "AND status IN ('CONFIRMED','ASSEMBLING','READY','DELIVERED') ORDER BY due_date IS NULL, due_date, created_at", assemblerId);
+                "AND status IN ('CONFIRMED','ASSEMBLING','READY','DELIVERED') ORDER BY created_at DESC", assemblerId);
         if (orders.isEmpty()) return List.of();
         
         List<Integer> orderIds = orders.stream().map(o -> ((Number) o.get("order_id")).intValue()).toList();
@@ -164,6 +164,7 @@ public class AssemblyService {
         result.put("recipient", fallback(order.get("recipient_name"), "Not specified"));
         result.put("message", fallback(order.get("gift_message"), "No gift message"));
         result.put("dueDate", iso(order.get("due_date")));
+        result.put("createdAt", iso(order.get("created_at")));
         result.put("submittedAt", iso(order.get("assembly_submitted_at")));
         result.put("status", order.get("assembly_status"));
         result.put("issue", workspace.get("issue"));

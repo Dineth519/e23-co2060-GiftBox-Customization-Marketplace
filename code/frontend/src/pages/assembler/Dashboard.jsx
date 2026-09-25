@@ -33,7 +33,7 @@ export default function AssemblerDashboard({ queueMode = false }) {
   const setQuery = value => updateSearch('q', value);
   const [box, setBox] = useState('all');
   const [due, setDue] = useState('all');
-  const [sort, setSort] = useState('due');
+  const [sort, setSort] = useState('newest');
   const navigate = useNavigate();
   const { orders: allOrders, loading, error, reload } = useAssemblyOrders();
   const liveOrders = allOrders;
@@ -45,8 +45,8 @@ export default function AssemblerDashboard({ queueMode = false }) {
   const openWorkspace = order => {
     navigate('/assembler/orders/' + order.id);
   };
-  const reset = () => { setSearchParams({}, { replace: true }); setBox('all'); setDue('all'); setSort('due'); };
-  const hasFilters = status !== 'all' || query || box !== 'all' || due !== 'all' || sort !== 'due';
+  const reset = () => { setSearchParams({}, { replace: true }); setBox('all'); setDue('all'); setSort('newest'); };
+  const hasFilters = status !== 'all' || query || box !== 'all' || due !== 'all' || sort !== 'newest';
 
   return (
     <section className="asm-overview" aria-labelledby="ao-title">
@@ -151,7 +151,7 @@ export default function AssemblerDashboard({ queueMode = false }) {
         {queueMode && <div className="aq-toolbar">
           <label>Box size<select value={box} onChange={event => setBox(event.target.value)}><option value="all">All sizes</option>{['Small', 'Medium', 'Large'].map(size => <option key={size}>{size}</option>)}</select></label>
           <label>Due<select value={due} onChange={event => setDue(event.target.value)}><option value="all">Any time</option>{['Overdue', 'Today', 'Tomorrow', 'In 2 days', 'Not scheduled'].map(day => <option key={day}>{day}</option>)}</select></label>
-          <label>Sort by<select value={sort} onChange={event => setSort(event.target.value)}><option value="due">Due soonest</option><option value="id">Order ID</option></select></label>
+          <label>Sort by<select value={sort} onChange={event => setSort(event.target.value)}><option value="newest">Newest first</option><option value="due">Due soonest</option><option value="id">Order ID</option></select></label>
           {hasFilters && <button type="button" onClick={reset}>Reset filters</button>}
         </div>}
         <div className="ao-table-scroll" tabIndex={0} role="region" aria-label="Work queue table">

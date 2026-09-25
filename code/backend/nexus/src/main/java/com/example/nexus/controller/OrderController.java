@@ -49,7 +49,37 @@ public class OrderController {
         if (!isActor(authentication, "VENDOR", vendorId)) {
             return ResponseEntity.status(403).body("Vendor access denied");
         }
-        List<Map<String, Object>> response = subOrderRepository.findByVendorId(vendorId).stream().map(subOrder -> {
+        List<SubOrder> subOrders = subOrderRepository.findByVendorIdOrderBySubOrderIdDesc(vendorId);
+        
+        java.util.Set<Integer> orderIds = new java.util.HashSet<>();
+        java.util.Set<Integer> customerIds = new java.util.HashSet<>();
+        for (SubOrder subOrder : subOrders) {
+            orderIds.add(subOrder.getOrder().getOrderId());
+            if (subOrder.getOrder().getCustomerId() != null) {
+                customerIds.add(subOrder.getOrder().getCustomerId());
+            }
+        }
+        
+        java.util.Map<Integer, com.example.nexus.model.User> userMap = new java.util.HashMap<>();
+        if (!customerIds.isEmpty()) {
+            userRepository.findAllById(customerIds).forEach(u -> userMap.put(u.getId(), u));
+        }
+
+        List<OrderItem> allOrderItems = new java.util.ArrayList<>();
+        if (!orderIds.isEmpty()) {
+            allOrderItems = orderItemRepository.findByOrderIdIn(orderIds);
+        }
+        
+        java.util.Set<Integer> productIds = allOrderItems.stream().map(OrderItem::getProductId).collect(java.util.stream.Collectors.toSet());
+        java.util.Map<Integer, Product> productMap = new java.util.HashMap<>();
+        if (!productIds.isEmpty()) {
+            productRepository.findAllById(productIds).forEach(p -> productMap.put(p.getId(), p));
+        }
+        
+        java.util.Map<Integer, List<OrderItem>> itemsByOrderId = allOrderItems.stream()
+            .collect(java.util.stream.Collectors.groupingBy(OrderItem::getOrderId));
+
+        List<Map<String, Object>> response = subOrders.stream().map(subOrder -> {
             Order order = subOrder.getOrder();
             Map<String, Object> item = new java.util.LinkedHashMap<>();
             item.put("sub_order_id", subOrder.getSubOrderId());
@@ -58,14 +88,21 @@ public class OrderController {
             item.put("status", subOrder.getStatus());
             item.put("vendor_total", subOrder.getVendorTotal().multiply(new java.math.BigDecimal("0.9")));
             item.put("total_amount", subOrder.getVendorTotal().multiply(new java.math.BigDecimal("0.9")));
+            
             String customerName = "Unknown";
             if (order.getCustomerId() != null) {
-                com.example.nexus.model.User u = userRepository.findById(order.getCustomerId()).orElse(null);
-                if (u != null) customerName = u.getName();
+                com.example.nexus.model.User u = userMap.get(order.getCustomerId());
+                if (u != null && u.getName() != null && !u.getName().trim().isEmpty()) {
+                    customerName = u.getName();
+                } else if (u != null && u.getUsername() != null && !u.getUsername().trim().isEmpty()) {
+                    customerName = u.getUsername();
+                }
             }
 
-            List<Map<String, Object>> itemsList = orderItemRepository.findByOrderId(order.getOrderId()).stream()
-                .map(oi -> new java.util.AbstractMap.SimpleEntry<>(oi, productRepository.findById(oi.getProductId()).orElse(null)))
+            List<OrderItem> orderItemsForThisOrder = itemsByOrderId.getOrDefault(order.getOrderId(), java.util.Collections.emptyList());
+            
+            List<Map<String, Object>> itemsList = orderItemsForThisOrder.stream()
+                .map(oi -> new java.util.AbstractMap.SimpleEntry<>(oi, productMap.get(oi.getProductId())))
                 .filter(entry -> entry.getValue() != null && entry.getValue().getVendorId().equals(subOrder.getVendorId()))
                 .map(entry -> {
                     OrderItem oi = entry.getKey();
@@ -326,8 +363,8 @@ public class OrderController {
             order.setVendorId(null); // Parent order is multi-vendor
             order.setDeliveryAddress(request.getDeliveryAddress());
             order.setOrderType(orderType);
-            
-            order.setStatus("PENDING");
+            // DEMO BYPASS: Set directly to CONFIRMED instead of PENDING so it instantly reaches the assembler
+            order.setStatus("CONFIRMED");
             if ("CUSTOM_BOX".equals(orderType)) {
                 order.setOccasion(request.getOccasion());
                 order.setBoxSize(request.getBoxSize());
@@ -357,6 +394,7 @@ public class OrderController {
                 subOrder.setOrder(savedOrder);
                 subOrder.setVendorId(entry.getKey());
                 subOrder.setVendorTotal(entry.getValue());
+                // DEMO BYPASS: We keep this as PENDING_VENDOR_ACCEPTANCE so vendors can still see and accept it
                 subOrder.setStatus("PENDING_VENDOR_ACCEPTANCE");
                 subOrderRepository.save(subOrder);
             }
