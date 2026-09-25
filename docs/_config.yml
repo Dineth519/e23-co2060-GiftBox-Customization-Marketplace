@@ -1,9 +1,9 @@
 # This theme is based on https://github.com/jekyll/minima
 # Please refer above link to know the available configurations
 
-title: ""
+title: "Giftora — Personalized Gift Box Marketplace"
 remote_theme: cepdnaclk/eYY-project-theme
-description: ""
+description: "A multi-vendor platform for customizing, assembling, and tracking personalized gift boxes."
 markdown: kramdown
 
 kramdown:

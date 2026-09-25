@@ -1,6 +1,6 @@
-# Frontend test organization
+# Giftora frontend test guide
 
-Tests are grouped first by testing level and then by application role.
+The frontend suite verifies shared utilities and the Customer, Vendor, Assembler, and Administrator experiences. Tests in `src/__tests__` are grouped first by testing level and then by application role; a small number of page-focused tests are colocated with their components.
 
 ```text
 __tests__/
@@ -15,10 +15,13 @@ __tests__/
     └── customer/    React cart-provider behaviour
 ```
 
+Colocated tests currently cover assembler dashboard/profile presentation and monthly-output calculations under `src/pages/assembler`.
+
 ## Placement rules
 
 - Put pure function, validation, calculation, payload, and mocked request tests in `unit/<role>`.
 - Put tests that render React components or providers in `component/<role>`.
+- Keep a test beside its page only when it is tightly coupled to that single page; shared behaviour belongs in `src/__tests__`.
 - Name every test file `*.test.js` or `*.test.jsx` so React Scripts discovers it automatically.
 - Do not connect unit tests to the live database, Stripe, email, Cloudinary, or backend server.
 - Backend API and database integration workflows are stored separately in
@@ -49,3 +52,5 @@ Run with coverage:
 ```bash
 CI=true npm test -- --runInBand --coverage --watchAll=false
 ```
+
+All commands are run from `code/frontend`. The suite uses Jest and React Testing Library through React Scripts and must not require the live backend or third-party services.

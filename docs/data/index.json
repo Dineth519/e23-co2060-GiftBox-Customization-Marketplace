@@ -1,37 +1,28 @@
 {
     "team": [
         {
-            "name": "Team Member Name 1",
+            "name": "Karunarathna A. V. P. J. P.",
             "email": "e23167@eng.pdn.ac.lk",
             "eNumber": "E/23/167"
         },
         {
-            "name": "Team Member Name 2",
+            "name": "Sanjuna K. D.",
             "email": "e23351@eng.pdn.ac.lk",
             "eNumber": "E/23/351"
         },
         {
-            "name": "Team Member Name 3",
+            "name": "Vidanya A. P. S.",
             "email": "e23412@eng.pdn.ac.lk",
             "eNumber": "E/23/412"
         },
         {
-            "name": "Team Member Name 4",
+            "name": "Vishwaka A. G. S.",
             "email": "e23416@eng.pdn.ac.lk",
             "eNumber": "E/23/416"
         }
     ],
-    "supervisors": [
-        {
-            "name": "Dr. Supervisor 1",
-            "email": "email@eng.pdn.ac.lk"
-        },
-        {
-            "name": "Supervisor 2",
-            "email": "email@eng.pdn.ac.lk"
-        }
-    ],
-    "tags": ["Web", "Software Systems", "CO2060"],
+    "supervisors": [],
+    "tags": ["Web", "Marketplace", "Multi-vendor", "Gift Customization", "Software Systems", "CO2060"],
     "image":"../images/cover_page.jpg",
     "thumbnail":"../images/thumbnail.jpg"
 }
