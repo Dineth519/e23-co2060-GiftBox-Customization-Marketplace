@@ -105,7 +105,6 @@ The frontend is designed for Vercel, the backend for Azure App Service, and the 
 .
 ├── code/
 │   ├── backend/nexus/        Spring Boot API, migrations, and tests
-│   ├── database/             Supporting SQL data
 │   └── frontend/             React application and tests
 ├── docs/                     GitHub Pages project site and metadata
 └── README.md                 Repository overview and setup guide
@@ -135,7 +134,20 @@ cd code/backend/nexus
 ./mvnw spring-boot:run
 ```
 
-The API starts on `http://localhost:8080` by default. Flyway applies the schema migrations at startup.
+The API starts on `http://localhost:8080` by default. Database changes are managed only through the versioned Flyway migrations in `code/backend/nexus/src/main/resources/db/migration`; there is no separate manual SQL setup folder.
+
+### Database migrations
+
+The backend is the single source of truth for the database schema and seed evolution:
+
+```text
+code/backend/nexus/src/main/resources/db/migration/
+├── V1__initial_schema.sql ... V24__add_version_to_products.sql
+├── assembly/     Assembly-workflow migrations
+└── commerce/     Multi-vendor commerce migrations
+```
+
+Add future schema changes as new, versioned migrations. Do not edit an already-applied migration or maintain a second copy of the schema elsewhere in the repository.
 
 ### 3. Start the frontend
 

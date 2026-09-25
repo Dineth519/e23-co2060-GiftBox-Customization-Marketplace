@@ -137,6 +137,10 @@ Customer order
 - **Migration-driven schema evolution** keeps the database reproducible as commerce and assembly workflows change.
 - **Dedicated assembly state** records verification, issues, packing, and QA without overloading the customer order model.
 
+### Database ownership
+
+The versioned Flyway scripts under `code/backend/nexus/src/main/resources/db/migration` are the only source of truth for database schema and seed changes. The project does not require a separate manual SQL import step; the backend migration configuration manages the core, commerce, and assembly migration streams.
+
 ## Current implementation status
 
 - ✅ Authentication, email verification, refresh tokens, and role-based access
