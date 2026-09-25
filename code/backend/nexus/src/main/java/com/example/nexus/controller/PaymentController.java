@@ -29,7 +29,8 @@ public class PaymentController {
     public ResponseEntity<Map<String, String>> createPaymentIntent(@RequestBody PaymentRequest request) {
         try {
             // Amount is in cents for Stripe, so we multiply by 100
-            long amount = request.getAmount() * 100;
+            // Stripe requires a minimum charge of ~0.50 USD. We force a minimum of 200 LKR.
+            long amount = Math.max(request.getAmount(), 200) * 100;
 
             PaymentIntentCreateParams params =
                     PaymentIntentCreateParams.builder()
